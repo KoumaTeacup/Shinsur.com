@@ -3,9 +3,11 @@ var dt = require('./myfirstmodule');
 var url = require('url');
 var fs = require('fs');
 
-http.createServer(function (req, res) {
+var server = http.createServer(function (req, res) {
 	var q = url.parse(req.url, true);
-	var filename = "." + q.pathname;
+	
+	var filename = q.pathname == '/' ? './Default.html' : '.' + q.pathname;
+	
 	fs.readFile(filename, function(err, data){
 		if(err) {
 			res.writeHead(404, {'Content-Type': 'text/html'});
@@ -18,4 +20,6 @@ http.createServer(function (req, res) {
 		// 	+ "URL: " + req.url);
 		return res.end();
 	});
-}).listen(8080);
+});
+
+server.listen(80);
