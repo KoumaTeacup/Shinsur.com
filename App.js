@@ -1,9 +1,15 @@
-var http = require('http');
+var https = require('https');
 var dt = require('./myfirstmodule');
 var url = require('url');
 var fs = require('fs');
 
-var server = http.createServer(function (req, res) {
+var options = {
+	key: fs.readFileSync('/etc/letsencrypt/live/shinsur.com/privkey.pem'),
+	cert: fs.readFileSync('/etc/letsencrypt/live/shinsur.com/cert.pem'),
+	ca: fs.readFileSync('/etc/letsencrypt/live/shinsur.com/chain.pem')
+}
+
+var server = https.createServer(options, (req, res) => {
 	var q = url.parse(req.url, true);
 	
 	var filename = q.pathname == '/' ? './Default.html' : '.' + q.pathname;
@@ -22,4 +28,4 @@ var server = http.createServer(function (req, res) {
 	});
 });
 
-server.listen(80);
+server.listen(443);
