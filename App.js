@@ -25,6 +25,7 @@ app.get('/', (req, res) => {
 	if(req.connection.remoteAddress != '::1' && !req.secure)
 	{
 		res.redirect('https://' + req.headers.host + req.url);
+		return res.end;
 	}
 	const q = url.parse(req.url, true);
 	
