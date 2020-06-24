@@ -1,18 +1,32 @@
-var https = require('https');
-var dt = require('./myfirstmodule');
-var url = require('url');
-var fs = require('fs');
+const http = require('http');
+const https = require('https');
+const express = require('express');
+const url = require('url');
+const fs = require('fs');
 
-var options = {
-	key: fs.readFileSync('/etc/letsencrypt/live/shinsur.com/privkey.pem'),
-	cert: fs.readFileSync('/etc/letsencrypt/live/shinsur.com/cert.pem'),
-	ca: fs.readFileSync('/etc/letsencrypt/live/shinsur.com/chain.pem')
+const app = express();
+
+try{
+	var keyFile = fs.readFileSync('/etc/letsencrypt/live/shinsur.com/privkey.pem');
+	var certFile = fs.readFileSync('/etc/letsencrypt/live/shinsur.com/cert.pem');
+	var caFile = fs.readFileSync('/etc/letsencrypt/live/shinsur.com/chain.pem');
+}catch (err){
+	console.log(err);
 }
 
-var server = https.createServer(options, (req, res) => {
-	var q = url.parse(req.url, true);
+const credentials  = {
+	key: keyFile,
+	cert: certFile,
+	ca: caFile
+	// key: fs.readFileSync('/etc/letsencrypt/live/shinsur.com/privkey.pem'),
+	// cert: fs.readFileSync('/etc/letsencrypt/live/shinsur.com/cert.pem'),
+	// ca: fs.readFileSync('/etc/letsencrypt/live/shinsur.com/chain.pem')
+}
+
+app.get('/', (req, res) => {
+	const q = url.parse(req.url, true);
 	
-	var filename = q.pathname == '/' ? './Default.html' : '.' + q.pathname;
+	const filename = q.pathname == '/' ? './Default.html' : '.' + q.pathname;
 	
 	fs.readFile(filename, function(err, data){
 		if(err) {
@@ -26,6 +40,11 @@ var server = https.createServer(options, (req, res) => {
 		// 	+ "URL: " + req.url);
 		return res.end();
 	});
-});
+})
 
-server.listen(443);
+const httpServer = http.createServer(app);
+const httpsServer = https.createServer(credentials, app);
+
+app.use(express.static(__dirname + '/public'));
+httpServer.listen(80);
+httpsServer.listen(443);
