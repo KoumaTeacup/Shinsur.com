@@ -5,6 +5,7 @@ const url = require('url');
 const fs = require('fs');
 
 const app = express();
+app.use(express.static(__dirname + '/public'));
 
 try{
 	var keyFile = fs.readFileSync('/etc/letsencrypt/live/shinsur.com/privkey.pem');
@@ -18,12 +19,13 @@ const credentials  = {
 	key: keyFile,
 	cert: certFile,
 	ca: caFile
-	// key: fs.readFileSync('/etc/letsencrypt/live/shinsur.com/privkey.pem'),
-	// cert: fs.readFileSync('/etc/letsencrypt/live/shinsur.com/cert.pem'),
-	// ca: fs.readFileSync('/etc/letsencrypt/live/shinsur.com/chain.pem')
 }
 
 app.get('/', (req, res) => {
+	if(req.connection.remoteAddress != '::1' && !req.secure)
+	{
+		res.redirect('https://' + req.headers.host + req.url);
+	}
 	const q = url.parse(req.url, true);
 	
 	const filename = q.pathname == '/' ? './Default.html' : '.' + q.pathname;
@@ -45,6 +47,13 @@ app.get('/', (req, res) => {
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(credentials, app);
 
-app.use(express.static(__dirname + '/public'));
 httpServer.listen(80);
 httpsServer.listen(443);
+
+
+
+// Handle Ctrl+C
+process.on('SIGINT', signal => {
+  console.log(`Process ${process.pid} has been interrupted`)
+  process.exit(0)
+})
