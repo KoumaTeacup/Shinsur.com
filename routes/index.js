@@ -7,11 +7,8 @@ router.get('/', function(req, res, next) {
 	res.sendFile(app.get('views') + '/Default.html');
 });
 
-// router.get('/views/:filename.html', function(req, res){
-// 		console.log('bbbbb');
-// 	res.sendFile(path.join(__dirname + 'views/Default.html'), function (err){
-// 		res.end(err);
-// 	});
-// });
+router.get('/:filename.html', function(req, res){
+	res.sendFile(app.get('views') + '/' + req.params.filename + '.html');
+});
 
 module.exports = router;
