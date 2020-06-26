@@ -1,60 +1,41 @@
-const http = require('http');
-const https = require('https');
-const express = require('express');
-const url = require('url');
-const fs = require('fs');
+var createError = require('http-errors');
+var express = require('express');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
 
-const app = express();
-app.use(express.static(__dirname + '/public'));
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
 
-try{
-	var keyFile = fs.readFileSync('/etc/letsencrypt/live/shinsur.com/privkey.pem');
-	var certFile = fs.readFileSync('/etc/letsencrypt/live/shinsur.com/cert.pem');
-	var caFile = fs.readFileSync('/etc/letsencrypt/live/shinsur.com/chain.pem');
-}catch (err){
-	console.log(err);
-}
+var app = express();
 
-const credentials  = {
-	key: keyFile,
-	cert: certFile,
-	ca: caFile
-}
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
 
-app.get('/', (req, res) => {
-	if(req.connection.remoteAddress != '::1' && !req.secure)
-	{
-		res.redirect('https://' + req.headers.host + req.url);
-		return res.end;
-	}
-	const q = url.parse(req.url, true);
-	
-	const filename = q.pathname == '/' ? './Default.html' : '.' + q.pathname;
-	
-	fs.readFile(filename, function(err, data){
-		if(err) {
-			res.writeHead(404, {'Content-Type': 'text/html'});
-			return res.end("404 Not Found");
-		}
-		res.writeHead(200, {'Content-Type': 'text/html'});
-		res.write(data);
-		// res.write("Hello MB!\n \
-		// 	The date and time are currently: " + dt.myDateTime()
-		// 	+ "URL: " + req.url);
-		return res.end();
-	});
-})
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
-const httpServer = http.createServer(app);
-const httpsServer = https.createServer(credentials, app);
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
 
-httpServer.listen(80);
-httpsServer.listen(443);
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
+});
 
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
 
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
 
-// Handle Ctrl+C
-process.on('SIGINT', signal => {
-  console.log(`Process ${process.pid} has been interrupted`)
-  process.exit(0)
-})
+module.exports = app;
