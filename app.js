@@ -17,7 +17,17 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public/images')));
+
+// Redirect to force https
+app.use((req, res, next)=>{
+	if(process.env.ENV === 'prod' && !req.secure){
+		res.redirect('https://' + req.headers.host + req.url);
+		res.end();
+	}else{
+		next();
+	}
+});
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
