@@ -1,5 +1,5 @@
 {
   "verbose": false,
   "ignore": [ "public/shaders/*", "public/javascripts/bundle.js"],
-  "ext": "vs,fs,js"
+  "ext": "vs,fs,js,html"
 }
