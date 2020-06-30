@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
-    "devstart": "nodemon ./bin/www",
+    "start": "node ./bin/init & browserify ./public/javascripts/webgl.js -o ./public/javascripts/bundle.js & node ./bin/www",
+    "devstart": "node ./bin/init & browserify ./public/javascripts/webgl.js -o ./public/javascripts/bundle.js & nodemon ./bin/www",
     "debugstart": "DEBUG=express-locallibrary-tutorial:* npm run devstart"
   },
   "dependencies": {

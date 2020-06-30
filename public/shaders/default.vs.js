@@ -1,4 +1,4 @@
-var shaderSrc=`#version 300 es
+var shaderSrc = `#version 300 es
  
 // an attribute is an input (in) to a vertex shader.
 // It will receive data from a buffer
@@ -10,5 +10,4 @@ void main() {
   // gl_Position is a special variable a vertex shader
   // is responsible for setting
   gl_Position = a_position;
-}`;
-module.exports=shaderSrc;
+}`;module.exports=shaderSrc;

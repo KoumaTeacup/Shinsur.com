@@ -109,12 +109,10 @@ out vec4 outColor;
  
 void main() {
   // Just set the output to a constant reddish-purple
-  outColor = vec4(1, 0, 0.5, 1);
-}
-`;
-module.exports=shaderSrc;
+  outColor = vec4(0.0, 1.0, 0.5, 1);
+}`;module.exports=shaderSrc;
 },{}],3:[function(require,module,exports){
-var shaderSrc=`#version 300 es
+var shaderSrc = `#version 300 es
  
 // an attribute is an input (in) to a vertex shader.
 // It will receive data from a buffer
@@ -126,6 +124,5 @@ void main() {
   // gl_Position is a special variable a vertex shader
   // is responsible for setting
   gl_Position = a_position;
-}`;
-module.exports=shaderSrc;
+}`;module.exports=shaderSrc;
 },{}]},{},[1]);
