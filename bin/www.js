@@ -9,7 +9,6 @@ var debug = require('debug')('shinsur.com:server');
 var http = require('http');
 var https = require('https');
 var fs = require('fs');
-var browserify = require('browserify');
 
 var server,port;
 if(process.env.ENV == 'prod'){
