@@ -1,5 +1,10 @@
+import {Shader} from './shader.js';
+import {default_fs, default_vs} from './shsrc.js';
+var sh = new Shader();
+sh.compile();
 var canvas = document.querySelector("#c");
-const { mat4 } = require("gl-matrix");
+
+import * as mat4 from './gl-matrix/mat4.js';
 
 var gl = canvas.getContext("webgl2");
 if (!gl) {
@@ -10,8 +15,9 @@ console.log("running webgl2");
 // compose shader source
 // var vertShaderSource = document.getElementById('default.vs').text;
 
-var vertexShaderSource = require('../shaders/default.vs.js');
-var fragmentShaderSource = require('../shaders/default.fs.js');
+var vertexShaderSource = default_vs;
+var fragmentShaderSource = default_fs;
+console.log(default_fs);
 
 // create shader method
 function createShader(gl, type, source) {
