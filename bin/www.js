@@ -10,11 +10,11 @@ var http = require('http');
 var https = require('https');
 var fs = require('fs');
 
-var server,port;
-if(process.env.ENV == 'prod'){
+var server, port;
+if (process.env.ENV == 'prod') {
   // SSL
 
-  const credentials  = {
+  const credentials = {
     key: fs.readFileSync('/etc/letsencrypt/live/shinsur.com/privkey.pem'),
     cert: fs.readFileSync('/etc/letsencrypt/live/shinsur.com/cert.pem'),
     ca: fs.readFileSync('/etc/letsencrypt/live/shinsur.com/chain.pem')
@@ -26,7 +26,7 @@ if(process.env.ENV == 'prod'){
   //Setup http server only to redirect
   httpServer = http.createServer(app)
   httpServer.listen('80');
-}else if(process.env.ENV == 'dev'){
+} else if (process.env.ENV == 'dev') {
   port = normalizePort(process.env.PORT || '80');
   server = http.createServer(app);
 }
