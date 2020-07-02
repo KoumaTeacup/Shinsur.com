@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
+    "start": "node ./bin/init & node ./bin/www",
     "devstart": "node ./bin/init & nodemon ./bin/www",
     "debugstart": "DEBUG=express-locallibrary-tutorial:* npm run devstart"
   },
