@@ -1,9 +1,8 @@
 {
 	"append": true,
-	"watch": true,
 	"script": "www.js",
 	"command": "npm run foreverstart",
-	"number": 300,
+	"number": 100,
 	"sourceDir": "/usr/local/bin/shinsur/bin",
 	"logFile": "/usr/local/bin/shinsur/logs/forever.log",
 	"outFile": "/usr/local/bin/shinsur/logs/out.log",
