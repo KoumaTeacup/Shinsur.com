@@ -103,5 +103,5 @@ dist
 # TernJS port file
 .tern-port
 
-# generated shader file
+# generated shader files
 shsrc.js
