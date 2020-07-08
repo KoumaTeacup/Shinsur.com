@@ -58,6 +58,11 @@ class Program {
     return gl.getAttribLocation(this.program, _descName);
   }
 
+  bindTexture2D(_descName = '', value) {
+    var uniformLoc = gl.getUniformLocation(this.program, _descName);
+    gl.uniform1i(uniformLoc, value);
+  }
+
   bindUniform3fv(_descName = '', value) {
     var uniformLoc = gl.getUniformLocation(this.program, _descName);
     gl.uniform3fv(uniformLoc, value);

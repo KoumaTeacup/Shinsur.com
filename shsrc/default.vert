@@ -11,6 +11,7 @@ uniform mat4 u_matProj;
 uniform vec2 u_offset;
 out vec4 WorldPos;
 out vec3 Normal;
+out vec2 UV;
  
 // all shaders have a main function
 void main() {
@@ -20,4 +21,5 @@ void main() {
   WorldPos = u_matModel * a_position;
   gl_Position = u_matProj * u_matView * WorldPos;//  * u_matModel * u_matView;// * u_matProj; //vec4(a_position.xy + u_offset.xy, 0.0f, 1.0f);
   Normal = (u_matModel * a_normal).xyz;
+  UV = a_uv;
 }

@@ -1,12 +1,15 @@
 import { Program } from './shader.js';
 import * as mat4 from './gl-matrix/mat4.js';
 import { gl } from './context.js';
+import { Texture2D } from './texture.js';
 
 // actually create program
 var defaultProg = new Program('default');
 
 // attribute
 var positionAttributeLocation = gl.getAttribLocation(defaultProg.program, "a_position");
+
+var tex = new Texture2D('./Tifa.jpg');
 
 // Use program to set uniform
 gl.useProgram(defaultProg.program);
@@ -330,8 +333,10 @@ function draw(timestamp) {
   // bind ibo
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
 
+  tex.bind();
   // update uniform
   defaultProg.use();
+  defaultProg.bindTexture2D('Sampler', 0);
   defaultProg.bindUniform3fv('LightPos', [3.0, 3.0, 3.0]);
   defaultProg.bindUniformMatrix4fv('u_matModel', mat4.fromRotation([], timestamp / 1000, [2.0, 3.0, 1.0]));
   defaultProg.bindUniformMatrix4fv('u_matView', mat4.lookAt(
