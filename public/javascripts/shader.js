@@ -2,12 +2,11 @@ import { gl } from './context.js';
 import { srcArray } from './shsrc.js';
 
 class Shader {
-  constructor(_type = gl.VERTEX_SHADER, _src = '') {
-    this.type = _type;
-    this.src = _src
+  shader;
 
-    this.shader = gl.createShader(this.type);
-    gl.shaderSource(this.shader, this.src);
+  constructor(_type = gl.VERTEX_SHADER, _src = '') {
+    this.shader = gl.createShader(_type);
+    gl.shaderSource(this.shader, _src);
     gl.compileShader(this.shader);
     if (!gl.getShaderParameter(this.shader, gl.COMPILE_STATUS)) {
       console.log(gl.getShaderInfoLog(this.shader));
@@ -17,10 +16,17 @@ class Shader {
 }
 
 class Program {
+  name;
+  vShader;
+  fShader;
+  program;
+
   constructor(_descName = '') {
-    this.descName = _descName;
+    this.name = _descName;
+
+    // create shaders
     for (var srcObj of srcArray) {
-      if (srcObj.descName === this.descName) {
+      if (srcObj.descName === this.name) {
         switch (srcObj.type) {
           case 'vert':
             this.vShader = new Shader(gl.VERTEX_SHADER, srcObj.data);
@@ -35,19 +41,24 @@ class Program {
       }
     }
 
-    // create program method
+    // create program
     this.program = gl.createProgram();
     gl.attachShader(this.program, this.vShader.shader);
     gl.attachShader(this.program, this.fShader.shader);
+
+    // set attribute location
+    gl.bindAttribLocation(this.program, 0, 'a_position');
+    gl.bindAttribLocation(this.program, 1, 'a_tangent');
+    gl.bindAttribLocation(this.program, 2, 'a_normal');
+    gl.bindAttribLocation(this.program, 3, 'a_uv');
+
+    // link program
     gl.linkProgram(this.program);
     if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
       console.log(gl.getProgramInfoLog(this.program));
       gl.deleteProgram(this.program);
     }
-  }
 
-  link() {
-    gl.linkProgram(this.program);;
   }
 
   use() {

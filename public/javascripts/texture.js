@@ -1,9 +1,13 @@
 ﻿import { gl } from './context.js';
 
 class Texture2D {
+  name;
   texture;
   image = new Image();
+  initialized = false;
+
   constructor(file) {
+    this.name = file;
     this.texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
     gl.texImage2D(
@@ -25,12 +29,33 @@ class Texture2D {
 
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+      this.initialized = true;
     }
   }
 
-  bind(slot) {
+  bind(uniform, slot) {
+    if (!this.initialized) {
+      console.log('[Log] Texture binding skipped, texture \'' + this.name + '\' not initialized');
+      return;
+    }
+
+    // Activate slot
     gl.activeTexture(slot);
+
+    // Bind slot
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
+
+    // Get current program
+    var currShader = gl.getParameter(gl.CURRENT_PROGRAM);
+    if (!currShader) {
+      console.log('[Warning] Texture binding failed, no bound program found');
+      return;
+    }
+
+    // Set uniform
+    var uniformLoc = gl.getUniformLocation(currShader, uniform);
+    gl.uniform1i(uniformLoc, slot - gl.TEXTURE0);
   }
 };
 
