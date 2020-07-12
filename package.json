@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node ./bin/www",
     "devstart": "nodemon --exec \"node ./bin/init && node ./bin/www\"",
-    "debugstart": "DEBUG=express-locallibrary-tutorial:* npm run devstart"
+    "debugstart": "DEBUG=express-locallibrary-tutorial:* npm run devstart",
+    "foreverstart": "node ./bin/init && node ./bin/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
