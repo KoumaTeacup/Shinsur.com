@@ -2,7 +2,6 @@
 import * as vec2 from './gl-matrix/vec2.js';
 import * as vec3 from './gl-matrix/vec3.js';
 import * as mat4 from './gl-matrix/mat4.js';
-import * as quat from './gl-matrix/quat.js';
 import * as glMatrix from './gl-matrix/common.js';
 
 class FocusCamera {
@@ -16,6 +15,7 @@ class FocusCamera {
   near = 0.001;
   far = 1000;
   height = 0.0;
+  aspect = gl.canvas.width / gl.canvas.height;
 
   // camera contorl
   isLMBDown = false;
@@ -53,6 +53,7 @@ class FocusCamera {
     });
 
     canvas.addEventListener('wheel', (event) => {
+      event.preventDefault();
       this.distance += event.deltaY/100;
       this.distance = Math.min(100, Math.max(0, this.distance));
     });
@@ -98,7 +99,7 @@ class FocusCamera {
     var matPorj = mat4.perspective(
       [],
       this.fov,
-      gl.canvas.width / gl.canvas.height,
+      this.aspect,
       this.near,
       this.far);
 

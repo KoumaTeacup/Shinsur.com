@@ -16,25 +16,25 @@ class Material {
   }
 
   bind() {
+    // Get current program
+    var currShader = gl.getParameter(gl.CURRENT_PROGRAM);
+    if (!currShader) {
+      console.log('[Warning] Texture binding failed, no bound program found');
+      return;
+    }
+
+    var uniformLoc;
+
+    uniformLoc = gl.getUniformLocation(currShader, 'UseRawColor');
+    gl.uniform1i(uniformLoc, this.useRawColor);
+
     if (this.useRawColor) {
-      // Get current program
-      var currShader = gl.getParameter(gl.CURRENT_PROGRAM);
-      if (!currShader) {
-        console.log('[Warning] Texture binding failed, no bound program found');
-        return;
-      }
-
-      var uniformLoc;
-      uniformLoc = gl.getUniformLocation(currShader, 'UseRawColor');
-      gl.uniform1i(uniformLoc, this.useRawColor);
-
       uniformLoc = gl.getUniformLocation(currShader, 'RawColor');
-      gl.uniform1i(uniformLoc, this.RawColor);
-
+      gl.uniform4fv(uniformLoc, this.RawColor);
     } else {
-      if (this.diffuse) this.diffuse.bind('DiffuseSampler', gl.TEXTURE0);
-      if (this.specular) this.diffuse.bind('SpecularSampler', gl.TEXTURE1);
-      if (this.normalMap) this.diffuse.bind('NormalSampler', gl.TEXTURE2);
+      if (this.diffuse) this.diffuse.bind('DiffuseSampler', 0);
+      if (this.specular) this.diffuse.bind('SpecularSampler', 1);
+      if (this.normalMap) this.diffuse.bind('NormalSampler', 2);
     }
   }
 }

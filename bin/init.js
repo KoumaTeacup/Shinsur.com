@@ -11,8 +11,6 @@ list.forEach(shaderFile => {
     shaderFile.substring(0, ext.index)
     var rawFile = fs.readFileSync(__dirname + '/../shsrc/' + shaderFile, 'utf8');
     rawFile = (rawFile.replace(/\/\/.*$/gm, '')).replace(/\s\s/gm, '');
-    // console.log(rawFile);
-    // console.log(rawFile.replace(/\s\s/gm, ''));
     output += '{descName: \'' + shaderFile.replace(/\..*$/, '') + '\', type: \'' + ext[1] + '\', data: `' + rawFile + '`}, ';
     console.log('Shader file generate successfully: ' + shaderFile);
   };

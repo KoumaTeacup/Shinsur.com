@@ -7,20 +7,20 @@ class Texture2D {
   initialized = false;
 
   constructor(file) {
-    this.name = file;
+    if (file) {
+      this.name = file;
+    } else {
+      console.log('[Warning] Texture must be initialized with a file name!');
+      return;
+    }
+
     this.texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0, // A GLint specifying the level of detail
-      gl.RGBA, // internal format
-      1, // width
-      1, // height
-      0, // A GLint specifying the width of the border. Must be 0.
-      gl.RGBA, // upload format
-      gl.UNSIGNED_BYTE, // upload type
-      new Uint8Array([57, 197, 187, 255]));
-    
+
+    // use miku blue as the default color before the texture is loaded
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([57, 197, 187, 255]));
+
+    // upload external texture
     this.image.src = file;
     this.image.onload = () => {
       gl.bindTexture(gl.TEXTURE_2D, this.texture);
@@ -41,7 +41,7 @@ class Texture2D {
     }
 
     // Activate slot
-    gl.activeTexture(slot);
+    gl.activeTexture(gl.TEXTURE0 + slot);
 
     // Bind slot
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
@@ -55,7 +55,7 @@ class Texture2D {
 
     // Set uniform
     var uniformLoc = gl.getUniformLocation(currShader, uniform);
-    gl.uniform1i(uniformLoc, slot - gl.TEXTURE0);
+    gl.uniform1i(uniformLoc, slot);
   }
 };
 

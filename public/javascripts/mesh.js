@@ -286,7 +286,7 @@ class Mesh {
 
   draw() {
     if (!this.initialized) {
-      console.log('[Log] drawing skipped, mesh: \"' + this.filename + '\" is not initialized');
+      console.log('[Log] drawing skipped, mesh: \"' + this.name + '\" is not initialized');
       return;
     }
 
@@ -312,4 +312,75 @@ class Mesh {
   }
 }
 
-export { Mesh };
+// a simple plane mesh to display framebuffer
+class RenderPlane{
+  posX = 0;
+  posY = 0;
+  width = gl.canvas.width;
+  height = gl.canvas.width;
+  vbo;
+  ibo;
+  // gl doesn't allow single attribute less than 4 bytes alignment
+  // x-f4, y-f4, z-f4, tu-us2, tv-us2 = 16 bytes;
+  vertexSize = 16;
+
+  constructor(_width, _height) {
+    if (_width && _height) {
+      this.width = _width; this.height = _height;
+    }
+
+    var left = this.posX / gl.canvas.width * 2.0 - 1.0;
+    var right = (this.posX + this.width) / gl.canvas.width * 2.0 - 1.0;
+    var bottom = this.posY / gl.canvas.height * 2.0 - 1.0;
+    var top = (this.posY + this.height) / gl.canvas.height * 2.0 - 1.0;
+
+    var outputBuffer = new ArrayBuffer(4 * this.vertexSize);
+    var dv = new DataView(outputBuffer);
+    dv.setFloat32(0, left, true); dv.setFloat32(4, bottom, true); dv.setFloat32(8, 0.0, true);
+    dv.setUint16(12, 0, true); dv.setUint16(14, 0, true);
+    dv.setFloat32(16, right, true); dv.setFloat32(20, bottom, true); dv.setFloat32(24, 0.0, true);
+    dv.setUint16(28, 0xFFFF, true); dv.setUint16(30, 0, true);
+    dv.setFloat32(32, left, true); dv.setFloat32(36, top, true); dv.setFloat32(40, 0.0, true);
+    dv.setUint16(44, 0, true); dv.setUint16(46, 0xFFFF, true);
+    dv.setFloat32(48, right, true); dv.setFloat32(52, top, true); dv.setFloat32(56, 0.0, true);
+    dv.setUint16(60, 0xFFFF, true); dv.setUint16(62, 0xFFFF, true);
+    this.vbo = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+    gl.bufferData(gl.ARRAY_BUFFER, outputBuffer, gl.STATIC_DRAW);
+
+    // position
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 3, gl.FLOAT, false, this.vertexSize, 0);
+
+    // texture UV
+    gl.enableVertexAttribArray(3);
+    gl.vertexAttribPointer(3, 2, gl.UNSIGNED_SHORT, true, this.vertexSize, 12);
+
+    var indexBuffer = [0, 1, 2, 3];
+    
+    this.ibo = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array(indexBuffer), gl.STATIC_DRAW);
+  }
+
+  bind(){
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo);
+
+    // position
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 3, gl.FLOAT, false, this.vertexSize, 0);
+
+    // texture UV
+    gl.enableVertexAttribArray(3);
+    gl.vertexAttribPointer(3, 2, gl.UNSIGNED_SHORT, true, this.vertexSize, 12);
+  }
+
+  draw(){
+    this.bind();
+
+    gl.drawElements(gl.TRIANGLE_STRIP, 4, gl.UNSIGNED_SHORT, 0);
+  }
+}
+
+export { Mesh, RenderPlane };

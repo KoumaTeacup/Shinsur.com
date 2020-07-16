@@ -1,5 +1,5 @@
 {
   "verbose": false,
   "ignore": ["public/javascripts/shsrc.js"],
-  "ext": "vert,frag,js,html"
+  "ext": "vert,frag,js,html,css"
 }

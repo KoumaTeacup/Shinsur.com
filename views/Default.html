@@ -2,22 +2,33 @@
 <html>
 
 <head>
-	<title>Shinsur.com</title>
+    <title>Shinsur.com</title>
+    <link rel="stylesheet" type="text/css" href='style.css'>
 </head>
 
+
 <body>
-	<div>
-		<canvas id="c" width="1280" height="720"/>
-		<a href="/summer.html">I love summer</a>
-	</div>
-	<div>
-		<p>tasks:</p>
-		<p><s>auto convert shader to js</s></p>
-		<p><s>auto run with nodemon</s></p>
-		<p><s>webgl animation</s></p>
-		<p>render a solid box and wireframe box</p>
-		<p>render with MVP</p>
-	</div>
+    <div class="canvasContainer">
+        <div class="canvasDiv">
+            <canvas id="c" width="1280" height="720" />
+        </div>
+        <div class="debugInfoDiv">
+            <p id="fps">0</p>
+            <button id="debugFramebufferToggleButton" type="button">Toggle Debug Screen</button><br>
+            <button id="forwardShadingToggleButton" type="button">Switch to Forward Shading</button>
+        </div>
+    </div>
+
+    <div>
+        <a href="/summer.html">I love summer</a>
+    </div>
+
+    <address>
+        Developed by <a href="mailto:shingleex@gmail.com">Shin Chen</a>.<br>
+        <a href="https://www.linkedin.com/in/koumakan/">Linkedin</a><br>
+        <a href="https://github.com/KoumaTeacup/Shinsur.com">Git of this page</a><br>
+    </address>
+    <script type="module" src='webgl.js'></script>
 </body>
-	<script type="module" src='webgl.js'></script>
+
 </html>
