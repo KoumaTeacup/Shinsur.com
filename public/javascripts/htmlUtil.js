@@ -3,12 +3,15 @@
   useForwardShading = true;
 
   constructor() {
-    document.getElementById("debugFramebufferToggleButton").onclick = () => {
-      this.showDebugView = !this.showDebugView;
+    document.getElementById("debugFramebufferToggleButton").onclick = (e) => {
+      console.log(e.target.id);
+      if (e.target.id === 'debugFramebufferToggleButton') {
+        this.showDebugView = !this.showDebugView;
+      }
     }
 
-    document.getElementById("forwardShadingToggleButton").onclick = () => {
-      this.useForwardShading = !this.useForwardShading;
+    document.getElementById("shadingModeCheckBox").onclick = (e) => {
+      this.useForwardShading = !e.target.checked;
     }
   }
 }

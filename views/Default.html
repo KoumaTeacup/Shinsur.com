@@ -4,31 +4,57 @@
 <head>
     <title>Shinsur.com</title>
     <link rel="stylesheet" type="text/css" href='style.css'>
+    <script type="module" src='webgl.js'></script>
 </head>
-
 
 <body>
     <div class="canvasContainer">
         <div class="canvasDiv">
             <canvas id="c" width="1280" height="720" />
         </div>
-        <div class="debugInfoDiv">
-            <p id="fps">0</p>
-            <button id="debugFramebufferToggleButton" type="button">Toggle Debug Screen</button><br>
-            <button id="forwardShadingToggleButton" type="button">Switch to Forward Shading</button>
+        <div class="debugInfoContainer">
+            <div class="debugInfoDiv">
+                <p class="styleText" id="fps">0</p><br>
+            </div>
+            <div class="debugInfoDiv">
+                <p class="styleText">Toggle Debug View</p><br>
+                <p class="styleText">Off</p>
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider round"></span>
+                </label>
+                <p class="styleText">On</p><br>
+                <span class="styleText" id="debugFramebufferToggleButton">
+                    Buffer:
+                    <select class="styleText" name="DebugViewType" id="debugViewOptions">
+                        <option value="WorldPos">World Position</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Diffuse">Diffuse</option>
+                        <option value="Shadow">Shadow</option>
+                    </select>
+                </span>
+            </div>
+            <div class="debugInfoDiv">
+                <p class="styleText">Shading Mode</p><br />
+                <p class="styleText">Forward</p>
+                <label class="switch">
+                    <input id="shadingModeCheckBox" type="checkbox">
+                    <span class="slider round"></span>
+                </label>
+                <p class="styleText">Deferred</p>
+            </div>
         </div>
     </div>
 
-    <div>
-        <a href="/summer.html">I love summer</a>
-    </div>
+        <div>
+            <a href="/summer.html">I love summer</a>
+        </div>
 
-    <address>
-        Developed by <a href="mailto:shingleex@gmail.com">Shin Chen</a>.<br>
-        <a href="https://www.linkedin.com/in/koumakan/">Linkedin</a><br>
-        <a href="https://github.com/KoumaTeacup/Shinsur.com">Git of this page</a><br>
-    </address>
-    <script type="module" src='webgl.js'></script>
+        <address>
+            Developed by <a href="mailto:shingleex@gmail.com">Shin Chen</a>.<br>
+            <a href="https://www.linkedin.com/in/koumakan/">Linkedin</a><br>
+            <a href="https://github.com/KoumaTeacup/Shinsur.com">Git of this page</a><br>
+        </address>
 </body>
 
 </html>
