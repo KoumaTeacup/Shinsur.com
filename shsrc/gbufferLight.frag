@@ -21,5 +21,5 @@ void main() {
 	vec2 TexCoord = texture(TexCoordSampler, GBufferUV.st).rg;
 	vec3 L = normalize(vec3(LightPos - WorldPos));
 	vec3 Light = (vec3(max(dot(Normal, L),0.0f)) + vec3(0.2,0.2,0.2));
-	OutColor  = vec4(WorldPos, 1.0);
+	OutColor = vec4(Diffuse * Light, 1.0);
 }

@@ -20,7 +20,7 @@ constructor() {
     gl.enable(gl.CULL_FACE); // use back face culling for forward shading
     gl.enable(gl.DEPTH_TEST); // use depth test
 
-    gl.clearColor(0.22, 0.77, 0.73, 1); // use miku blue for forward shading
+    gl.clearColor(0.22, 0.77, 0.73, 1.0); // use miku blue for forward shading
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   }
 
@@ -37,7 +37,7 @@ constructor() {
     gl.disable(gl.CULL_FACE); // we don't need face culling
     gl.disable(gl.DEPTH_TEST); // we don't need depth testing for deferred shading
 
-    gl.clearColor(0, 0, 0, 1);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   }
 

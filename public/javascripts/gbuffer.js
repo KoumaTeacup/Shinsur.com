@@ -24,7 +24,7 @@ class GBuffer {
       // create texture
       var newTexture = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, newTexture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width, this.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, this.width, this.height, 0, gl.RGBA, gl.FLOAT, null);
 
       // no mip & clamp to edge
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST); // gl.NEAREST prevent interpolation

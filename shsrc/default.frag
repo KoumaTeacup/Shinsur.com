@@ -21,5 +21,5 @@ void main() {
 	float Dis = length(vec3(LightPos - WorldPos));
 	vec3 Diffuse = (UseRawColor ? RawColor : texture(DiffuseSampler, UV.st)).rgb;
 	vec3 Light = (vec3(max(dot(Normal, L),0.0f)) + vec3(0.2,0.2,0.2));
-	OutColor  = vec4(WorldPos/10.0, 1.0);
+	OutColor = vec4(Diffuse * Light, 1.0);
 }

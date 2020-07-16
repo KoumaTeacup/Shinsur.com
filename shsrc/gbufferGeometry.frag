@@ -19,7 +19,7 @@ layout (location = 2) out vec3 NormalOut;
 layout (location = 3) out vec2 TexCoordOut;
  
 void main() {
-	WorldPosOut = (1,0,0);
+	WorldPosOut = WorldPos;
 	DiffuseOut = (UseRawColor ? RawColor : texture(DiffuseSampler, UV.st)).rgb;
 	NormalOut = Normal;
 	TexCoordOut = UV;
