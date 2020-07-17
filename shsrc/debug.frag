@@ -4,11 +4,13 @@
 // to pick one. highp is a good default. It means "high precision"
 precision highp float;
  
-in vec2 UV;
+uniform ivec2 DrawSize;
 uniform sampler2D FramebufferSampler;
-out vec4 outColor;
+out vec4 OutColor;
  
 void main() {
-//	outColor = vec4(1.0,0.0, 0.0, 1.0);
-	outColor = texture(FramebufferSampler, UV.xy);
+	vec2 GBufferUV = gl_FragCoord.xy / vec2(DrawSize);
+	vec3 Color = texture(FramebufferSampler, GBufferUV.xy).rgb;
+	OutColor = vec4(GBufferUV,0.0, 1.0);
+	OutColor = vec4(texture(FramebufferSampler, GBufferUV.xy).rgb, 1.0);
 }

@@ -8,7 +8,7 @@ class Material {
   diffuse;
   specular;
   normalMap;
-  rougeness;
+  rougeness = 0.4;
 
 
   constructor(_name) {
@@ -28,13 +28,16 @@ class Material {
     uniformLoc = gl.getUniformLocation(currShader, 'UseRawColor');
     gl.uniform1i(uniformLoc, this.useRawColor);
 
+    uniformLoc = gl.getUniformLocation(currShader, 'Roughness');
+    gl.uniform1f(uniformLoc, this.rougeness);
+
     if (this.useRawColor) {
       uniformLoc = gl.getUniformLocation(currShader, 'RawColor');
       gl.uniform4fv(uniformLoc, this.RawColor);
     } else {
       if (this.diffuse) this.diffuse.bind('DiffuseSampler', 0);
-      if (this.specular) this.diffuse.bind('SpecularSampler', 1);
-      if (this.normalMap) this.diffuse.bind('NormalSampler', 2);
+      if (this.specular) this.specular.bind('SpecularSampler', 1);
+      if (this.normalMap) this.normalMap.bind('NormalSampler', 2);
     }
   }
 }

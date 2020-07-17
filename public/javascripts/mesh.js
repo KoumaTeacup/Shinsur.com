@@ -301,7 +301,7 @@ class Mesh {
     var matModel = mat4.fromRotationTranslationScale([], quat.fromEuler([], this.rotation[0], this.rotation[1], this.rotation[2]), this.translate, this.scale);
 
     // Set uniform
-    var uniformLoc = gl.getUniformLocation(currShader, 'u_matModel');
+    var uniformLoc = gl.getUniformLocation(currShader, 'MatModel');
     gl.uniformMatrix4fv(uniformLoc, false, matModel);
 
     // draw all meshes
@@ -317,12 +317,12 @@ class RenderPlane{
   posX = 0;
   posY = 0;
   width = gl.canvas.width;
-  height = gl.canvas.width;
+  height = gl.canvas.height;
   vbo;
   ibo;
   // gl doesn't allow single attribute less than 4 bytes alignment
-  // x-f4, y-f4, z-f4, tu-us2, tv-us2 = 16 bytes;
-  vertexSize = 16;
+  // x-f4, y-f4, z-f4 = 12 bytes;
+  vertexSize = 12;
 
   constructor(_width, _height) {
     if (_width && _height) {
@@ -337,24 +337,16 @@ class RenderPlane{
     var outputBuffer = new ArrayBuffer(4 * this.vertexSize);
     var dv = new DataView(outputBuffer);
     dv.setFloat32(0, left, true); dv.setFloat32(4, bottom, true); dv.setFloat32(8, 0.0, true);
-    dv.setUint16(12, 0, true); dv.setUint16(14, 0, true);
-    dv.setFloat32(16, right, true); dv.setFloat32(20, bottom, true); dv.setFloat32(24, 0.0, true);
-    dv.setUint16(28, 0xFFFF, true); dv.setUint16(30, 0, true);
-    dv.setFloat32(32, left, true); dv.setFloat32(36, top, true); dv.setFloat32(40, 0.0, true);
-    dv.setUint16(44, 0, true); dv.setUint16(46, 0xFFFF, true);
-    dv.setFloat32(48, right, true); dv.setFloat32(52, top, true); dv.setFloat32(56, 0.0, true);
-    dv.setUint16(60, 0xFFFF, true); dv.setUint16(62, 0xFFFF, true);
+    dv.setFloat32(12, right, true); dv.setFloat32(16, bottom, true); dv.setFloat32(20, 0.0, true);
+    dv.setFloat32(24, left, true); dv.setFloat32(28, top, true); dv.setFloat32(32, 0.0, true);
+    dv.setFloat32(36, right, true); dv.setFloat32(40, top, true); dv.setFloat32(44, 0.0, true);
     this.vbo = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
     gl.bufferData(gl.ARRAY_BUFFER, outputBuffer, gl.STATIC_DRAW);
 
-    // position
+    // setup attribute
     gl.enableVertexAttribArray(0);
     gl.vertexAttribPointer(0, 3, gl.FLOAT, false, this.vertexSize, 0);
-
-    // texture UV
-    gl.enableVertexAttribArray(3);
-    gl.vertexAttribPointer(3, 2, gl.UNSIGNED_SHORT, true, this.vertexSize, 12);
 
     var indexBuffer = [0, 1, 2, 3];
     
@@ -371,9 +363,16 @@ class RenderPlane{
     gl.enableVertexAttribArray(0);
     gl.vertexAttribPointer(0, 3, gl.FLOAT, false, this.vertexSize, 0);
 
-    // texture UV
-    gl.enableVertexAttribArray(3);
-    gl.vertexAttribPointer(3, 2, gl.UNSIGNED_SHORT, true, this.vertexSize, 12);
+    // Get current program
+    var currShader = gl.getParameter(gl.CURRENT_PROGRAM);
+    if (!currShader) {
+      console.log('[Warning] Texture binding failed, no bound program found');
+      return;
+    }
+
+    // Set uniform
+    var uniformLoc = gl.getUniformLocation(currShader, 'DrawSize');
+    gl.uniform2iv(uniformLoc, new Int32Array([this.width, this.height]));
   }
 
   draw(){

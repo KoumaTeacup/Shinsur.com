@@ -5,17 +5,17 @@ import { Mesh, RenderPlane } from './mesh.js';
 import { FocusCamera } from './camera.js';
 import { PointLight } from './pointLight.js';
 import { Viewport } from './viewport.js';
-import { Utility } from './htmlUtil.js';
+import { util } from './htmlUtil.js';
 
 // Contructor needed, don't delete
 //var htmlUtil = new Utility();
-var util = new Utility();
 var viewport = new Viewport();
 
 var defaultProg = new Program('default');
 var debugProg = new Program('debug');
 var gbufferLightProg = new Program('gbufferLight');
 var gbufferGeometryProg = new Program('gbufferGeometry');
+var shadowProgrm = new Program('shadow');
 
 var bowsette = new Mesh('bowsette');
 var floor = new Mesh('floor');
@@ -26,8 +26,8 @@ var camera = new FocusCamera();
 camera.viewAngle = vec3.fromValues(0.0, 1.0, 1.0);
 camera.distance = 20.0;
 
-var light = new PointLight();
-light.worldLocation = [3.0, 3.0, 3.0];
+var lights = [new PointLight()];
+lights[0].worldLocation = [10.0, 10.0, 10.0];
 
 // viewport
 
@@ -38,23 +38,21 @@ function renderLoop(timestamp) {
   lastTimestamp = timestamp;
 
   // Update html UI:
-  document.getElementById("fps").innerHTML = 'fps: ' + Math.trunc(1000/deltaTime);
+  document.getElementById("fps").innerHTML = 'fps: ' + Math.trunc(1000 / deltaTime);
 
-  // ------------ Render to FB ------------
-  if (util.showDebugView) {
+  // ----------- Shadow Pass------------
+  for (var light of lights) {
     // program
-    defaultProg.use();
+    shadowProgrm.use();
     // viewport
-    viewport.renderToDebugFB();
-    // camera
-    camera.update();
+    viewport.renderToCustomFB();
     // light
-    light.bind();
+    light.bindForShadow();
     // mesh
     bowsette.draw();
-    floor.draw();
+    //floor.draw();
   }
-  // ----------- End of Render to FB ------------
+  // ----------- End of Shadow Pass ------------
 
   // ----------- Forward rendering ------------
   if (util.useForwardShading) {
@@ -75,8 +73,8 @@ function renderLoop(timestamp) {
     if (util.showDebugView) {
       // program
       debugProg.use();
-      // bind fb for reading
-      viewport.bindDebugFB()
+      // viewport
+      viewport.bindCustomFB();
       // mesh
       debugPlane.draw();
     }
@@ -105,12 +103,26 @@ function renderLoop(timestamp) {
     gbufferLightProg.use();
     // viewport
     viewport.renderToDefaultDeferredShading();
+    // camera
+    camera.update();
     // light
     light.bind();
     // mesh
     screenPlane.draw();
-    // ------------ End of Light pass ------------
 
+    // ------------ Render debug view ------------
+    // draw debug screen
+    if (util.showDebugView) {
+      // program
+      debugProg.use();
+      // viewport
+      viewport.renderToDefaultDeferredShadingDebug('position');
+      // mesh
+      debugPlane.draw();
+    }
+    // ------------ End of Render debug view ------------
+
+    // ------------ End of Light pass ------------
   }
   // ------------ End of Deferred rendering ------------
 

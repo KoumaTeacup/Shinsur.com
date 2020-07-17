@@ -17,24 +17,6 @@
                 <p class="styleText" id="fps">0</p><br>
             </div>
             <div class="debugInfoDiv">
-                <p class="styleText">Toggle Debug View</p><br>
-                <p class="styleText">Off</p>
-                <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider round"></span>
-                </label>
-                <p class="styleText">On</p><br>
-                <span class="styleText" id="debugFramebufferToggleButton">
-                    Buffer:
-                    <select class="styleText" name="DebugViewType" id="debugViewOptions">
-                        <option value="WorldPos">World Position</option>
-                        <option value="Normal">Normal</option>
-                        <option value="Diffuse">Diffuse</option>
-                        <option value="Shadow">Shadow</option>
-                    </select>
-                </span>
-            </div>
-            <div class="debugInfoDiv">
                 <p class="styleText">Shading Mode</p><br />
                 <p class="styleText">Forward</p>
                 <label class="switch">
@@ -42,6 +24,24 @@
                     <span class="slider round"></span>
                 </label>
                 <p class="styleText">Deferred</p>
+            </div>
+            <div class="debugInfoDiv">
+                <p class="styleText">Toggle Debug View</p><br>
+                <p class="styleText">Off</p>
+                <label class="switch">
+                    <input id="DebugViewCheckbox" type="checkbox">
+                    <span class="slider round"></span>
+                </label>
+                <p class="styleText">On</p><br>
+                <span class="styleHideable" id="DebugBufferSelector">
+                    Buffer:
+                    <select class="styleDropdown" name="DebugViewType" id="debugViewOptions">
+                        <option value="WorldPos">World Position</option>
+                        <option value="Diffuse">Diffuse</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Shadow">Shadow</option>
+                    </select>
+                </span>
             </div>
         </div>
     </div>

@@ -3,7 +3,7 @@ import { Framebuffer } from './framebuffer.js';
 import { GBuffer } from './gbuffer.js';
 
 class Viewport {
-  debugFBO = new Framebuffer();
+  fbo = new Framebuffer();
   gBuffer = new GBuffer();
 constructor() {
     gl.cullFace(gl.BACK);
@@ -25,8 +25,7 @@ constructor() {
   }
 
   renderToDefaultDeferredShading() {
-    this.gBuffer.bindForReading();
-
+    this.gBuffer.bindAllForReading();
     // canvas size
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
@@ -41,16 +40,23 @@ constructor() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   }
 
-  renderToDebugFB() {
-    this.debugFBO.bindFB();
+  // this is expected to be called only after normal deferred shading render pass
+  renderToDefaultDeferredShadingDebug(bufferType) {
+    gl.disable(gl.BLEND);
+
+    this.gBuffer.bindDebugBuffer();
+  }
+
+  renderToCustomFB() {
+    this.fbo.bindFB();
 
     // canvas size
-    gl.viewport(0, 0, this.debugFBO.width, this.debugFBO.height);
+    gl.viewport(0, 0, this.fbo.width, this.fbo.height);
 
     gl.enable(gl.CULL_FACE);
     gl.enable(gl.DEPTH_TEST);
 
-    gl.clearColor(1, 0, 0, 1); // use red for debug buffer
+    gl.clearColor(0, 0, 0, 1); // use red for debug buffer
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   }
 
@@ -69,8 +75,8 @@ constructor() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   }
 
-  bindDebugFB() {
-    this.debugFBO.bindRender();
+  bindCustomFB() {
+    this.fbo.bindRender();
   }
 }
 export { Viewport };

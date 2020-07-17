@@ -104,10 +104,12 @@ class FocusCamera {
       this.far);
 
     // Set uniform
-    var uniformLoc = gl.getUniformLocation(currShader, 'u_matView');
+    var uniformLoc = gl.getUniformLocation(currShader, 'MatView');
     gl.uniformMatrix4fv(uniformLoc, false, matView);
-    var uniformLoc = gl.getUniformLocation(currShader, 'u_matProj');
+    var uniformLoc = gl.getUniformLocation(currShader, 'MatProj');
     gl.uniformMatrix4fv(uniformLoc, false, matPorj);
+    var uniformLoc = gl.getUniformLocation(currShader, 'CameraPos');
+    gl.uniform3fv(uniformLoc, pos);
   }
 }
 

@@ -1,4 +1,5 @@
 ﻿import { gl } from './context.js';
+import { util } from './htmlUtil.js';
 
 class GBuffer {
   fb;
@@ -67,7 +68,7 @@ class GBuffer {
     gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, this.fb);
   }
 
-  bindForReading() {
+  bindAllForReading() {
     gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
 
     // Get current program
@@ -76,10 +77,6 @@ class GBuffer {
       console.log('[Warning] Texture binding failed, no bound program found');
       return;
     }
-
-    // Set uniform
-    var uniformLoc = gl.getUniformLocation(currShader, 'ScreenSize');
-    gl.uniform2iv(uniformLoc, new Int32Array([this.width, this.height]));
 
     // bind textures
     for (var texInfo of this.texturesInfo) {
@@ -94,6 +91,32 @@ class GBuffer {
       var uniformLoc = gl.getUniformLocation(currShader, texInfo.uniform);
       gl.uniform1i(uniformLoc, index);
     }
+  }
+
+  bindDebugBuffer(bufferType) {
+    // Get current program
+    var currShader = gl.getParameter(gl.CURRENT_PROGRAM);
+    if (!currShader) {
+      console.log('[Warning] Texture binding failed, no bound program found');
+      return;
+    }
+    var bufferType;
+    switch (util.SelectedBufferIndex) {
+      case 0: bufferType = 'position'; break;
+      case 1: bufferType = 'diffuse'; break;
+      case 2: bufferType = 'normal'; break;
+      default: return;
+    }
+    var index = this.texturesInfo.findIndex((element) => element.type === bufferType);
+    // Activate slot
+    gl.activeTexture(gl.TEXTURE0 + index);
+
+    // Bind slot
+    gl.bindTexture(gl.TEXTURE_2D, this.texturesInfo[index].object);
+
+    // Set uniform
+    var uniformLoc = gl.getUniformLocation(currShader, 'FramebufferSampler');
+    gl.uniform1i(uniformLoc, index);
   }
 
 }
