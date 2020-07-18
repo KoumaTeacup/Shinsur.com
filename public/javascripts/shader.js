@@ -1,5 +1,6 @@
 import { gl } from './context.js';
 import { srcArray } from './shsrc.js';
+import { util } from './htmlUtil.js';
 
 class Shader {
   shader;
@@ -63,25 +64,12 @@ class Program {
 
   use() {
     gl.useProgram(this.program);
-  }
 
-  attriLoc(_descName) {
-    return gl.getAttribLocation(this.program, _descName);
-  }
-
-  bindTexture2D(_descName = '', value) {
-    var uniformLoc = gl.getUniformLocation(this.program, _descName);
-    gl.uniform1i(uniformLoc, value);
-  }
-
-  bindUniform3fv(_descName = '', value) {
-    var uniformLoc = gl.getUniformLocation(this.program, _descName);
-    gl.uniform3fv(uniformLoc, value);
-  }
-
-  bindUniformMatrix4fv(_descName = '', value) {
-    var uniformLoc = gl.getUniformLocation(this.program, _descName);
-    gl.uniformMatrix4fv(uniformLoc, false, value);
+    // Bind some render settings automatically
+    var uniformLoc = gl.getUniformLocation(this.program, 'ShadowBias');
+    gl.uniform1f(uniformLoc, util.shadowBias);
+    var uniformLoc = gl.getUniformLocation(this.program, 'ShadowView');
+    gl.uniform1i(uniformLoc, util.shadowView);
   }
 }
 

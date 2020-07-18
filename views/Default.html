@@ -14,10 +14,11 @@
         </div>
         <div class="debugInfoContainer">
             <div class="debugInfoDiv">
+                <p class="debugInfoCategory">Performance</p>
                 <p class="styleText" id="fps">0</p><br>
             </div>
             <div class="debugInfoDiv">
-                <p class="styleText">Shading Mode</p><br />
+                <p class="debugInfoCategory">Shading Mode</p><br />
                 <p class="styleText">Forward</p>
                 <label class="switch">
                     <input id="shadingModeCheckBox" type="checkbox">
@@ -26,7 +27,7 @@
                 <p class="styleText">Deferred</p>
             </div>
             <div class="debugInfoDiv">
-                <p class="styleText">Toggle Debug View</p><br>
+                <p class="debugInfoCategory">Toggle Debug View</p><br>
                 <p class="styleText">Off</p>
                 <label class="switch">
                     <input id="DebugViewCheckbox" type="checkbox">
@@ -42,6 +43,31 @@
                         <option value="Shadow">Shadow</option>
                     </select>
                 </span>
+            </div>
+            <div class="debugInfoDiv">
+                <p class="debugInfoCategory">Shadow</p>
+                <p class="styleText">Shadow View: Off</p>
+                <label class="switch">
+                    <input id="ShadowViewCheckbox" type="checkbox">
+                    <span class="slider round"></span>
+                </label>
+                <p class="styleText">On</p><br>
+                <p class="styleText">Resolution: </p>
+                <form name="shadowResForm">
+                    <input type="radio" id="shadowRes1k" name="shadowRes" value="1024">
+                    <label for="shadowRes1k" style="color:snow">1k</label>
+                    <input type="radio" id="shadowRes2k" name="shadowRes" value="2048">
+                    <label for="shadowRes2k" style="color:snow">2k</label>
+                    <input type="radio" id="shadowRes4k" name="shadowRes" value="4096" checked>
+                    <label for="shadowRes4k" style="color:snow">4k</label>
+                    <input type="radio" id="shadowRes8k" name="shadowRes" value="8192">
+                    <label for="shadowRes8k" style="color:snow">8k</label>
+                </form><br>
+                <p class="styleText">Bias: </p>
+                <div class="slidecontainer">
+                    <input type="range" min="0" max="100" value="44" id="shadowBiasRange">
+                    <p class="styleText" id="shadowBiasDisplay"></p>
+                </div>
             </div>
         </div>
     </div>

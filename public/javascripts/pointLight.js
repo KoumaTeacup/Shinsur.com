@@ -44,15 +44,15 @@ class PointLight {
     // Compute projection matrix
     var matPorj = mat4.perspective(
       [],
-      1.0,
+      2.0,
       1.0,
       0.1,
       100);
 
     // Set uniform
-    var uniformLoc = gl.getUniformLocation(currShader, 'MatView');
+    var uniformLoc = gl.getUniformLocation(currShader, 'MatShadowView');
     gl.uniformMatrix4fv(uniformLoc, false, matView);
-    var uniformLoc = gl.getUniformLocation(currShader, 'MatProj');
+    var uniformLoc = gl.getUniformLocation(currShader, 'MatShadowProj');
     gl.uniformMatrix4fv(uniformLoc, false, matPorj);
   }
 }

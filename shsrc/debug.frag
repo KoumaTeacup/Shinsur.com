@@ -5,12 +5,11 @@
 precision highp float;
  
 uniform ivec2 DrawSize;
-uniform sampler2D FramebufferSampler;
+uniform sampler2D DebugBufferSampler;
 out vec4 OutColor;
  
 void main() {
 	vec2 GBufferUV = gl_FragCoord.xy / vec2(DrawSize);
-	vec3 Color = texture(FramebufferSampler, GBufferUV.xy).rgb;
-	OutColor = vec4(GBufferUV,0.0, 1.0);
-	OutColor = vec4(texture(FramebufferSampler, GBufferUV.xy).rgb, 1.0);
+	vec3 Color = texture(DebugBufferSampler, GBufferUV.xy).rgb * -1.0 / 100.0;
+	OutColor = vec4(Color, 1.0);
 }

@@ -48,7 +48,7 @@ constructor() {
   }
 
   renderToCustomFB() {
-    this.fbo.bindFB();
+    this.fbo.bindForWriting();
 
     // canvas size
     gl.viewport(0, 0, this.fbo.width, this.fbo.height);
@@ -75,8 +75,12 @@ constructor() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   }
 
-  bindCustomFB() {
-    this.fbo.bindRender();
+  bindCustomFBForShadow() {
+    this.fbo.bindForReading(7, 'ShadowSampler');
+  }
+
+  bindCustomFBForDebug() {
+    this.fbo.bindForReading(0, 'DebugBufferSampler');
   }
 }
 export { Viewport };

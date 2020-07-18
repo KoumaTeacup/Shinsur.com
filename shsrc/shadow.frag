@@ -8,6 +8,5 @@ in float CameraDepth;
 out vec4 OutColor;
  
 void main() {
-	OutColor = vec4(vec3(gl_FragCoord.w), 1.0);
-	OutColor = vec4(vec3(-CameraDepth), 1.0);
+	OutColor = vec4(vec3(CameraDepth), 1.0);
 }

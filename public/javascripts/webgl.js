@@ -50,7 +50,7 @@ function renderLoop(timestamp) {
     light.bindForShadow();
     // mesh
     bowsette.draw();
-    //floor.draw();
+    floor.draw();
   }
   // ----------- End of Shadow Pass ------------
 
@@ -60,10 +60,12 @@ function renderLoop(timestamp) {
     defaultProg.use();
     // viewport
     viewport.renderToDefaultForwardShading();
+    viewport.bindCustomFBForShadow();
     // camera
     camera.update();
     // light
     light.bind();
+    light.bindForShadow();
     // mesh
     bowsette.draw();
     floor.draw();
@@ -74,7 +76,7 @@ function renderLoop(timestamp) {
       // program
       debugProg.use();
       // viewport
-      viewport.bindCustomFB();
+      viewport.bindCustomFBForDebug();
       // mesh
       debugPlane.draw();
     }
