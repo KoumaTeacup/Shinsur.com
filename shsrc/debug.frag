@@ -10,6 +10,6 @@ out vec4 OutColor;
  
 void main() {
 	vec2 GBufferUV = gl_FragCoord.xy / vec2(DrawSize);
-	vec3 Color = texture(DebugBufferSampler, GBufferUV.xy).rgb * -1.0 / 100.0;
+	vec3 Color = texture(DebugBufferSampler, GBufferUV).rgb;
 	OutColor = vec4(Color, 1.0);
 }

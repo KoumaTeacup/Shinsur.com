@@ -45,7 +45,7 @@ function renderLoop(timestamp) {
     // program
     shadowProgrm.use();
     // viewport
-    viewport.renderToCustomFB();
+    viewport.renderToShadowMap();
     // light
     light.bindForShadow();
     // mesh
@@ -60,7 +60,7 @@ function renderLoop(timestamp) {
     defaultProg.use();
     // viewport
     viewport.renderToDefaultForwardShading();
-    viewport.bindCustomFBForShadow();
+    viewport.bindShadowMap();
     // camera
     camera.update();
     // light
@@ -105,10 +105,12 @@ function renderLoop(timestamp) {
     gbufferLightProg.use();
     // viewport
     viewport.renderToDefaultDeferredShading();
+    viewport.bindShadowMap();
     // camera
     camera.update();
     // light
     light.bind();
+    light.bindForShadow();
     // mesh
     screenPlane.draw();
 
@@ -118,7 +120,8 @@ function renderLoop(timestamp) {
       // program
       debugProg.use();
       // viewport
-      viewport.renderToDefaultDeferredShadingDebug('position');
+      //viewport.renderToDefaultDeferredShadingDebug();
+      viewport.bindCustomFBForDebug();
       // mesh
       debugPlane.draw();
     }

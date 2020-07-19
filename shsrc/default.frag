@@ -28,19 +28,26 @@ uniform vec4 RawColor;
 out vec4 OutColor;
  
 void main() {
+	// load sampler texture
 	vec3 DiffuseColor = (UseRawColor ? RawColor : texture(DiffuseSampler, UV.st)).rgb;
+
+	// shadow claculation
 	vec2 ShadowUV = (ShadowClip / ShadowClip.w).xy / 2.0 + 0.5;
 	float ShadowMapDepth = texture(ShadowSampler, ShadowUV).r;
 	float ShadowFactor = ShadowDepth + ShadowBias > ShadowMapDepth ? 1.0 : 0.0;
+
+	// light calculation
 	vec3 L = normalize(LightPos - WorldPos);
 	vec3 V = normalize(CameraPos - WorldPos);
 	float NdotL = dot(Normal, L);
 	vec3 R = normalize(NdotL * Normal * 2.0 -L);
 	float Dis = length(vec3(LightPos - WorldPos));
 	float Ambient = 0.15;
-	float Diffuse = max(NdotL,0.0f);
-	float Specular = max(pow(dot(R, V), 8.0),0.0);
+	float Diffuse = clamp(NdotL,0.0, 1.0);
+	float Specular = pow(clamp(dot(R, V), 0.0, 1.0), Roughness);
 	vec3 Light = (Ambient + (Diffuse + Specular) * ShadowFactor) * LightIntensity * LightColor;
+
+	// final output
 	OutColor = vec4(DiffuseColor * Light, 1.0);
 	OutColor = ShadowView == 0 ? OutColor : vec4(vec3(ShadowFactor), 1.0);
 }

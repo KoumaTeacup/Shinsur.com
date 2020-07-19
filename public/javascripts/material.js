@@ -8,7 +8,7 @@ class Material {
   diffuse;
   specular;
   normalMap;
-  rougeness = 0.4;
+  roughness = 8.0;
 
 
   constructor(_name) {
@@ -29,7 +29,7 @@ class Material {
     gl.uniform1i(uniformLoc, this.useRawColor);
 
     uniformLoc = gl.getUniformLocation(currShader, 'Roughness');
-    gl.uniform1f(uniformLoc, this.rougeness);
+    gl.uniform1f(uniformLoc, this.roughness);
 
     if (this.useRawColor) {
       uniformLoc = gl.getUniformLocation(currShader, 'RawColor');

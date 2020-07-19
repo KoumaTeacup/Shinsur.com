@@ -93,7 +93,7 @@ class GBuffer {
     }
   }
 
-  bindDebugBuffer(bufferType) {
+  bindDebugBuffer() {
     // Get current program
     var currShader = gl.getParameter(gl.CURRENT_PROGRAM);
     if (!currShader) {
@@ -115,7 +115,7 @@ class GBuffer {
     gl.bindTexture(gl.TEXTURE_2D, this.texturesInfo[index].object);
 
     // Set uniform
-    var uniformLoc = gl.getUniformLocation(currShader, 'FramebufferSampler');
+    var uniformLoc = gl.getUniformLocation(currShader, 'DebugBufferSampler');
     gl.uniform1i(uniformLoc, index);
   }
 

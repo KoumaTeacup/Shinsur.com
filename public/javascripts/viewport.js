@@ -3,7 +3,7 @@ import { Framebuffer } from './framebuffer.js';
 import { GBuffer } from './gbuffer.js';
 
 class Viewport {
-  fbo = new Framebuffer();
+  shadowFBO = new Framebuffer();
   gBuffer = new GBuffer();
 constructor() {
     gl.cullFace(gl.BACK);
@@ -41,18 +41,19 @@ constructor() {
   }
 
   // this is expected to be called only after normal deferred shading render pass
-  renderToDefaultDeferredShadingDebug(bufferType) {
+  renderToDefaultDeferredShadingDebug() {
     gl.disable(gl.BLEND);
 
     this.gBuffer.bindDebugBuffer();
   }
 
-  renderToCustomFB() {
-    this.fbo.bindForWriting();
+  renderToShadowMap() {
+    this.shadowFBO.bindForWriting();
 
     // canvas size
-    gl.viewport(0, 0, this.fbo.width, this.fbo.height);
+    gl.viewport(0, 0, this.shadowFBO.width, this.shadowFBO.height);
 
+    gl.disable(gl.BLEND);
     gl.enable(gl.CULL_FACE);
     gl.enable(gl.DEPTH_TEST);
 
@@ -75,12 +76,12 @@ constructor() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   }
 
-  bindCustomFBForShadow() {
-    this.fbo.bindForReading(7, 'ShadowSampler');
+  bindShadowMap() {
+    this.shadowFBO.bindForReading(7, 'ShadowSampler');
   }
 
   bindCustomFBForDebug() {
-    this.fbo.bindForReading(0, 'DebugBufferSampler');
+    this.shadowFBO.bindForReading(0, 'DebugBufferSampler');
   }
 }
 export { Viewport };
