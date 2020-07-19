@@ -15,7 +15,6 @@ uniform int ShadowView;
 uniform float LightIntensity;
 uniform float Roughness;
 uniform float ShadowBias;
-uniform ivec2 DrawSize;
 uniform vec3 LightColor;
 uniform vec3 LightPos;
 uniform vec3 CameraPos;
@@ -29,12 +28,14 @@ out vec4 OutColor;
  
 void main() {
 	// load sampler texture
-	vec3 DiffuseColor = (UseRawColor ? RawColor : texture(DiffuseSampler, UV.st)).rgb;
+	vec3 DiffuseColor = (UseRawColor ? RawColor : texture(DiffuseSampler, UV)).rgb;
 
 	// shadow claculation
 	vec2 ShadowUV = (ShadowClip / ShadowClip.w).xy / 2.0 + 0.5;
 	float ShadowMapDepth = texture(ShadowSampler, ShadowUV).r;
-	float ShadowFactor = ShadowDepth + ShadowBias > ShadowMapDepth ? 1.0 : 0.0;
+//	float ShadowFactor = ShadowDepth + ShadowBias > ShadowMapDepth ? 1.0 : 0.0;
+	float ExpScale = 1.0;
+	float ShadowFactor = clamp(exp((ShadowDepth+ ShadowBias) * ExpScale) * exp(-ShadowMapDepth * ExpScale), 0.0, 1.0);
 
 	// light calculation
 	vec3 L = normalize(LightPos - WorldPos);
@@ -50,4 +51,5 @@ void main() {
 	// final output
 	OutColor = vec4(DiffuseColor * Light, 1.0);
 	OutColor = ShadowView == 0 ? OutColor : vec4(vec3(ShadowFactor), 1.0);
+//	OutColor = vec4(vec3(-ShadowMapDepth/10.0), 1.0);
 }

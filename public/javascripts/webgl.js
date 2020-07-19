@@ -1,6 +1,5 @@
 import { Program } from './shader.js';
 import * as vec3 from './gl-matrix/vec3.js';
-import { gl } from './context.js';
 import { Mesh, RenderPlane } from './mesh.js';
 import { FocusCamera } from './camera.js';
 import { PointLight } from './pointLight.js';
@@ -16,18 +15,19 @@ var debugProg = new Program('debug');
 var gbufferLightProg = new Program('gbufferLight');
 var gbufferGeometryProg = new Program('gbufferGeometry');
 var shadowProgrm = new Program('shadow');
+var PCFHorizontalProgram = new Program('PCFFilter');
 
 var bowsette = new Mesh('bowsette');
 var floor = new Mesh('floor');
 var screenPlane = new RenderPlane();
-var debugPlane = new RenderPlane(gl.canvas.width / 2.0, gl.canvas.height / 2.0);
+var debugPlane = new RenderPlane(0.5);
 
 var camera = new FocusCamera();
 camera.viewAngle = vec3.fromValues(0.0, 1.0, 1.0);
 camera.distance = 20.0;
 
 var lights = [new PointLight()];
-lights[0].worldLocation = [10.0, 10.0, 10.0];
+lights[0].worldLocation = [6.0, 6.0, 6.0];
 
 // viewport
 
@@ -51,6 +51,18 @@ function renderLoop(timestamp) {
     // mesh
     bowsette.draw();
     floor.draw();
+
+    // program
+    PCFHorizontalProgram.use();
+    // viewport
+    viewport.bindPCFHorizontal();
+    // mesh
+    screenPlane.draw();
+
+    // viewprot
+    viewport.bindPCFVertical();
+    // mesh
+    screenPlane.draw();
   }
   // ----------- End of Shadow Pass ------------
 
@@ -120,8 +132,7 @@ function renderLoop(timestamp) {
       // program
       debugProg.use();
       // viewport
-      //viewport.renderToDefaultDeferredShadingDebug();
-      viewport.bindCustomFBForDebug();
+      viewport.renderToDefaultDeferredShadingDebug();
       // mesh
       debugPlane.draw();
     }

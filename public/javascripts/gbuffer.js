@@ -56,6 +56,7 @@ class GBuffer {
   }
 
   bindForWriting() {
+    // this is lazy unbind, which can cause surprises, call this before any other texture binding within this draw call
     // unbind textures
     for (var i = 0; i < this.texturesInfo.length; i++) {
       // Activate slot

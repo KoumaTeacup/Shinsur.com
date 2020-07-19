@@ -17,6 +17,8 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
+    <Content Include=".env" />
+    <Content Include=".gitignore" />
     <Content Include="forever.json" />
     <Content Include="nodemon.json" />
     <Content Include="package-lock.json" />
@@ -24,8 +26,34 @@
     <Content Include="app.js" />
     <Content Include="bin\init.js" />
     <Content Include="bin\www.js" />
+    <Content Include="public\images\Bowsette_BASE.png" />
+    <Content Include="public\images\Bowsette_BODY.png" />
+    <Content Include="public\images\Bowsette_EYES.png" />
+    <Content Include="public\images\Bowsette_HEAD.png" />
+    <Content Include="public\images\default.jpg" />
+    <Content Include="public\images\IzayoiLightOff.png" />
+    <Content Include="public\images\IzayoiLightOn.png" />
+    <Content Include="public\mesh\bowsette.bin" />
+    <Content Include="public\mesh\bowsette.gltf" />
+    <Content Include="public\mesh\floor.bin" />
+    <Content Include="public\mesh\floor.gltf" />
+    <Content Include="public\mesh\test.bin" />
+    <Content Include="public\mesh\test.gltf" />
+    <Content Include="README.md" />
     <Content Include="routes\index.js" />
     <Content Include="routes\users.js" />
+    <Content Include="shsrc\debug.frag" />
+    <Content Include="shsrc\debug.vert" />
+    <Content Include="shsrc\default.frag" />
+    <Content Include="shsrc\default.vert" />
+    <Content Include="shsrc\gbufferGeometry.frag" />
+    <Content Include="shsrc\gbufferGeometry.vert" />
+    <Content Include="shsrc\gbufferLight.frag" />
+    <Content Include="shsrc\gbufferLight.vert" />
+    <Content Include="shsrc\PCFFilter.frag" />
+    <Content Include="shsrc\PCFFilter.vert" />
+    <Content Include="shsrc\shadow.frag" />
+    <Content Include="shsrc\shadow.vert" />
     <Content Include="views\Default.html" />
     <Content Include="views\summer.html" />
     <Content Include="views\winter.html" />
@@ -57,13 +85,14 @@
     <Folder Include="public\images" />
     <Folder Include="public\javascripts" />
     <Folder Include="public\javascripts\gl-matrix" />
+    <Folder Include="public\mesh\" />
     <Folder Include="public\stylesheets" />
     <Folder Include="routes" />
-    <Folder Include="Shinsur" />
     <Folder Include="shsrc" />
     <Folder Include="views" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="public\javascripts\camera.js" />
     <Compile Include="public\javascripts\framebuffer.js">
       <SubType>Code</SubType>
     </Compile>
@@ -76,9 +105,12 @@
     <Compile Include="public\javascripts\material.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="public\javascripts\mesh.js" />
     <Compile Include="public\javascripts\pointLight.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="public\javascripts\shsrc.js" />
+    <Compile Include="public\javascripts\texture.js" />
     <Compile Include="public\javascripts\viewport.js">
       <SubType>Code</SubType>
     </Compile>

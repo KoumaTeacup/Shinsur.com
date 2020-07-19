@@ -7,7 +7,6 @@ precision highp float;
 uniform int ShadowView;
 uniform float LightIntensity;
 uniform float ShadowBias;
-uniform ivec2 DrawSize;
 uniform vec3 LightPos;
 uniform vec3 CameraPos;
 uniform vec3 LightColor;
@@ -22,7 +21,8 @@ out vec4 OutColor;
  
 void main() {
 	// load gbuffer textures
-	vec2 GBufferUV = gl_FragCoord.xy / vec2(DrawSize);
+	ivec2 GBufferSize = textureSize(WorldPosSampler, 0);
+	vec2 GBufferUV = gl_FragCoord.xy / vec2(GBufferSize);
 	vec3 WorldPos = texture(WorldPosSampler, GBufferUV.st).rgb;
 	vec3 DiffuseColor = texture(DiffuseSampler, GBufferUV.st).rgb;
 	float Roughness = texture(DiffuseSampler, GBufferUV.st).a;
@@ -34,6 +34,8 @@ void main() {
 	float ShadowDepth = vecShadowMV.z;
 	vec4 ShadowClip = MatShadowProj * vecShadowMV;
 	vec2 ShadowUV = (ShadowClip / ShadowClip.w).xy / 2.0 + 0.5;
+
+	// PCF sampling
 	float ShadowMapDepth = texture(ShadowSampler, ShadowUV).r;
 	float ShadowFactor = ShadowDepth + ShadowBias > ShadowMapDepth ? 1.0 : 0.0;
 

@@ -316,23 +316,20 @@ class Mesh {
 class RenderPlane{
   posX = 0;
   posY = 0;
-  width = gl.canvas.width;
-  height = gl.canvas.height;
+  scale;
   vbo;
   ibo;
   // gl doesn't allow single attribute less than 4 bytes alignment
   // x-f4, y-f4, z-f4 = 12 bytes;
   vertexSize = 12;
 
-  constructor(_width, _height) {
-    if (_width && _height) {
-      this.width = _width; this.height = _height;
-    }
+  constructor(_scale = 1.0) {
+    this.scale = _scale;
 
-    var left = this.posX / gl.canvas.width * 2.0 - 1.0;
-    var right = (this.posX + this.width) / gl.canvas.width * 2.0 - 1.0;
+    var left = this.posX / gl.canvas.height * 2.0 - 1.0;
+    var right = (this.posX / gl.canvas.height + this.scale) * 2.0 - 1.0;
     var bottom = this.posY / gl.canvas.height * 2.0 - 1.0;
-    var top = (this.posY + this.height) / gl.canvas.height * 2.0 - 1.0;
+    var top = (this.posY / gl.canvas.height + this.scale) * 2.0 - 1.0;
 
     var outputBuffer = new ArrayBuffer(4 * this.vertexSize);
     var dv = new DataView(outputBuffer);
@@ -371,8 +368,8 @@ class RenderPlane{
     }
 
     // Set uniform
-    var uniformLoc = gl.getUniformLocation(currShader, 'DrawSize');
-    gl.uniform2iv(uniformLoc, new Int32Array([this.width, this.height]));
+    var uniformLoc = gl.getUniformLocation(currShader, 'DrawScale');
+    gl.uniform1f(uniformLoc, this.scale);
   }
 
   draw(){
