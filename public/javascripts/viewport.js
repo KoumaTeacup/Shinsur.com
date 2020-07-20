@@ -6,10 +6,10 @@ class Viewport {
   shadowFBO;
   gBuffer = new GBuffer();
   GaussianBlurFBO;
-  PCFKernelSize = 7;
+  PCFKernelSize;
   PCFKernel = [];
   PCFKernelSum;
-  GaussianWidth = 50;
+  GaussianWidth;
   constructor() {
     // Read resolution from settings
     var shadowResElem = document.shadowResForm.shadowRes;
@@ -26,7 +26,21 @@ class Viewport {
 
     gl.cullFace(gl.BACK);
 
-    this.calculatePCFKernel();
+    var PCFSizeslider = document.getElementById("PCFKernelSizeSlider");
+    var PCFSize = PCFSizeslider.value * 2 + 1;
+    document.getElementById('PCFKernelSizeDisplay').innerHTML = PCFSize + 'x' + PCFSize;
+    PCFSizeslider.oninput = (e) => {
+      this.SetPCFKernelSize(e.target.value * 2 + 1, this.GaussianWidth);
+    }
+
+    var PCFWidthSlider = document.getElementById("PCFGaussianWidthSlider");
+    var PCFWidth = PCFWidthSlider.value / 10.0;
+    document.getElementById('PCFGaussianWidthSlider').innerHTML = PCFWidth;
+    PCFWidthSlider.oninput = (e) => {
+      this.SetPCFKernelSize(this.PCFKernelSize, e.target.value / 10.0);
+    }
+
+    this.SetPCFKernelSize(PCFSize, PCFWidth);
   }
 
   renderToDefaultForwardShading() {
@@ -160,8 +174,12 @@ class Viewport {
     gl.uniform1i(uniformLoc, false);
   }
 
-  calculatePCFKernel() {
-    var constant = 1.0 / this.GaussianWidth * Math.sqrt(2.0 * Math.PI);
+  SetPCFKernelSize(_size, _width) {
+    this.PCFKernelSize = _size ? _size : this.PCFKernelSize;
+    this.GaussianWidth = _width ? _width : this.GaussianWidth;
+    document.getElementById('PCFKernelSizeDisplay').innerHTML = this.PCFKernelSize + 'x' + this.PCFKernelSize;
+    document.getElementById('PCFGaussianWidthDisplay').innerHTML = this.GaussianWidth;
+
     var exp = Math.pow(Math.E, -0.5 / this.GaussianWidth / this.GaussianWidth);
     this.PCFKernelSum = 0;
     for (var i = 0; i < this.PCFKernelSize; i++) {

@@ -7,6 +7,7 @@ precision highp float;
 uniform int ShadowView;
 uniform float LightIntensity;
 uniform float ShadowBias;
+uniform float ShadowExpScale;
 uniform vec3 LightPos;
 uniform vec3 CameraPos;
 uniform vec3 LightColor;
@@ -37,7 +38,7 @@ void main() {
 
 	// PCF sampling
 	float ShadowMapDepth = texture(ShadowSampler, ShadowUV).r;
-	float ShadowFactor = ShadowDepth + ShadowBias > ShadowMapDepth ? 1.0 : 0.0;
+	float ShadowFactor = clamp(exp((ShadowDepth+ ShadowBias) * ShadowExpScale) * exp(-ShadowMapDepth * ShadowExpScale), 0.0, 1.0);
 
 	// light calculation
 	vec3 L = normalize(LightPos - WorldPos);

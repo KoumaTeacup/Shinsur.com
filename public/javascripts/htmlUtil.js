@@ -1,9 +1,10 @@
 ﻿class Utility {
   showDebugView = false;
-  SelectedBufferIndex = 0;
+  slectedBufferIndex = 0;
   useForwardShading = true;
   shadowView = false;
-  shadowBias = 0.01;
+  shadowBias;
+  shadowExpScale;
 
   constructor() {
     document.getElementById("DebugViewCheckbox").onclick = (e) => {
@@ -19,19 +20,27 @@
     }
 
     document.getElementById('debugViewOptions').onchange = (e) => {
-      this.SelectedBufferIndex = e.target.selectedIndex;
+      this.slectedBufferIndex = e.target.selectedIndex;
     }
 
     document.getElementById("ShadowViewCheckbox").onclick = (e) => {
       this.shadowView = e.target.checked;
     }
 
-    var slider = document.getElementById("shadowBiasRange");
-    this.shadowBias = Math.pow(0.85, 100 - slider.value / 3.0) * 9.9;
+    var shadowBiasslider = document.getElementById("ShadowBiasSlider");
+    this.shadowBias = Math.pow(0.85, 100 - shadowBiasslider.value / 3.0) * 9.9;
     document.getElementById('shadowBiasDisplay').innerHTML = this.shadowBias.toFixed(6);
-    slider.oninput = (e) => {
+    shadowBiasslider.oninput = (e) => {
       this.shadowBias = Math.pow(0.85, 100 - e.target.value / 3.0) * 9.9;
       document.getElementById('shadowBiasDisplay').innerHTML = this.shadowBias.toFixed(6);
+    }
+
+    var shadowExpScaleslider = document.getElementById("ShadowExpScaleSlider");
+    this.shadowExpScale = shadowExpScaleslider.value / 100.0;
+    document.getElementById('ShadowExpScaleDisplay').innerHTML = this.shadowExpScale;
+    shadowExpScaleslider.oninput = (e) => {
+      this.shadowExpScale = e.target.value / 100.0;
+      document.getElementById('ShadowExpScaleDisplay').innerHTML = this.shadowExpScale;
     }
   }
 }

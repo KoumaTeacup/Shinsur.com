@@ -65,8 +65,23 @@
                 </form>
                 <p class="styleText">Bias: </p>
                 <div class="slidecontainer">
-                    <input type="range" min="0" max="300" value="152" id="shadowBiasRange">
+                    <input type="range" min="0" max="300" value="152" id="ShadowBiasSlider">
                     <p class="styleText" id="shadowBiasDisplay"></p>
+                </div>
+                <p class="styleText">PCF Kernel Size: </p>
+                <div class="slidecontainer">
+                    <input type="range" min="1" max="15" value="3" id="PCFKernelSizeSlider">
+                    <p class="styleText" id="PCFKernelSizeDisplay"></p>
+                </div>
+                <p class="styleText">PCF Gauss Width: </p>
+                <div class="slidecontainer">
+                    <input type="range" min="1" max="100" value="7" id="PCFGaussianWidthSlider">
+                    <p class="styleText" id="PCFGaussianWidthDisplay"></p>
+                </div>
+                <p class="styleText">Exponential Scale: </p>
+                <div class="slidecontainer">
+                    <input type="range" min="1" max="100" value="50" id="ShadowExpScaleSlider">
+                    <p class="styleText" id="ShadowExpScaleDisplay"></p>
                 </div>
             </div>
         </div>

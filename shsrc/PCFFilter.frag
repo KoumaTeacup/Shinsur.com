@@ -7,7 +7,7 @@ precision highp float;
 uniform bool IsHorizontal;
 uniform int KernelSize;
 uniform float KernelSum;
-uniform float Kernel[15];
+uniform float Kernel[31];
 uniform sampler2D InputSampler;
 out vec4 OutColor;
  

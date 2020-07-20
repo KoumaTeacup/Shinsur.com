@@ -102,7 +102,7 @@ class GBuffer {
       return;
     }
     var bufferType;
-    switch (util.SelectedBufferIndex) {
+    switch (util.slectedBufferIndex) {
       case 0: bufferType = 'position'; break;
       case 1: bufferType = 'diffuse'; break;
       case 2: bufferType = 'normal'; break;

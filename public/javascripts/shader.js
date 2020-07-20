@@ -70,6 +70,8 @@ class Program {
     gl.uniform1f(uniformLoc, util.shadowBias);
     var uniformLoc = gl.getUniformLocation(this.program, 'ShadowView');
     gl.uniform1i(uniformLoc, util.shadowView);
+    var uniformLoc = gl.getUniformLocation(this.program, 'ShadowExpScale');
+    gl.uniform1f(uniformLoc, util.shadowExpScale);
   }
 }
 
