@@ -1,6 +1,7 @@
 ﻿import { gl } from './context.js';
 import { Framebuffer } from './framebuffer.js';
 import { GBuffer } from './gbuffer.js';
+import { Program } from './shader.js';
 
 class Viewport {
   shadowFBO;
@@ -134,23 +135,12 @@ class Viewport {
 
     gl.clearColor(0, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    // Get current program
-    var currShader = gl.getParameter(gl.CURRENT_PROGRAM);
-    if (!currShader) {
-      console.log('[Warning] Texture binding failed, no bound program found');
-      return;
-    }
-
+    
     // Set uniform
-    var uniformLoc = gl.getUniformLocation(currShader, 'KernelSize');
-    gl.uniform1i(uniformLoc, this.PCFKernelSize);
-    var uniformLoc = gl.getUniformLocation(currShader, 'KernelSum');
-    gl.uniform1f(uniformLoc, this.PCFKernelSum);
-    var uniformLoc = gl.getUniformLocation(currShader, 'Kernel');
-    gl.uniform1fv(uniformLoc, new Float32Array(this.PCFKernel));
-    var uniformLoc = gl.getUniformLocation(currShader, 'IsHorizontal');
-    gl.uniform1i(uniformLoc, true);
+    Program.setUniform1i('KernelSize', this.PCFKernelSize);
+    Program.setUniform1f('KernelSum', this.PCFKernelSum);
+    Program.setUniform1fv('Kernel', new Float32Array(this.PCFKernel));
+    Program.setUniform1i('IsHorizontal', true);
   }
 
   // must be coupled with horizontal filter above
@@ -163,15 +153,7 @@ class Viewport {
     gl.clearColor(0, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // Get current program
-    var currShader = gl.getParameter(gl.CURRENT_PROGRAM);
-    if (!currShader) {
-      console.log('[Warning] Texture binding failed, no bound program found');
-      return;
-    }
-
-    var uniformLoc = gl.getUniformLocation(currShader, 'IsHorizontal');
-    gl.uniform1i(uniformLoc, false);
+    Program.setUniform1i('IsHorizontal', false);
   }
 
   SetPCFKernelSize(_size, _width) {

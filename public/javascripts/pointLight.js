@@ -1,4 +1,5 @@
 ﻿import { gl } from './context.js';
+import { Program } from './shader.js';
 import * as vec3 from './gl-matrix/vec3.js';
 import * as mat4 from './gl-matrix/mat4.js';
 
@@ -12,29 +13,12 @@ class PointLight {
   }
 
   bind() {
-    // Get current program
-    var currShader = gl.getParameter(gl.CURRENT_PROGRAM);
-    if (!currShader) {
-      console.log('[Warning] Texture binding failed, no bound program found');
-      return;
-    }
-
-    var uniformLoc = gl.getUniformLocation(currShader, 'LightPos');
-    gl.uniform3fv(uniformLoc, this.worldLocation);
-    var uniformLoc = gl.getUniformLocation(currShader, 'LightIntensity');
-    gl.uniform1f(uniformLoc, this.intensity);
-    var uniformLoc = gl.getUniformLocation(currShader, 'LightColor');
-    gl.uniform3fv(uniformLoc, this.color);
+    Program.setUniform3fv('LightPos', this.worldLocation);
+    Program.setUniform1f('LightIntensity', this.intensity);
+    Program.setUniform3fv('LightColor', this.color);
   }
 
   bindForShadow() {
-    // Get current program
-    var currShader = gl.getParameter(gl.CURRENT_PROGRAM);
-    if (!currShader) {
-      console.log('[Warning] Texture binding failed, no bound program found');
-      return;
-    }
-
     var matView = mat4.lookAt(
       [],
       this.worldLocation,
@@ -50,10 +34,8 @@ class PointLight {
       100);
 
     // Set uniform
-    var uniformLoc = gl.getUniformLocation(currShader, 'MatShadowView');
-    gl.uniformMatrix4fv(uniformLoc, false, matView);
-    var uniformLoc = gl.getUniformLocation(currShader, 'MatShadowProj');
-    gl.uniformMatrix4fv(uniformLoc, false, matPorj);
+    Program.setUniformMatrix4fv('MatShadowView', matView);
+    Program.setUniformMatrix4fv('MatShadowProj', matPorj);
   }
 }
 export { PointLight };

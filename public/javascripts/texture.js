@@ -1,4 +1,5 @@
 ﻿import { gl } from './context.js';
+import { Program } from './shader.js';
 
 class Texture2D {
   name;
@@ -40,22 +41,10 @@ class Texture2D {
       return;
     }
 
-    // Activate slot
+    // bind texture
     gl.activeTexture(gl.TEXTURE0 + slot);
-
-    // Bind slot
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
-
-    // Get current program
-    var currShader = gl.getParameter(gl.CURRENT_PROGRAM);
-    if (!currShader) {
-      console.log('[Warning] Texture binding failed, no bound program found');
-      return;
-    }
-
-    // Set uniform
-    var uniformLoc = gl.getUniformLocation(currShader, uniform);
-    gl.uniform1i(uniformLoc, slot);
+    Program.setUniform1i(uniform, slot);
   }
 };
 

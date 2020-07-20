@@ -21,6 +21,7 @@ class Program {
   vShader;
   fShader;
   program;
+  static currentShader = 0;
 
   constructor(_descName = '') {
     this.name = _descName;
@@ -63,6 +64,7 @@ class Program {
   }
 
   use() {
+    Program.currentShader = this.program;
     gl.useProgram(this.program);
 
     // Bind some render settings automatically
@@ -72,6 +74,47 @@ class Program {
     gl.uniform1i(uniformLoc, util.shadowView);
     var uniformLoc = gl.getUniformLocation(this.program, 'ShadowExpScale');
     gl.uniform1f(uniformLoc, util.shadowExpScale);
+  }
+
+  static setUniform1f(_uniform, _value) {
+    if (!Program.currentShader) alert('No shader bound, this should never happen!');
+    var loc = gl.getUniformLocation(this.currentShader, _uniform);
+    if (loc) gl.uniform1f(loc, _value);
+  }
+  static setUniform1i(_uniform, _value) {
+    if (!Program.currentShader) alert('No shader bound, this should never happen!');
+    var loc = gl.getUniformLocation(this.currentShader, _uniform);
+    if (loc) gl.uniform1i(loc, _value);
+  }
+  static setUniform1fv(_uniform, _value) {
+    if (!Program.currentShader) alert('No shader bound, this should never happen!');
+    var loc = gl.getUniformLocation(this.currentShader, _uniform);
+    if (loc) gl.uniform1fv(loc, _value);
+  }
+  static setUniform1iv(_uniform, _value) {
+    if (!Program.currentShader) alert('No shader bound, this should never happen!');
+    var loc = gl.getUniformLocation(this.currentShader, _uniform);
+    if (loc) gl.uniform1iv(loc, _value);
+  }
+  static setUniform2fv(_uniform, _value) {
+    if (!Program.currentShader) alert('No shader bound, this should never happen!');
+    var loc = gl.getUniformLocation(this.currentShader, _uniform);
+    if (loc) gl.uniform2fv(loc, _value);
+  }
+  static setUniform3fv(_uniform, _value) {
+    if (!Program.currentShader) alert('No shader bound, this should never happen!');
+    var loc = gl.getUniformLocation(this.currentShader, _uniform);
+    if (loc) gl.uniform3fv(loc, _value);
+  }
+  static setUniform4fv(_uniform, _value) {
+    if (!Program.currentShader) alert('No shader bound, this should never happen!');
+    var loc = gl.getUniformLocation(this.currentShader, _uniform);
+    if (loc) gl.uniform4fv(loc, _value);
+  }
+  static setUniformMatrix4fv(_uniform, _value) {
+    if (!Program.currentShader) alert('No shader bound, this should never happen!');
+    var loc = gl.getUniformLocation(this.currentShader, _uniform);
+    if (loc) gl.uniformMatrix4fv(loc, false, _value);
   }
 }
 

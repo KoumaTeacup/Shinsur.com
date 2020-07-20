@@ -40,7 +40,6 @@
                         <option value="WorldPos">World Position</option>
                         <option value="Diffuse">Diffuse</option>
                         <option value="Normal">Normal</option>
-                        <option value="Shadow">Shadow</option>
                     </select>
                 </span>
             </div>
@@ -68,20 +67,28 @@
                     <input type="range" min="0" max="300" value="152" id="ShadowBiasSlider">
                     <p class="styleText" id="shadowBiasDisplay"></p>
                 </div>
-                <p class="styleText">PCF Kernel Size: </p>
-                <div class="slidecontainer">
-                    <input type="range" min="1" max="15" value="3" id="PCFKernelSizeSlider">
-                    <p class="styleText" id="PCFKernelSizeDisplay"></p>
-                </div>
-                <p class="styleText">PCF Gauss Width: </p>
-                <div class="slidecontainer">
-                    <input type="range" min="1" max="100" value="7" id="PCFGaussianWidthSlider">
-                    <p class="styleText" id="PCFGaussianWidthDisplay"></p>
-                </div>
                 <p class="styleText">Exponential Scale: </p>
                 <div class="slidecontainer">
                     <input type="range" min="1" max="100" value="50" id="ShadowExpScaleSlider">
                     <p class="styleText" id="ShadowExpScaleDisplay"></p>
+                </div>
+                <p class="styleText">PCF Filter</p>
+                <label class="switch">
+                    <input id="PCFFilterCheckbox" type="checkbox" checked>
+                    <span class="slider round"></span>
+                </label>
+                <p class="styleText">On</p><br>
+                <div id="PCFFilterDiv">
+                    <p class="styleText">PCF Kernel Size: </p>
+                    <div class="slidecontainer">
+                        <input type="range" min="1" max="15" value="3" id="PCFKernelSizeSlider">
+                        <p class="styleText" id="PCFKernelSizeDisplay"></p>
+                    </div>
+                    <p class="styleText">PCF Gauss Width: </p>
+                    <div class="slidecontainer">
+                        <input type="range" min="1" max="100" value="7" id="PCFGaussianWidthSlider">
+                        <p class="styleText" id="PCFGaussianWidthDisplay"></p>
+                    </div>
                 </div>
             </div>
         </div>

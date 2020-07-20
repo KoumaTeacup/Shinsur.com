@@ -1,10 +1,11 @@
 ﻿import { gl } from './context.js';
+import { Material } from './material.js';
+import { Texture2D } from './texture.js';
+import { Program } from './shader.js';
 import * as mat4 from './gl-matrix/mat4.js';
 import * as vec3 from './gl-matrix/vec3.js';
 import * as vec4 from './gl-matrix/vec4.js';
 import * as quat from './gl-matrix/quat.js';
-import { Material } from './material.js';
-import { Texture2D } from './texture.js';
 
 class Mesh {
   name;
@@ -290,19 +291,11 @@ class Mesh {
       return;
     }
 
-    // Get current program
-    var currShader = gl.getParameter(gl.CURRENT_PROGRAM);
-    if (!currShader) {
-      console.log('[Warning] Texture binding failed, no bound program found');
-      return;
-    }
-
     // Compute model matrix
     var matModel = mat4.fromRotationTranslationScale([], quat.fromEuler([], this.rotation[0], this.rotation[1], this.rotation[2]), this.translate, this.scale);
 
     // Set uniform
-    var uniformLoc = gl.getUniformLocation(currShader, 'MatModel');
-    gl.uniformMatrix4fv(uniformLoc, false, matModel);
+    Program.setUniformMatrix4fv('MatModel', matModel);
 
     // draw all meshes
     for (var i = 0; i < this.indexCount.length; i++) {
@@ -360,16 +353,8 @@ class RenderPlane{
     gl.enableVertexAttribArray(0);
     gl.vertexAttribPointer(0, 3, gl.FLOAT, false, this.vertexSize, 0);
 
-    // Get current program
-    var currShader = gl.getParameter(gl.CURRENT_PROGRAM);
-    if (!currShader) {
-      console.log('[Warning] Texture binding failed, no bound program found');
-      return;
-    }
-
     // Set uniform
-    var uniformLoc = gl.getUniformLocation(currShader, 'DrawScale');
-    gl.uniform1f(uniformLoc, this.scale);
+    Program.setUniform1f('DrawScale', this.scale);
   }
 
   draw(){

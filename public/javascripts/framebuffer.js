@@ -1,4 +1,5 @@
 ﻿import { gl } from './context.js';
+import { Program } from './shader.js';
 
 class Framebuffer {
   fb;
@@ -47,49 +48,34 @@ class Framebuffer {
   }
 
   bindForWriting() {
-    // this is lazy unbind, which can cause surprises, call this before any other texture binding within this draw call
+    // Unbind texture, otherwise chrome is gonna complain
     gl.activeTexture(gl.TEXTURE0 + this.lastBoundSlot);
-    gl.bindTexture(gl.TEXTURE_2D, null);
+    if (gl.getParameter(gl.ACTIVE_TEXTURE) == this.colorBuffer)
+      gl.bindTexture(gl.TEXTURE_2D, null);
+
+    // Bind framebuffer for writing
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.fb);
   }
 
   bindForReading(slot, uniform) {
+    // cache bound slot
     this.lastBoundSlot = slot;
 
-    // Get current program
-    var currShader = gl.getParameter(gl.CURRENT_PROGRAM);
-    if (!currShader) {
-      console.log('[Warning] Texture binding failed, no bound program found');
-      return;
-    }
-
-    // Activate slot
+    // Bind color buffer for shader sampler
     gl.activeTexture(gl.TEXTURE0 + slot);
-
-    // bind texture to be used as sampler
     gl.bindTexture(gl.TEXTURE_2D, this.colorBuffer);
-
-    // Set uniform
-    var uniformLoc = gl.getUniformLocation(currShader, uniform);
-    gl.uniform1i(uniformLoc, slot);
+    Program.setUniform1i(uniform, slot);
   }
 
   resize(_width, _height) {
     this.width = _width;
     this.height = _height;
+    // resize color buffer
     gl.bindTexture(gl.TEXTURE_2D, this.colorBuffer);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, this.width, this.height, 0, gl.RGBA, gl.FLOAT, null);
-
-    // no mip & clamp to edge
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
+    // resize depth buffer
     gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width, this.height);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.fb);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.colorBuffer, 0);
   }
 }
 

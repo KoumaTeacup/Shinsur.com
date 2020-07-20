@@ -1,10 +1,10 @@
 import { Program } from './shader.js';
-import * as vec3 from './gl-matrix/vec3.js';
 import { Mesh, RenderPlane } from './mesh.js';
 import { FocusCamera } from './camera.js';
 import { PointLight } from './pointLight.js';
 import { Viewport } from './viewport.js';
 import { util } from './htmlUtil.js';
+import * as vec3 from './gl-matrix/vec3.js';
 
 // Contructor needed, don't delete
 //var htmlUtil = new Utility();
@@ -52,17 +52,19 @@ function renderLoop(timestamp) {
     bowsette.draw();
     floor.draw();
 
-    // program
-    PCFHorizontalProgram.use();
-    // viewport
-    viewport.bindPCFHorizontal();
-    // mesh
-    screenPlane.draw();
+    if (util.PCFEnabled) {
+      // program
+      PCFHorizontalProgram.use();
+      // viewport
+      viewport.bindPCFHorizontal();
+      // mesh
+      screenPlane.draw();
 
-    // viewprot
-    viewport.bindPCFVertical();
-    // mesh
-    screenPlane.draw();
+      // viewprot
+      viewport.bindPCFVertical();
+      // mesh
+      screenPlane.draw();
+    }
   }
   // ----------- End of Shadow Pass ------------
 

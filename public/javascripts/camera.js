@@ -1,4 +1,5 @@
 ﻿import { canvas, gl } from './context.js';
+import { Program } from './shader.js';
 import * as vec2 from './gl-matrix/vec2.js';
 import * as vec3 from './gl-matrix/vec3.js';
 import * as mat4 from './gl-matrix/mat4.js';
@@ -74,13 +75,6 @@ class FocusCamera {
   }
 
   update() {
-    // Get current program
-    var currShader = gl.getParameter(gl.CURRENT_PROGRAM);
-    if (!currShader) {
-      console.log('[Warning] Texture binding failed, no bound program found');
-      return;
-    }
-
     // Compute view matrix, pos = focus + viewAngle * distance
     var vecZ = vec3.fromValues(0.0, 0.0, 1.0);
     vec3.rotateX(vecZ, vecZ, vec3.fromValues(0.0, 0.0, 0.0), glMatrix.toRadian(this.upAngle));
@@ -104,12 +98,9 @@ class FocusCamera {
       this.far);
 
     // Set uniform
-    var uniformLoc = gl.getUniformLocation(currShader, 'MatView');
-    gl.uniformMatrix4fv(uniformLoc, false, matView);
-    var uniformLoc = gl.getUniformLocation(currShader, 'MatProj');
-    gl.uniformMatrix4fv(uniformLoc, false, matPorj);
-    var uniformLoc = gl.getUniformLocation(currShader, 'CameraPos');
-    gl.uniform3fv(uniformLoc, pos);
+    Program.setUniformMatrix4fv('MatView', matView);
+    Program.setUniformMatrix4fv('MatProj', matPorj);
+    Program.setUniform3fv('CameraPos', pos);
   }
 }
 

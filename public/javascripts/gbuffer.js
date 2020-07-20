@@ -1,5 +1,6 @@
 ﻿import { gl } from './context.js';
 import { util } from './htmlUtil.js';
+import { Program } from './shader.js';
 
 class GBuffer {
   fb;
@@ -19,7 +20,6 @@ class GBuffer {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.fb);
 
     // create all buffer textures
-    var internalFormat, format, dataType;
     var attachementArray = [];
     for (var texInfo of this.texturesInfo) {
       // create texture
@@ -59,11 +59,9 @@ class GBuffer {
     // this is lazy unbind, which can cause surprises, call this before any other texture binding within this draw call
     // unbind textures
     for (var i = 0; i < this.texturesInfo.length; i++) {
-      // Activate slot
       gl.activeTexture(gl.TEXTURE0 + i);
-
-      // Bind slot
-      gl.bindTexture(gl.TEXTURE_2D, null);
+      if (gl.getParameter(gl.ACTIVE_TEXTURE) == this.texturesInfo[i].object)
+        gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
     gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, this.fb);
@@ -72,35 +70,17 @@ class GBuffer {
   bindAllForReading() {
     gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
 
-    // Get current program
-    var currShader = gl.getParameter(gl.CURRENT_PROGRAM);
-    if (!currShader) {
-      console.log('[Warning] Texture binding failed, no bound program found');
-      return;
-    }
-
     // bind textures
     for (var texInfo of this.texturesInfo) {
       var index = this.texturesInfo.findIndex((element) => element.type === texInfo.type);
-      // Activate slot
       gl.activeTexture(gl.TEXTURE0 + index);
-
-      // Bind slot
       gl.bindTexture(gl.TEXTURE_2D, texInfo.object);
 
-      // Set uniform
-      var uniformLoc = gl.getUniformLocation(currShader, texInfo.uniform);
-      gl.uniform1i(uniformLoc, index);
+      Program.setUniform1i(texInfo.uniform, index);
     }
   }
 
   bindDebugBuffer() {
-    // Get current program
-    var currShader = gl.getParameter(gl.CURRENT_PROGRAM);
-    if (!currShader) {
-      console.log('[Warning] Texture binding failed, no bound program found');
-      return;
-    }
     var bufferType;
     switch (util.slectedBufferIndex) {
       case 0: bufferType = 'position'; break;
@@ -109,17 +89,11 @@ class GBuffer {
       default: return;
     }
     var index = this.texturesInfo.findIndex((element) => element.type === bufferType);
-    // Activate slot
+
     gl.activeTexture(gl.TEXTURE0 + index);
-
-    // Bind slot
     gl.bindTexture(gl.TEXTURE_2D, this.texturesInfo[index].object);
-
-    // Set uniform
-    var uniformLoc = gl.getUniformLocation(currShader, 'DebugBufferSampler');
-    gl.uniform1i(uniformLoc, index);
+    Program.setUniform1i('DebugBufferSampler', index);
   }
-
 }
 
 export { GBuffer };

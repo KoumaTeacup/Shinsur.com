@@ -2,6 +2,7 @@
   showDebugView = false;
   slectedBufferIndex = 0;
   useForwardShading = true;
+  PCFEnabled = true;
   shadowView = false;
   shadowBias;
   shadowExpScale;
@@ -25,6 +26,15 @@
 
     document.getElementById("ShadowViewCheckbox").onclick = (e) => {
       this.shadowView = e.target.checked;
+    }
+
+    document.getElementById("PCFFilterCheckbox").onclick = (e) => {
+      this.PCFEnabled = e.target.checked;
+      if (!this.PCFEnabled) {
+        document.getElementById("PCFFilterDiv").style.display = 'none';
+      } else {
+        document.getElementById("PCFFilterDiv").style.display = 'block';
+      }
     }
 
     var shadowBiasslider = document.getElementById("ShadowBiasSlider");

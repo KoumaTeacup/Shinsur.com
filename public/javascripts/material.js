@@ -1,4 +1,5 @@
 ﻿import { gl } from './context.js';
+import { Program } from './shader.js';
 import * as vec4 from './gl-matrix/vec4.js';
 
 class Material {
@@ -10,30 +11,16 @@ class Material {
   normalMap;
   roughness = 8.0;
 
-
   constructor(_name) {
     this.name = _name;
   }
 
   bind() {
-    // Get current program
-    var currShader = gl.getParameter(gl.CURRENT_PROGRAM);
-    if (!currShader) {
-      console.log('[Warning] Texture binding failed, no bound program found');
-      return;
-    }
-
-    var uniformLoc;
-
-    uniformLoc = gl.getUniformLocation(currShader, 'UseRawColor');
-    gl.uniform1i(uniformLoc, this.useRawColor);
-
-    uniformLoc = gl.getUniformLocation(currShader, 'Roughness');
-    gl.uniform1f(uniformLoc, this.roughness);
+    Program.setUniform1i('UseRawColor', this.useRawColor);
+    Program.setUniform1f('Roughness', this.roughness);
 
     if (this.useRawColor) {
-      uniformLoc = gl.getUniformLocation(currShader, 'RawColor');
-      gl.uniform4fv(uniformLoc, this.RawColor);
+      Program.setUniform4fv('RawColor', this.RawColor);
     } else {
       if (this.diffuse) this.diffuse.bind('DiffuseSampler', 0);
       if (this.specular) this.specular.bind('SpecularSampler', 1);
