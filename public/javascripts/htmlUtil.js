@@ -1,4 +1,5 @@
 ﻿class Utility {
+  useNPR = true;
   showDebugView = false;
   slectedBufferIndex = 0;
   useForwardShading = true;
@@ -14,6 +15,10 @@
       } else {
         document.getElementsByClassName('styleHideable')[0].style.display = 'none';
       }
+    }
+
+    document.getElementById("shadingStyleCheckbox").onclick = (e) => {
+      this.useNPR = e.target.checked;
     }
 
     document.getElementById("shadingModeCheckBox").onclick = (e) => {

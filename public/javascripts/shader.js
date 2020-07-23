@@ -53,6 +53,7 @@ class Program {
     gl.bindAttribLocation(this.program, 1, 'a_tangent');
     gl.bindAttribLocation(this.program, 2, 'a_normal');
     gl.bindAttribLocation(this.program, 3, 'a_uv');
+    gl.bindAttribLocation(this.program, 4, 'a_snormal');
 
     // link program
     gl.linkProgram(this.program);

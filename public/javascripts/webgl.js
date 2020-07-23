@@ -7,7 +7,6 @@ import { util } from './htmlUtil.js';
 import * as vec3 from './gl-matrix/vec3.js';
 
 // Contructor needed, don't delete
-//var htmlUtil = new Utility();
 var viewport = new Viewport();
 
 var defaultProg = new Program('default');
@@ -16,6 +15,8 @@ var gbufferLightProg = new Program('gbufferLight');
 var gbufferGeometryProg = new Program('gbufferGeometry');
 var shadowProgrm = new Program('shadow');
 var PCFHorizontalProgram = new Program('PCFFilter');
+var pencilGeometryProgram = new Program('pencilGeometry');
+var pencilLightProgram = new Program('pencilLight');
 
 var bowsette = new Mesh('bowsette');
 var floor = new Mesh('floor');
@@ -68,43 +69,89 @@ function renderLoop(timestamp) {
   }
   // ----------- End of Shadow Pass ------------
 
-  // ----------- Forward rendering ------------
-  if (util.useForwardShading) {
-    // program
-    defaultProg.use();
-    // viewport
-    viewport.renderToDefaultForwardShading();
-    viewport.bindShadowMap();
-    // camera
-    camera.update();
-    // light
-    light.bind();
-    light.bindForShadow();
-    // mesh
-    bowsette.draw();
-    floor.draw();
+  if (!util.useNPR) {
 
-    // ------------ Render debug view ------------
-    // draw debug screen
-    if (util.showDebugView) {
+    // ----------- Forward rendering ------------
+    if (util.useForwardShading) {
       // program
-      debugProg.use();
+      defaultProg.use();
       // viewport
-      viewport.bindCustomFBForDebug();
+      viewport.renderToDefaultForwardShading();
+      viewport.bindShadowMap();
+      // camera
+      camera.update();
+      // light
+      lights[0].bind();
+      lights[0].bindForShadow();
       // mesh
-      debugPlane.draw();
+      bowsette.draw();
+      floor.draw();
+
+      // ------------ Render debug view ------------
+      // draw debug screen
+      if (util.showDebugView) {
+        // program
+        debugProg.use();
+        // viewport
+        viewport.bindCustomFBForDebug();
+        // mesh
+        debugPlane.draw();
+      }
+      // ------------ End of Render debug view ------------
+
     }
-    // ------------ End of Render debug view ------------
+    // ------------ End of Forward Rendering ------------
 
-  }
-  // ------------ End of Forward Rendering ------------
+    // ------------ Deferred rendering ------------
+    if (!util.useForwardShading) {
 
-  // ------------ Deferred rendering ------------
-  if (!util.useForwardShading) {
+      // ------------ Geometry pass ------------
+      // program
+      gbufferGeometryProg.use();
+      // viewport
+      viewport.renderToGBuffer();
+      // camera
+      camera.update();
+      // mesh
+      bowsette.draw();
+      floor.draw();
+      // ------------ End of Geometry pass ------------
+
+      // ------------ Light pass ------------
+      // program
+      gbufferLightProg.use();
+      // viewport
+      viewport.renderToDefaultDeferredShading();
+      viewport.bindShadowMap();
+      // camera
+      camera.update();
+      // light
+      lights[0].bind();
+      lights[0].bindForShadow();
+      // mesh
+      screenPlane.draw();
+
+      // ------------ Render debug view ------------
+      // draw debug screen
+      if (util.showDebugView) {
+        // program
+        debugProg.use();
+        // viewport
+        viewport.renderToDefaultDeferredShadingDebug();
+        // mesh
+        debugPlane.draw();
+      }
+      // ------------ End of Render debug view ------------
+
+      // ------------ End of Light pass ------------
+    }
+    // ------------ End of Deferred rendering ------------
+  } else {
+    // ------------ Pencil Rendering ------------
 
     // ------------ Geometry pass ------------
     // program
-    gbufferGeometryProg.use();
+    pencilGeometryProgram.use();
     // viewport
     viewport.renderToGBuffer();
     // camera
@@ -116,34 +163,34 @@ function renderLoop(timestamp) {
 
     // ------------ Light pass ------------
     // program
-    gbufferLightProg.use();
+    pencilLightProgram.use();
     // viewport
-    viewport.renderToDefaultDeferredShading();
+    viewport.renderToDefaultPencilShading();
     viewport.bindShadowMap();
     // camera
     camera.update();
     // light
-    light.bind();
-    light.bindForShadow();
+    lights[0].bind();
+    lights[0].bindForShadow();
     // mesh
     screenPlane.draw();
 
     // ------------ Render debug view ------------
     // draw debug screen
-    if (util.showDebugView) {
-      // program
-      debugProg.use();
-      // viewport
-      viewport.renderToDefaultDeferredShadingDebug();
-      // mesh
-      debugPlane.draw();
-    }
+    //if (util.showDebugView) {
+    //  // program
+    //  debugProg.use();
+    //  // viewport
+    //  viewport.renderToDefaultDeferredShadingDebug();
+    //  // mesh
+    //  debugPlane.draw();
+    //}
     // ------------ End of Render debug view ------------
 
     // ------------ End of Light pass ------------
-  }
-  // ------------ End of Deferred rendering ------------
 
+    // ------------ End of Pencil rendering ------------
+  }
   // request next frame
   window.requestAnimationFrame(renderLoop);
 }

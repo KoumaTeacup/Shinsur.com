@@ -44,8 +44,16 @@ a {
         transition: .4s;
     }
 
+input:default + .slider {
+    background-color: blue;
+}
+
+input:default + .round {
+    background-color: white;
+}
+
 input:checked + .slider {
-    background-color:green;
+    background-color: green;
 }
 
 input:focus + .slider {
@@ -98,7 +106,15 @@ input:checked + .slider:before {
     position: absolute;
     top:0;
 }
+
+.shadingSytleControlDiv {
+    zoom:3;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
 .canvasDiv {
+    top:auto;
     margin: auto;
     width: 1280px;
     position: relative;

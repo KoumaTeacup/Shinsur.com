@@ -9,6 +9,7 @@ class GBuffer {
     { type: 'position', uniform: 'WorldPosSampler', object: 0 },
     { type: 'diffuse', uniform: 'DiffuseSampler', object: 0 },
     { type: 'normal', uniform: 'NormalSampler', object: 0 },
+    { type: 'snormal', uniform: 'SNormalSampler', object: 0 },
     { type: 'texCoord', uniform: 'TexCoordSampler', object: 0 }];
   width = gl.canvas.width;
   height = gl.canvas.height;

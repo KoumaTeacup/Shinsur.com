@@ -21,7 +21,7 @@ class Viewport {
       }
     }
 
-    var shadowRes = shadowResElem.value;
+    var shadowRes = Number(shadowResElem.value);
     this.shadowFBO = new Framebuffer(shadowRes, shadowRes);
     this.GaussianBlurFBO = new Framebuffer(this.shadowFBO.width, this.shadowFBO.height);
 
@@ -72,6 +72,19 @@ class Viewport {
     gl.disable(gl.DEPTH_TEST); // we don't need depth testing for deferred shading
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  }
+
+  renderToDefaultPencilShading() {
+    this.gBuffer.bindAllForReading();
+    // canvas size
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+    gl.disable(gl.BLEND);
+    gl.disable(gl.CULL_FACE); // we don't need face culling
+    gl.disable(gl.DEPTH_TEST); // we don't need depth testing for deferred shading
+
+    gl.clearColor(1.0, 1.0, 1.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   }
 

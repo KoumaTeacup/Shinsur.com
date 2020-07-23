@@ -23,8 +23,8 @@ class Mesh {
 
   // parse the buffer, using the data type we want to pack
   // gl doesn't allow single attribute less than 4 bytes alignment, so we need to pad normal and tanget
-  // x-f4, y-f4, z-f4, tx-b1, ty-b1, tz-b1, padding-b1, nx-b1, ny-b1, nz-b1, padding-b1, tu-us2, tv-us2 = 24 bytes;
-  vertexSize = 24;
+  // x-f4, y-f4, z-f4, tx-b1, ty-b1, tz-b1, padding-b1, nx-b1, ny-b1, nz-b1, padding-b1, snx-b1, sny-b1, snz-b1, padding-b1, tu-us2, tv-us2 = 28 bytes;
+  vertexSize = 28;
 
   constructor(filename) {
     this.name = filename;
@@ -85,7 +85,6 @@ class Mesh {
         // Use texture
         var index = matDetail.baseColorTexture.index;
         newMaterial.diffuse = new Texture2D('./' + this.gltf.textures[index].name);
-        //newMaterial.diffuse = new Texture2D('./' + this.gltf.textures[index].name);
       } else {
         console.log('[Warning] Material: \'' + material.name + '\'is not supported.');
       }
@@ -212,9 +211,16 @@ class Mesh {
           // padding
           outputView.setInt8(i * this.vertexSize + 19, 0);
 
+          // initialize smoothed normal with normal
+          outputView.setInt8(i * this.vertexSize + 20, 100, true);
+          outputView.setInt8(i * this.vertexSize + 21, 0, true);
+          outputView.setInt8(i * this.vertexSize + 22, 100, true);
+          // padding
+          outputView.setInt8(i * this.vertexSize + 23, 0);
+
           // assuming uv type float32 and 4 components
-          outputView.setUint16(i * this.vertexSize + 20, uvDV.getFloat32(uvOffset + (i - currVertCount) * uvStride, true) * 0xFFFF, true);
-          outputView.setUint16(i * this.vertexSize + 22, uvDV.getFloat32(uvOffset + 4 + (i - currVertCount) * uvStride, true) * 0xFFFF, true);
+          outputView.setUint16(i * this.vertexSize + 24, uvDV.getFloat32(uvOffset + (i - currVertCount) * uvStride, true) * 0xFFFF, true);
+          outputView.setUint16(i * this.vertexSize + 26, uvDV.getFloat32(uvOffset + 4 + (i - currVertCount) * uvStride, true) * 0xFFFF, true);
         }
 
         // assuming only 1 primitve and 1 mesh
@@ -222,23 +228,7 @@ class Mesh {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo[matIndex]);
         gl.bufferData(gl.ARRAY_BUFFER, outputBuffer, gl.STATIC_DRAW);
 
-        // position
-        gl.enableVertexAttribArray(0);
-        gl.vertexAttribPointer(0, 3, gl.FLOAT, false, this.vertexSize, 0);
-
-        // tangent
-        gl.enableVertexAttribArray(1);
-        gl.vertexAttribPointer(1, 4, gl.BYTE, true, this.vertexSize, 12);
-
-        // normal
-        gl.enableVertexAttribArray(2);
-        gl.vertexAttribPointer(2, 4, gl.BYTE, true, this.vertexSize, 16);
-
-        // texture UV
-        gl.enableVertexAttribArray(3);
-        gl.vertexAttribPointer(3, 2, gl.UNSIGNED_SHORT, true, this.vertexSize, 20);
-
-        // assumign unsigned short
+        // assuming unsigned short
         var currIndexCount = this.indexCount[matIndex];
         this.indexCount[matIndex] += accessors[indIndex].count;
         var indexView = new DataView(indexBuffer);
@@ -270,19 +260,23 @@ class Mesh {
 
     // position
     gl.enableVertexAttribArray(0);
-    gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 24, 0);
+    gl.vertexAttribPointer(0, 3, gl.FLOAT, false, this.vertexSize, 0);
 
     // tangent
     gl.enableVertexAttribArray(1);
-    gl.vertexAttribPointer(1, 4, gl.BYTE, true, 24, 12);
+    gl.vertexAttribPointer(1, 4, gl.BYTE, true, this.vertexSize, 12);
 
     // normal
     gl.enableVertexAttribArray(2);
-    gl.vertexAttribPointer(2, 4, gl.BYTE, true, 24, 16);
+    gl.vertexAttribPointer(2, 4, gl.BYTE, true, this.vertexSize, 16);
 
     // texture UV
     gl.enableVertexAttribArray(3);
-    gl.vertexAttribPointer(3, 2, gl.UNSIGNED_SHORT, true, 24, 20);
+    gl.vertexAttribPointer(3, 2, gl.UNSIGNED_SHORT, true, this.vertexSize, 24);
+
+    // smoothed normal
+    gl.enableVertexAttribArray(4);
+    gl.vertexAttribPointer(4, 4, gl.BYTE, true, this.vertexSize, 20);
   }
 
   draw() {
