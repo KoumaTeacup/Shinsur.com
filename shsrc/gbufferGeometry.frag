@@ -7,6 +7,7 @@ precision highp float;
 in vec3 WorldPos;
 in vec3 Tanget;
 in vec3 Normal;
+in vec3 SNormal;
 in vec2 UV;
 
 uniform float Roughness;
@@ -25,6 +26,6 @@ void main() {
 	DiffuseOut.rgb = (UseRawColor ? RawColor : texture(DiffuseSampler, UV.st)).rgb;
 	DiffuseOut.a = Roughness;
 	NormalOut = Normal;
-	SNormalOut = Normal;
+	SNormalOut = SNormal;
 	TexCoordOut = UV;
 }

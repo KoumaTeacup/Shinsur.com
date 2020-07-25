@@ -1,5 +1,4 @@
-﻿import { gl } from './context.js';
-import { Program } from './shader.js';
+﻿import { Program } from './shader.js';
 import * as vec4 from './gl-matrix/vec4.js';
 
 class Material {

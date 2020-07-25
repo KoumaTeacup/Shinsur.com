@@ -2,6 +2,7 @@
 import { Material } from './material.js';
 import { Texture2D } from './texture.js';
 import { Program } from './shader.js';
+import { util } from './htmlUtil.js';
 import * as mat4 from './gl-matrix/mat4.js';
 import * as vec3 from './gl-matrix/vec3.js';
 import * as vec4 from './gl-matrix/vec4.js';
@@ -35,7 +36,7 @@ class Mesh {
     } else {
       fetchAddr = 'https://shinsur.com';
     }
-    
+
     // fetch gltf file
     fetch(fetchAddr + '/' + filename + '.gltf')
       .then(response => {
@@ -57,7 +58,7 @@ class Mesh {
                   response.blob()
                     .then(_data => {
                       this.buffers.push({ index: i, data: _data });
-                      var runParse = new Promise((resolve, reject) =>this.parse());
+                      var runParse = new Promise((resolve, reject) => this.parse());
                       runParse.then((results) => this.initialized = true);
                     })
                 })
@@ -224,7 +225,7 @@ class Mesh {
 
           // gather and smooth normals
           if (!normalHash.has(JSON.stringify(posVal))) {
-            normalHash.set(JSON.stringify(posVal), { normal: norVal, count: 1, index:[i] });
+            normalHash.set(JSON.stringify(posVal), { normal: norVal, count: 1, index: [i] });
           } else {
             var savedNormal = normalHash.get(JSON.stringify(posVal));
             savedNormal.normal = [
@@ -332,14 +333,15 @@ class Mesh {
 
     // draw all meshes
     for (var i = 0; i < this.indexCount.length; i++) {
-    this.bind(i);
-    gl.drawElements(gl.TRIANGLES, this.indexCount[i], gl.UNSIGNED_INT, 0);
+      this.bind(i);
+      gl.drawElements(gl.TRIANGLES, this.indexCount[i], gl.UNSIGNED_INT, 0);
+      util.totalTries += this.indexCount[i] / 3;
     }
   }
 }
 
 // a simple plane mesh to display framebuffer
-class RenderPlane{
+class RenderPlane {
   posX = 0;
   posY = 0;
   scale;
@@ -372,13 +374,13 @@ class RenderPlane{
     gl.vertexAttribPointer(0, 3, gl.FLOAT, false, this.vertexSize, 0);
 
     var indexBuffer = [0, 1, 2, 3];
-    
+
     this.ibo = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array(indexBuffer), gl.STATIC_DRAW);
   }
 
-  bind(){
+  bind() {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo);
 
@@ -390,7 +392,7 @@ class RenderPlane{
     Program.setUniform1f('DrawScale', this.scale);
   }
 
-  draw(){
+  draw() {
     this.bind();
 
     gl.drawElements(gl.TRIANGLE_STRIP, 4, gl.UNSIGNED_SHORT, 0);

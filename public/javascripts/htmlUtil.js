@@ -1,12 +1,13 @@
 ﻿class Utility {
-  useNPR = true;
+  useNPR;
   showDebugView = false;
   slectedBufferIndex = 0;
-  useForwardShading = true;
+  useForwardShading;
   PCFEnabled = true;
   shadowView = false;
   shadowBias;
   shadowExpScale;
+  totalTries = 0;
 
   constructor() {
     document.getElementById("DebugViewCheckbox").onclick = (e) => {
@@ -17,12 +18,28 @@
       }
     }
 
+    this.useNPR = document.getElementById('shadingStyleCheckbox').checked;
     document.getElementById("shadingStyleCheckbox").onclick = (e) => {
       this.useNPR = e.target.checked;
+      if (this.useNPR) {
+        document.getElementById('shadowSection').style.display = 'none';
+        document.getElementById('shadingModeSection').style.display = 'none';
+        document.getElementById('contourSection').style.display = 'block';
+      } else {
+        document.getElementById('shadowSection').style.display = 'block';
+        document.getElementById('shadingModeSection').style.display = 'block';
+        document.getElementById('contourSection').style.display = 'none';
+      }
     }
 
+    this.useForwardShading = !document.getElementById('shadingModeCheckBox').checked;
     document.getElementById("shadingModeCheckBox").onclick = (e) => {
       this.useForwardShading = !e.target.checked;
+      if (this.useForwardShading) {
+        document.getElementById('GbufferViewerSection').style.display = 'none';
+      } else {
+        document.getElementById('GbufferViewerSection').style.display = 'block';
+      }
     }
 
     document.getElementById('debugViewOptions').onchange = (e) => {

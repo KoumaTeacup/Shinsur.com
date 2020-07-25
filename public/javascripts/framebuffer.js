@@ -50,8 +50,7 @@ class Framebuffer {
   bindForWriting() {
     // Unbind texture, otherwise chrome is gonna complain
     gl.activeTexture(gl.TEXTURE0 + this.lastBoundSlot);
-    if (gl.getParameter(gl.ACTIVE_TEXTURE) == this.colorBuffer)
-      gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.bindTexture(gl.TEXTURE_2D, null);
 
     // Bind framebuffer for writing
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.fb);

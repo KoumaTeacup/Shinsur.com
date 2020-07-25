@@ -16,7 +16,8 @@ var gbufferGeometryProg = new Program('gbufferGeometry');
 var shadowProgrm = new Program('shadow');
 var PCFHorizontalProgram = new Program('PCFFilter');
 var pencilGeometryProgram = new Program('pencilGeometry');
-var pencilLightProgram = new Program('pencilLight');
+var contourLightProgram = new Program('contourLight');
+var contourShakingProgram = new Program('contourShaking');
 
 var floor = new Mesh('floor');
 var bowsette = new Mesh('bowsette');
@@ -51,8 +52,8 @@ function renderLoop(timestamp) {
     // light
     light.bindForShadow();
     // mesh
-    //bowsette.draw();
-    //floor.draw();
+    bowsette.draw();
+    floor.draw();
 
     if (util.PCFEnabled) {
       // program
@@ -69,6 +70,9 @@ function renderLoop(timestamp) {
     }
   }
   // ----------- End of Shadow Pass ------------
+
+  // clear html per frame data
+  util.totalTries = 0;
 
   if (!util.useNPR) {
 
@@ -87,19 +91,6 @@ function renderLoop(timestamp) {
       // mesh
       bowsette.draw();
       floor.draw();
-
-      // ------------ Render debug view ------------
-      // draw debug screen
-      if (util.showDebugView) {
-        // program
-        debugProg.use();
-        // viewport
-        viewport.bindCustomFBForDebug();
-        // mesh
-        debugPlane.draw();
-      }
-      // ------------ End of Render debug view ------------
-
     }
     // ------------ End of Forward Rendering ------------
 
@@ -116,7 +107,6 @@ function renderLoop(timestamp) {
       // mesh
       bowsette.draw();
       floor.draw();
-      // ------------ End of Geometry pass ------------
 
       // ------------ Light pass ------------
       // program
@@ -142,15 +132,12 @@ function renderLoop(timestamp) {
         // mesh
         debugPlane.draw();
       }
-      // ------------ End of Render debug view ------------
-
-      // ------------ End of Light pass ------------
     }
     // ------------ End of Deferred rendering ------------
   } else {
     // ------------ Pencil Rendering ------------
 
-    // ------------ Geometry pass ------------
+    // ------------ Contour Geometry pass ------------
     // program
     pencilGeometryProgram.use();
     // viewport
@@ -158,15 +145,13 @@ function renderLoop(timestamp) {
     // camera
     camera.update();
     // mesh
-    bowsette.draw();
-    floor.draw();
-    // ------------ End of Geometry pass ------------
+    cubes.draw();
 
-    // ------------ Light pass ------------
+    // ------------ Contour Light pass ------------
     // program
-    pencilLightProgram.use();
+    contourLightProgram.use();
     // viewport
-    viewport.renderToDefaultPencilShading();
+    viewport.renderToContourShadingFBO(0);
     viewport.bindShadowMap();
     // camera
     camera.update();
@@ -176,22 +161,19 @@ function renderLoop(timestamp) {
     // mesh
     screenPlane.draw();
 
-    // ------------ Render debug view ------------
-    // draw debug screen
-    //if (util.showDebugView) {
-    //  // program
-    //  debugProg.use();
-    //  // viewport
-    //  viewport.renderToDefaultDeferredShadingDebug();
-    //  // mesh
-    //  debugPlane.draw();
-    //}
-    // ------------ End of Render debug view ------------
-
-    // ------------ End of Light pass ------------
-
+    // ------------ Contour Shaking pass ------------
+    // program
+    contourShakingProgram.use();
+    // viewport
+    viewport.renderToDefaultDeferredShading();
+    viewport.bindScreenSizeFBO(0);
+    // mesh
+    screenPlane.draw();
     // ------------ End of Pencil rendering ------------
   }
+  // update html
+  document.getElementById('triCount').innerHTML = 'Tries Drawn: ' + util.totalTries;
+
   // request next frame
   window.requestAnimationFrame(renderLoop);
 }

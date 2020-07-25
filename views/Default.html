@@ -24,8 +24,9 @@
             <div class="debugInfoDiv">
                 <p class="debugInfoCategory">Performance</p>
                 <p class="styleText" id="fps">0</p><br>
+                <p class="styleText" id="triCount">0</p><br>
             </div>
-            <div class="debugInfoDiv">
+            <div class="debugInfoDiv" id="shadingModeSection" style="display:none">
                 <p class="debugInfoCategory">Shading Mode</p><br />
                 <p class="styleText">Forward</p>
                 <label class="switch">
@@ -34,8 +35,8 @@
                 </label>
                 <p class="styleText">Deferred</p>
             </div>
-            <div class="debugInfoDiv">
-                <p class="debugInfoCategory">Toggle Debug View</p><br>
+            <div class="debugInfoDiv" id="GbufferViewerSection" style="display:none">
+                <p class="debugInfoCategory">Gbuffer Viewer</p><br>
                 <p class="styleText">Off</p>
                 <label class="switch">
                     <input id="DebugViewCheckbox" type="checkbox">
@@ -48,10 +49,12 @@
                         <option value="WorldPos">World Position</option>
                         <option value="Diffuse">Diffuse</option>
                         <option value="Normal">Normal</option>
+                        <option value="SNormal">Smoothed Normal</option>
+                        <option value="TexCoord">Texture Coordinate</option>
                     </select>
                 </span>
             </div>
-            <div class="debugInfoDiv">
+            <div class="debugInfoDiv" id="shadowSection" style="display:none">
                 <p class="debugInfoCategory">Shadow</p>
                 <p class="styleText">Shadow View: Off</p>
                 <label class="switch">
@@ -98,6 +101,15 @@
                         <p class="styleText" id="PCFGaussianWidthDisplay"></p>
                     </div>
                 </div>
+            </div>
+            <div class="debugInfoDiv" id="contourSection">
+                <p class="debugInfoCategory">Contour</p><br />
+                <p class="styleText">Contour View: Off</p>
+                <label class="switch">
+                    <input id="shadingModeCheckBox" type="checkbox">
+                    <span class="slider round"></span>
+                </label>
+                <p class="styleText">On</p>
             </div>
         </div>
     </div>

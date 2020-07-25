@@ -61,8 +61,7 @@ class GBuffer {
     // unbind textures
     for (var i = 0; i < this.texturesInfo.length; i++) {
       gl.activeTexture(gl.TEXTURE0 + i);
-      if (gl.getParameter(gl.ACTIVE_TEXTURE) == this.texturesInfo[i].object)
-        gl.bindTexture(gl.TEXTURE_2D, null);
+      gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
     gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, this.fb);
@@ -87,6 +86,8 @@ class GBuffer {
       case 0: bufferType = 'position'; break;
       case 1: bufferType = 'diffuse'; break;
       case 2: bufferType = 'normal'; break;
+      case 3: bufferType = 'snormal'; break;
+      case 4: bufferType = 'texCoord'; break;
       default: return;
     }
     var index = this.texturesInfo.findIndex((element) => element.type === bufferType);

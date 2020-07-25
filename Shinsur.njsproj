@@ -35,6 +35,10 @@
     <Content Include="public\images\IzayoiLightOn.png" />
     <Content Include="public\mesh\bowsette.bin" />
     <Content Include="public\mesh\bowsette.gltf" />
+    <Content Include="public\mesh\cube.bin" />
+    <Content Include="public\mesh\cube.gltf" />
+    <Content Include="public\mesh\cubes.bin" />
+    <Content Include="public\mesh\cubes.gltf" />
     <Content Include="public\mesh\floor.bin" />
     <Content Include="public\mesh\floor.gltf" />
     <Content Include="public\mesh\test.bin" />
@@ -42,6 +46,10 @@
     <Content Include="README.md" />
     <Content Include="routes\index.js" />
     <Content Include="routes\users.js" />
+    <Content Include="shsrc\contourLight.frag" />
+    <Content Include="shsrc\contourLight.vert" />
+    <Content Include="shsrc\contourShaking.frag" />
+    <Content Include="shsrc\contourShaking.vert" />
     <Content Include="shsrc\debug.frag" />
     <Content Include="shsrc\debug.vert" />
     <Content Include="shsrc\default.frag" />
@@ -52,6 +60,8 @@
     <Content Include="shsrc\gbufferLight.vert" />
     <Content Include="shsrc\PCFFilter.frag" />
     <Content Include="shsrc\PCFFilter.vert" />
+    <Content Include="shsrc\pencilGeometry.frag" />
+    <Content Include="shsrc\pencilGeometry.vert" />
     <Content Include="shsrc\shadow.frag" />
     <Content Include="shsrc\shadow.vert" />
     <Content Include="views\Default.html" />
