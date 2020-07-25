@@ -13,6 +13,9 @@ uniform vec3 CameraPos;
 uniform vec3 LightColor;
 uniform mat4 MatShadowView;
 uniform mat4 MatShadowProj;
+uniform mat4 MatModel;
+uniform mat4 MatView;
+uniform mat4 MatProj;
 uniform sampler2D WorldPosSampler;
 uniform sampler2D DiffuseSampler;
 uniform sampler2D NormalSampler;
@@ -32,32 +35,44 @@ void main() {
 	vec3 SNormal = texture(SNormalSampler, GBufferUV.st).rgb;
 	vec2 TexCoord = texture(TexCoordSampler, GBufferUV.st).rg;
 	
-	// light calculation
 	vec3 V = normalize(CameraPos - WorldPos);
-	float NdotV = dot(Normal, V);
+	float NdotV = dot(SNormal, V);
 
-//	int NumSamples = 20;
-//	float SampleRadius = 2.0;
-//	float Tolerance = 0.2;
-//	float Threshold = 0.2;
-//	// Sampling surrounding pixels
-//	float PI = 3.1415926528;
-//	float UnitAngle = 2.0 * PI / float(NumSamples);
-//	float Max = NdotV;
-//	int NumDarker = 0;
-//	for (int i = 0; i < NumSamples; i++){
-//		vec2 SampleUV = GBufferUV;
-//		SampleUV.s += cos(UnitAngle * float(i)) * SampleRadius / float(GBufferSize.x);
-//		SampleUV.t += sin(UnitAngle * float(i)) * SampleRadius / float(GBufferSize.y);
-//		vec3 SampleNormal = texture(NormalSampler, SampleUV.st).rgb;
-//		float SampleNdotV = dot(SampleNormal, V);
-//		Max = Max < SampleNdotV ? SampleNdotV : Max;
-//		NumDarker = NdotV > SampleNdotV ? NumDarker + 1: NumDarker;
-//	}
-//
-//	float ContourFactor = (float(NumDarker) / float(NumSamples) < Tolerance && Max - NdotV > Threshold) ? 0.0 : 1.0;
-//	float ContourFactor = Max - NdotV > Threshold ? 0.0 : 1.0;
+	int NumSamples = 10;
+	float SampleRadius = 0.9;
+	float Tolerance = 0.8;
+	float Threshold = 0.5;
+	// Sampling surrounding pixels
+	float PI = 3.1415926528;
+	float UnitAngle = 2.0 * PI / float(NumSamples);
+	float Max = NdotV;
+	int NumDarker = 0;
 
-	// final output
-	OutColor = (Normal == vec3(0.0, 0.0, 0.0)) ? vec4(1.0, 1.0, 1.0, 0.0) : vec4(vec3(SNormal), 1.0);
+	float DepthThreshold = 0.01;
+	float Depth = (MatProj * MatView * vec4(WorldPos, 1.0)).z;
+	float SampleDepthSum = 0.0;
+	
+	float NormalFactor = 1.0;
+
+	for (int i = 0; i < NumSamples; i++){
+		vec2 SampleUV = GBufferUV;
+		SampleUV.s += cos(UnitAngle * float(i)) * SampleRadius / float(GBufferSize.x);
+		SampleUV.t += sin(UnitAngle * float(i)) * SampleRadius / float(GBufferSize.y);
+
+		// Normal Sample
+		vec3 SampleNormal = texture(NormalSampler, SampleUV.st).rgb;
+		NormalFactor *= max(dot(SampleNormal, SNormal), 0.0) < 0.5 ? 0.0 : 1.0;
+		float SampleNdotV = dot(SampleNormal, V);
+		Max = Max < SampleNdotV ? SampleNdotV : Max;
+		NumDarker = NdotV > SampleNdotV ? NumDarker + 1: NumDarker;
+
+		vec3 SamplePos = texture(WorldPosSampler, SampleUV.st).rgb;
+		SampleDepthSum += (MatProj * MatView * vec4(SamplePos, 1.0)).z;
+	}
+
+	float DepthFactor = abs((Depth * float(NumSamples) - SampleDepthSum)/Depth) > DepthThreshold ? 0.0 : 1.0;
+	float NdotVFactor = float(NumDarker) / float(NumSamples) > Tolerance ? 0.0 : 1.0;
+	float ContourFactor = DepthFactor * NormalFactor;
+
+	OutColor = (Normal == vec3(0.0, 0.0, 0.0)) ? vec4(1.0, 1.0, 1.0, 0.0) : vec4(vec3(ContourFactor), 1.0);
 }

@@ -18,8 +18,9 @@ var PCFHorizontalProgram = new Program('PCFFilter');
 var pencilGeometryProgram = new Program('pencilGeometry');
 var pencilLightProgram = new Program('pencilLight');
 
-var bowsette = new Mesh('bowsette');
 var floor = new Mesh('floor');
+var bowsette = new Mesh('bowsette');
+var cubes = new Mesh('cubes');
 var screenPlane = new RenderPlane();
 var debugPlane = new RenderPlane(0.5);
 
@@ -50,8 +51,8 @@ function renderLoop(timestamp) {
     // light
     light.bindForShadow();
     // mesh
-    bowsette.draw();
-    floor.draw();
+    //bowsette.draw();
+    //floor.draw();
 
     if (util.PCFEnabled) {
       // program

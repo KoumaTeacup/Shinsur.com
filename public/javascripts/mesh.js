@@ -192,11 +192,17 @@ class Mesh {
         this.vertCount[matIndex] += accessors[posIndex].count;
         var outputView = new DataView(outputBuffer);
 
+        var normalHash = new Map();
         for (var i = currVertCount; i < this.vertCount[matIndex]; i++) {
+          var posVal = [
+            posDV.getFloat32(posOffset + (i - currVertCount) * posStride, true) * 100.0,
+            posDV.getFloat32(posOffset + 4 + (i - currVertCount) * posStride, true) * 100.0,
+            posDV.getFloat32(posOffset + 8 + (i - currVertCount) * posStride, true) * 100.0
+          ];
           // assuming position type float32 and 3 components, x100 to compensate Maya scale
-          outputView.setFloat32(i * this.vertexSize + 0, posDV.getFloat32(posOffset + (i - currVertCount) * posStride, true) * 100.0, true);
-          outputView.setFloat32(i * this.vertexSize + 4, posDV.getFloat32(posOffset + 4 + (i - currVertCount) * posStride, true) * 100.0, true);
-          outputView.setFloat32(i * this.vertexSize + 8, posDV.getFloat32(posOffset + 8 + (i - currVertCount) * posStride, true) * 100.0, true);
+          outputView.setFloat32(i * this.vertexSize + 0, posVal[0], true);
+          outputView.setFloat32(i * this.vertexSize + 4, posVal[1], true);
+          outputView.setFloat32(i * this.vertexSize + 8, posVal[2], true);
 
           // assuming tangent type float32 and 4 components
           outputView.setInt8(i * this.vertexSize + 12, tanDV.getFloat32(tanOffset + (i - currVertCount) * tanStride, true) * 0x7F, true);
@@ -205,11 +211,31 @@ class Mesh {
           outputView.setInt8(i * this.vertexSize + 15, tanDV.getFloat32(tanOffset + 12 + (i - currVertCount) * tanStride, true) * 0x7F, true);
 
           // assuming normal type float32 and 3 components
-          outputView.setInt8(i * this.vertexSize + 16, norDV.getFloat32(norOffset + (i - currVertCount) * norStride, true) * 0x7F, true);
-          outputView.setInt8(i * this.vertexSize + 17, norDV.getFloat32(norOffset + 4 + (i - currVertCount) * norStride, true) * 0x7F, true);
-          outputView.setInt8(i * this.vertexSize + 18, norDV.getFloat32(norOffset + 8 + (i - currVertCount) * norStride, true) * 0x7F, true);
+          var norVal = [
+            norDV.getFloat32(norOffset + (i - currVertCount) * norStride, true) * 0x7F,
+            norDV.getFloat32(norOffset + 4 + (i - currVertCount) * norStride, true) * 0x7F,
+            norDV.getFloat32(norOffset + 8 + (i - currVertCount) * norStride, true) * 0x7F
+          ];
+          outputView.setInt8(i * this.vertexSize + 16, norVal[0], true);
+          outputView.setInt8(i * this.vertexSize + 17, norVal[1], true);
+          outputView.setInt8(i * this.vertexSize + 18, norVal[2], true);
           // padding
           outputView.setInt8(i * this.vertexSize + 19, 0);
+
+          // gather and smooth normals
+          if (!normalHash.has(JSON.stringify(posVal))) {
+            normalHash.set(JSON.stringify(posVal), { normal: norVal, count: 1, index:[i] });
+          } else {
+            var savedNormal = normalHash.get(JSON.stringify(posVal));
+            savedNormal.normal = [
+              (savedNormal.normal[0] * savedNormal.count + norVal[0]) / (savedNormal.count + 1),
+              (savedNormal.normal[1] * savedNormal.count + norVal[1]) / (savedNormal.count + 1),
+              (savedNormal.normal[2] * savedNormal.count + norVal[2]) / (savedNormal.count + 1)
+            ];
+
+            savedNormal.count++;
+            savedNormal.index.push(i);
+          }
 
           // initialize smoothed normal with normal
           outputView.setInt8(i * this.vertexSize + 20, 100, true);
@@ -223,6 +249,17 @@ class Mesh {
           outputView.setUint16(i * this.vertexSize + 26, uvDV.getFloat32(uvOffset + 4 + (i - currVertCount) * uvStride, true) * 0xFFFF, true);
         }
 
+        for (var hash of normalHash) {
+          var arrIndex = hash[1].index;
+          var snormal = [];
+          vec3.normalize(snormal, hash[1].normal);
+          for (var index of arrIndex) {
+            outputView.setInt8(index * this.vertexSize + 20, snormal[0] * 0x7F, true);
+            outputView.setInt8(index * this.vertexSize + 21, snormal[1] * 0x7F, true);
+            outputView.setInt8(index * this.vertexSize + 22, snormal[2] * 0x7F, true);
+          }
+        }
+
         // assuming only 1 primitve and 1 mesh
         this.vbo[matIndex] = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo[matIndex]);
@@ -234,7 +271,9 @@ class Mesh {
         var indexView = new DataView(indexBuffer);
 
         for (var i = currIndexCount; i < this.indexCount[matIndex]; i++) {
-          indexView.setUint32(i * 4, indDV.getInt16(indOffset + (i - currIndexCount) * 2, true) + currVertCount, true);
+          var index = indDV.getInt16(indOffset + (i - currIndexCount) * 2, true);
+          indexView.setUint32(i * 4, index + currVertCount, true);
+
         }
 
         this.ibo[matIndex] = gl.createBuffer();
