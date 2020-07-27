@@ -1,13 +1,15 @@
 ﻿class Utility {
   useNPR;
   showDebugView = false;
-  slectedBufferIndex = 0;
+  slectedBufferIndex;
   useForwardShading;
   PCFEnabled = true;
-  shadowView = false;
+  shadowView;
   shadowBias;
   shadowExpScale;
   totalTries = 0;
+  hatchingView;
+  currentHatchingDepth;
 
   constructor() {
     document.getElementById("DebugViewCheckbox").onclick = (e) => {
@@ -25,10 +27,12 @@
         document.getElementById('shadowSection').style.display = 'none';
         document.getElementById('shadingModeSection').style.display = 'none';
         document.getElementById('contourSection').style.display = 'block';
+        document.getElementById('hatchingSection').style.display = 'block';
       } else {
         document.getElementById('shadowSection').style.display = 'block';
         document.getElementById('shadingModeSection').style.display = 'block';
         document.getElementById('contourSection').style.display = 'none';
+        document.getElementById('hatchingSection').style.display = 'none';
       }
     }
 
@@ -42,12 +46,19 @@
       }
     }
 
+    this.slectedBufferIndex = document.getElementById('debugViewOptions').selectedIndex;
     document.getElementById('debugViewOptions').onchange = (e) => {
       this.slectedBufferIndex = e.target.selectedIndex;
     }
 
+    this.shadowView = document.getElementById('ShadowViewCheckbox').checked;
     document.getElementById("ShadowViewCheckbox").onclick = (e) => {
       this.shadowView = e.target.checked;
+    }
+
+    this.hatchingView = document.getElementById('viewHatchingCheckBox').checked;
+    document.getElementById('viewHatchingCheckBox').onclick = (e) => {
+      this.hatchingView = e.target.checked;
     }
 
     document.getElementById("PCFFilterCheckbox").onclick = (e) => {
@@ -73,6 +84,14 @@
     shadowExpScaleslider.oninput = (e) => {
       this.shadowExpScale = e.target.value / 100.0;
       document.getElementById('ShadowExpScaleDisplay').innerHTML = this.shadowExpScale;
+    }
+
+    var currentHatchingDepthSlider = document.getElementById("CurrentHatchingDepthSlider");
+    this.currentHatchingDepth = currentHatchingDepthSlider.value * (document.getElementById('HatchingDepthSlider').value - 1) / 100.0 + 1;
+    document.getElementById('CurrentHatchingDepthDisplay').innerHTML = this.currentHatchingDepth.toFixed(2);
+    currentHatchingDepthSlider.oninput = (e) => {
+      this.currentHatchingDepth = e.target.value * (document.getElementById('HatchingDepthSlider').value - 1) / 100.0 + 1;
+      document.getElementById('CurrentHatchingDepthDisplay').innerHTML = this.currentHatchingDepth.toFixed(2);
     }
   }
 }

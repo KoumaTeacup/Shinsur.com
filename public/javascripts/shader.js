@@ -68,7 +68,7 @@ class Program {
     Program.currentShader = this.program;
     gl.useProgram(this.program);
 
-    // Bind some render settings automatically
+    // Bind some global render settings automatically
     var uniformLoc = gl.getUniformLocation(this.program, 'ShadowBias');
     gl.uniform1f(uniformLoc, util.shadowBias);
     var uniformLoc = gl.getUniformLocation(this.program, 'ShadowView');

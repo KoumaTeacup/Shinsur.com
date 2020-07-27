@@ -1,7 +1,8 @@
 ﻿import { gl } from './context.js';
-import { Framebuffer } from './framebuffer.js';
+import { Framebuffer, Framebuffer3D } from './framebuffer.js';
 import { GBuffer } from './gbuffer.js';
 import { Program } from './shader.js';
+import { util } from './htmlUtil.js';
 
 class Viewport {
   shadowFBO;
@@ -12,8 +13,12 @@ class Viewport {
   PCFKernel = [];
   PCFKernelSum;
   GaussianWidth;
+  pencilHatchingFBO;
+  hatchingRes;
+  hatchingTexDepth;
+
   constructor() {
-    // Read resolution from settings
+    // Initialize shadow fbo from html settings
     var shadowResElem = document.shadowResForm.shadowRes;
     for (var i = 0; i < shadowResElem.length; i++) {
       shadowResElem[i].onchange = (e) => {
@@ -21,11 +26,30 @@ class Viewport {
         this.shadowFBO.resize(shadowRes, shadowRes);
       }
     }
-
     var shadowRes = Number(shadowResElem.value);
     this.shadowFBO = new Framebuffer(shadowRes, shadowRes);
     this.GaussianBlurFBO = new Framebuffer(this.shadowFBO.width, this.shadowFBO.height);
 
+    // Initialize hatching fbo from html settings
+    var hatchingResElem = document.hatchingResForm.hatchingRes;
+    for (var i = 0; i < hatchingResElem.length; i++) {
+      hatchingResElem[i].onchange = (e) => {
+        this.hatchingRes = e.target.value;
+        this.pencilHatchingFBO.resize(this.hatchingRes, this.hatchingRes, this.hatchingTexDepth);
+      }
+    }
+    this.hatchingRes = Number(hatchingResElem.value);
+
+    var hatchingTexDepthElem = document.getElementById("HatchingDepthSlider");
+    this.hatchingTexDepth = hatchingTexDepthElem.value;
+    document.getElementById('HatchingDepthDisplay').innerHTML = this.hatchingTexDepth;
+    hatchingTexDepthElem.oninput = (e) => {
+      this.hatchingTexDepth = e.target.value;
+      this.pencilHatchingFBO.resize(this.hatchingRes, this.hatchingRes, this.hatchingTexDepth);
+      document.getElementById('HatchingDepthDisplay').innerHTML = this.hatchingTexDepth;
+    }
+
+    this.pencilHatchingFBO = new Framebuffer3D(this.hatchingRes, this.hatchingRes, this.hatchingTexDepth);
 
     gl.cullFace(gl.BACK);
 
@@ -38,7 +62,7 @@ class Viewport {
 
     var PCFWidthSlider = document.getElementById("PCFGaussianWidthSlider");
     var PCFWidth = PCFWidthSlider.value / 10.0;
-    document.getElementById('PCFGaussianWidthSlider').innerHTML = PCFWidth;
+    document.getElementById('PCFGaussianWidthDisplay').innerHTML = PCFWidth;
     PCFWidthSlider.oninput = (e) => {
       this.SetPCFKernelSize(this.PCFKernelSize, e.target.value / 10.0);
     }
@@ -133,6 +157,33 @@ class Viewport {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   }
 
+  renderToHatchingPrepare() {
+    this.pencilHatchingFBO.bindForWriting();
+
+    gl.viewport(0, 0, this.pencilHatchingFBO.width, this.pencilHatchingFBO.height);
+
+    gl.disable(gl.BLEND);
+    gl.disable(gl.CULL_FACE);
+    gl.disable(gl.DEPTH_TEST);
+
+    gl.clearColor(0, 0, 0, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  }
+
+  renderToDefaultHatchingDebug() {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    this.bindHatchingFBO();
+
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+    gl.disable(gl.BLEND);
+    gl.disable(gl.CULL_FACE);
+    gl.disable(gl.DEPTH_TEST);
+
+    gl.clearColor(0, 0, 0, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  }
+
   bindShadowMap() {
     this.shadowFBO.bindForReading(7, 'ShadowSampler');
   }
@@ -184,6 +235,13 @@ class Viewport {
       alert('Cannot read empty fbo, check your pipe!');
     }
     this.screenSizeFBOs[index].bindForReading(7, 'InputSampler');
+  }
+
+  bindHatchingFBO() {
+    this.pencilHatchingFBO.bindForReading(0, 'HatchingSampler');
+
+    Program.setUniform1i('NumHatchingSlices', this.hatchingTexDepth);
+    Program.setUniform1f('HatchingSliceCoord', util.currentHatchingDepth);
   }
 
   SetPCFKernelSize(_size, _width) {

@@ -4,6 +4,7 @@ import { FocusCamera } from './camera.js';
 import { PointLight } from './pointLight.js';
 import { Viewport } from './viewport.js';
 import { util } from './htmlUtil.js';
+import { Framebuffer3D} from './framebuffer.js'
 import * as vec3 from './gl-matrix/vec3.js';
 
 // Contructor needed, don't delete
@@ -18,6 +19,8 @@ var PCFHorizontalProgram = new Program('PCFFilter');
 var pencilGeometryProgram = new Program('pencilGeometry');
 var contourLightProgram = new Program('contourLight');
 var contourShakingProgram = new Program('contourShaking');
+var hatchingPrepareProgram = new Program('hatchingPrepare');
+var hatchingDebugProgram = new Program('hatchingDebug');
 
 var floor = new Mesh('floor');
 var bowsette = new Mesh('bowsette');
@@ -35,6 +38,14 @@ lights[0].worldLocation = [6.0, 6.0, 6.0];
 // viewport
 
 var lastTimestamp = 0;
+
+// Hatching Prepare
+//hatchingPrepareProgram.use();
+//viewport.renderToHatchingPrepare();
+//screenPlane.draw();
+
+var fbo = new Framebuffer3D();
+
 function renderLoop(timestamp) {
   // update delta time
   var deltaTime = timestamp - lastTimestamp;
@@ -137,38 +148,52 @@ function renderLoop(timestamp) {
   } else {
     // ------------ Pencil Rendering ------------
 
-    // ------------ Contour Geometry pass ------------
-    // program
-    pencilGeometryProgram.use();
-    // viewport
-    viewport.renderToGBuffer();
-    // camera
-    camera.update();
-    // mesh
-    cubes.draw();
+    if (util.hatchingView) {
+      hatchingPrepareProgram.use();
+      viewport.renderToHatchingPrepare();
+      screenPlane.draw();
+      hatchingDebugProgram.use();
+      viewport.renderToDefaultHatchingDebug();
+      screenPlane.draw();
 
-    // ------------ Contour Light pass ------------
-    // program
-    contourLightProgram.use();
-    // viewport
-    viewport.renderToContourShadingFBO(0);
-    viewport.bindShadowMap();
-    // camera
-    camera.update();
-    // light
-    lights[0].bind();
-    lights[0].bindForShadow();
-    // mesh
-    screenPlane.draw();
+      //const data = new Uint8Array(2 * 2 * 4);
+      //gl.readPixels(0, 0, 2, 2, gl.RGBA, gl.UNSIGNED_BYTE, data);
+      //console.log(data);
+    } else {
 
-    // ------------ Contour Shaking pass ------------
-    // program
-    contourShakingProgram.use();
-    // viewport
-    viewport.renderToDefaultDeferredShading();
-    viewport.bindScreenSizeFBO(0);
-    // mesh
-    screenPlane.draw();
+      // ------------ Contour Geometry pass ------------
+      // program
+      pencilGeometryProgram.use();
+      // viewport
+      viewport.renderToGBuffer();
+      // camera
+      camera.update();
+      // mesh
+      cubes.draw();
+
+      // ------------ Contour Light pass ------------
+      // program
+      contourLightProgram.use();
+      // viewport
+      viewport.renderToContourShadingFBO(0);
+      viewport.bindShadowMap();
+      // camera
+      camera.update();
+      // light
+      lights[0].bind();
+      lights[0].bindForShadow();
+      // mesh
+      screenPlane.draw();
+
+      // ------------ Contour Shaking pass ------------
+      // program
+      contourShakingProgram.use();
+      // viewport
+      viewport.renderToDefaultDeferredShading();
+      viewport.bindScreenSizeFBO(0);
+      // mesh
+      screenPlane.draw();
+    }
     // ------------ End of Pencil rendering ------------
   }
   // update html

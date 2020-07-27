@@ -111,6 +111,35 @@
                 </label>
                 <p class="styleText">On</p>
             </div>
+            <div class="debugInfoDiv" id="hatchingSection">
+                <p class="debugInfoCategory">Hatching</p><br />
+                <p class="styleText">View Hatching Texture: Off</p>
+                <label class="switch">
+                    <input id="viewHatchingCheckBox" type="checkbox" checked>
+                    <span class="slider round"></span>
+                </label>
+                <p class="styleText">On</p>
+                <br>
+                <p class="styleText">Resolution: </p>
+                <form name="hatchingResForm">
+                    <input type="radio" id="hatchingRes512" name="hatchingRes" value="512">
+                    <label for="hatchingRes512" style="color:snow">512</label>
+                    <input type="radio" id="hatchingRes1k" name="hatchingRes" value="1024" checked>
+                    <label for="hatchingRes1k" style="color:snow">1k</label>
+                    <input type="radio" id="hatchingRes2k" name="hatchingRes" value="2048">
+                    <label for="hatchingRes2k" style="color:snow">2k</label>
+                </form>
+                <p class="styleText">Hatching Texture Depth:</p>
+                <div class="slidecontainer">
+                    <input type="range" min="1" max="16" value="3" id="HatchingDepthSlider">
+                    <p class="styleText" id="HatchingDepthDisplay"></p>
+                </div>
+                <p class="styleText">View Depth:</p>
+                <div class="slidecontainer">
+                    <input type="range" min="0" max="100" value="0" id="CurrentHatchingDepthSlider">
+                    <p class="styleText" id="CurrentHatchingDepthDisplay"></p>
+                </div>
+            </div>
         </div>
     </div>
 
