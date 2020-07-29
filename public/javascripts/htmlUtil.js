@@ -10,6 +10,11 @@
   totalTries = 0;
   hatchingView;
   currentHatchingDepth;
+  strokeWidth;
+  maxHatchingLines;
+  srcStrokeIntensity;
+  strokeAngleRange;
+  firstStrokeBias;
 
   constructor() {
     document.getElementById("DebugViewCheckbox").onclick = (e) => {
@@ -92,6 +97,46 @@
     currentHatchingDepthSlider.oninput = (e) => {
       this.currentHatchingDepth = e.target.value * (document.getElementById('HatchingDepthSlider').value - 1) / 100.0 + 1;
       document.getElementById('CurrentHatchingDepthDisplay').innerHTML = this.currentHatchingDepth.toFixed(2);
+    }
+
+    var maxHatchingLinesSlider = document.getElementById("MaxHatchingLinesSlider");
+    this.maxHatchingLines = maxHatchingLinesSlider.value;
+    document.getElementById('MaxHatchingLinesDisplay').innerHTML = this.maxHatchingLines;
+    maxHatchingLinesSlider.oninput = (e) => {
+      this.maxHatchingLines = e.target.value;
+      document.getElementById('MaxHatchingLinesDisplay').innerHTML = this.maxHatchingLines;
+    }
+
+    var hatchingStrokeWidthSlider = document.getElementById("HatchingStrokeWidthSlider");
+    this.strokeWidth = (Math.pow(10.0, (hatchingStrokeWidthSlider.value - 50.0) / 50.0)).toFixed(2);
+    document.getElementById('HatchingStrokeWidthDisplay').innerHTML = this.strokeWidth;
+    hatchingStrokeWidthSlider.oninput = (e) => {
+      this.strokeWidth = (Math.pow(10.0, (e.target.value - 50.0) / 50.0)).toFixed(2);
+      document.getElementById('HatchingStrokeWidthDisplay').innerHTML = this.strokeWidth;
+    }
+
+    var srcStrokeIntensitySlider = document.getElementById("SrcStrokeIntensitySlider");
+    this.srcStrokeIntensity = srcStrokeIntensitySlider.value / 100.0;
+    document.getElementById('SrcStrokeIntensityDisplay').innerHTML = this.srcStrokeIntensity;
+    srcStrokeIntensitySlider.oninput = (e) => {
+      this.srcStrokeIntensity = e.target.value / 100.0;
+      document.getElementById('SrcStrokeIntensityDisplay').innerHTML = this.srcStrokeIntensity;
+    }
+
+    var hatchingStrokeMaxAngleSlider = document.getElementById("HatchingStrokeMaxAngleSlider");
+    this.strokeAngleRange = hatchingStrokeMaxAngleSlider.value * Math.PI / 1800.0;
+    document.getElementById('HatchingStrokeMaxAngleDisplay').innerHTML = (this.strokeAngleRange / Math.PI * 180.0).toFixed(1);
+    hatchingStrokeMaxAngleSlider.oninput = (e) => {
+      this.strokeAngleRange = e.target.value * Math.PI / 1800.0;
+      document.getElementById('HatchingStrokeMaxAngleDisplay').innerHTML = (this.strokeAngleRange / Math.PI * 180.0).toFixed(1);
+    }
+
+    var firstStrokeBiasSlider = document.getElementById("FirstStrokeBiasSlider");
+    this.firstStrokeBias = firstStrokeBiasSlider.value / 100.0;
+    document.getElementById('FirstStrokeBiasDisplay').innerHTML = this.firstStrokeBias;
+    firstStrokeBiasSlider.oninput = (e) => {
+      this.firstStrokeBias = e.target.value / 100.0;
+      document.getElementById('FirstStrokeBiasDisplay').innerHTML = this.firstStrokeBias;
     }
   }
 }

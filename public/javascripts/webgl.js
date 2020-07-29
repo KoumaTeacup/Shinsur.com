@@ -26,7 +26,8 @@ var floor = new Mesh('floor');
 var bowsette = new Mesh('bowsette');
 var cubes = new Mesh('cubes');
 var screenPlane = new RenderPlane();
-var debugPlane = new RenderPlane(0.5);
+var debugPlane = new RenderPlane(640, 360);
+var squarePlane = new RenderPlane(720, 720);
 
 var camera = new FocusCamera();
 camera.viewAngle = vec3.fromValues(0.0, 1.0, 1.0);
@@ -45,6 +46,11 @@ var lastTimestamp = 0;
 //screenPlane.draw();
 
 var fbo = new Framebuffer3D();
+
+// Genrate Hatching Texture
+hatchingPrepareProgram.use();
+viewport.renderToHatchingPrepare();
+screenPlane.draw();
 
 function renderLoop(timestamp) {
   // update delta time
@@ -154,7 +160,7 @@ function renderLoop(timestamp) {
       screenPlane.draw();
       hatchingDebugProgram.use();
       viewport.renderToDefaultHatchingDebug();
-      screenPlane.draw();
+      squarePlane.draw();
 
       //const data = new Uint8Array(2 * 2 * 4);
       //gl.readPixels(0, 0, 2, 2, gl.RGBA, gl.UNSIGNED_BYTE, data);

@@ -3,6 +3,7 @@ import { Framebuffer, Framebuffer3D } from './framebuffer.js';
 import { GBuffer } from './gbuffer.js';
 import { Program } from './shader.js';
 import { util } from './htmlUtil.js';
+import { Texture2D } from './texture.js';
 
 class Viewport {
   shadowFBO;
@@ -16,8 +17,11 @@ class Viewport {
   pencilHatchingFBO;
   hatchingRes;
   hatchingTexDepth;
+  pencilStrokeTex;
 
   constructor() {
+    this.pencilStrokeTex = new Texture2D('./pencilStroke.png');
+
     // Initialize shadow fbo from html settings
     var shadowResElem = document.shadowResForm.shadowRes;
     for (var i = 0; i < shadowResElem.length; i++) {
@@ -35,23 +39,20 @@ class Viewport {
     for (var i = 0; i < hatchingResElem.length; i++) {
       hatchingResElem[i].onchange = (e) => {
         this.hatchingRes = e.target.value;
-        this.pencilHatchingFBO.resize(this.hatchingRes, this.hatchingRes, this.hatchingTexDepth);
+        this.pencilHatchingFBO.resize(this.hatchingRes, this.hatchingRes);
       }
     }
     this.hatchingRes = Number(hatchingResElem.value);
+    this.pencilHatchingFBO = new Framebuffer3D(this.hatchingRes, this.hatchingRes);
+    this.pencilHatchingFBO.resize(this.hatchingRes, this.hatchingRes);
 
     var hatchingTexDepthElem = document.getElementById("HatchingDepthSlider");
     this.hatchingTexDepth = hatchingTexDepthElem.value;
     document.getElementById('HatchingDepthDisplay').innerHTML = this.hatchingTexDepth;
     hatchingTexDepthElem.oninput = (e) => {
       this.hatchingTexDepth = e.target.value;
-      this.pencilHatchingFBO.resize(this.hatchingRes, this.hatchingRes, this.hatchingTexDepth);
       document.getElementById('HatchingDepthDisplay').innerHTML = this.hatchingTexDepth;
     }
-
-    this.pencilHatchingFBO = new Framebuffer3D(this.hatchingRes, this.hatchingRes, this.hatchingTexDepth);
-
-    gl.cullFace(gl.BACK);
 
     var PCFSizeslider = document.getElementById("PCFKernelSizeSlider");
     var PCFSize = PCFSizeslider.value * 2 + 1;
@@ -68,6 +69,8 @@ class Viewport {
     }
 
     this.SetPCFKernelSize(PCFSize, PCFWidth);
+
+    gl.cullFace(gl.BACK);
   }
 
   renderToDefaultForwardShading() {
@@ -166,8 +169,17 @@ class Viewport {
     gl.disable(gl.CULL_FACE);
     gl.disable(gl.DEPTH_TEST);
 
-    gl.clearColor(0, 0, 0, 1);
+    gl.clearColor(1, 1, 1, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    this.pencilStrokeTex.bind('StrokeSampler', 0);
+
+    Program.setUniform1f('SourceStrokeScale', util.srcStrokeIntensity);
+    Program.setUniform1i('NumLinesToDraw', util.maxHatchingLines);
+    Program.setUniform1f('AngleRange', util.strokeAngleRange);
+    Program.setUniform2fv('OutputSize', new Float32Array([this.pencilHatchingFBO.width, this.pencilHatchingFBO.height]));
+    Program.setUniform1f('StrokeWidth', util.strokeWidth);
+    Program.setUniform1f('FirstStrokeBias', util.firstStrokeBias);
   }
 
   renderToDefaultHatchingDebug() {
@@ -180,8 +192,10 @@ class Viewport {
     gl.disable(gl.CULL_FACE);
     gl.disable(gl.DEPTH_TEST);
 
-    gl.clearColor(0, 0, 0, 1);
+    gl.clearColor(1, 1, 1, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+
   }
 
   bindShadowMap() {

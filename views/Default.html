@@ -122,22 +122,49 @@
                 <br>
                 <p class="styleText">Resolution: </p>
                 <form name="hatchingResForm">
+                    <input type="radio" id="hatchingRes128" name="hatchingRes" value="128">
+                    <label for="hatchingRes128" style="color:snow">128</label>
+                    <input type="radio" id="hatchingRes256" name="hatchingRes" value="256">
+                    <label for="hatchingRes256" style="color:snow">256</label>
                     <input type="radio" id="hatchingRes512" name="hatchingRes" value="512">
                     <label for="hatchingRes512" style="color:snow">512</label>
                     <input type="radio" id="hatchingRes1k" name="hatchingRes" value="1024" checked>
                     <label for="hatchingRes1k" style="color:snow">1k</label>
-                    <input type="radio" id="hatchingRes2k" name="hatchingRes" value="2048">
-                    <label for="hatchingRes2k" style="color:snow">2k</label>
                 </form>
                 <p class="styleText">Hatching Texture Depth:</p>
                 <div class="slidecontainer">
-                    <input type="range" min="1" max="16" value="3" id="HatchingDepthSlider">
+                    <input type="range" min="1" max="8" value="8" id="HatchingDepthSlider">
                     <p class="styleText" id="HatchingDepthDisplay"></p>
                 </div>
                 <p class="styleText">View Depth:</p>
                 <div class="slidecontainer">
                     <input type="range" min="0" max="100" value="0" id="CurrentHatchingDepthSlider">
                     <p class="styleText" id="CurrentHatchingDepthDisplay"></p>
+                </div>
+                <p class="styleText">Max Lines Drawn:</p>
+                <div class="slidecontainer">
+                    <input type="range" min="1" max="5000" value="2000" id="MaxHatchingLinesSlider">
+                    <p class="styleText" id="MaxHatchingLinesDisplay"></p>
+                </div>
+                <p class="styleText">Stroke Width Scale:</p>
+                <div class="slidecontainer">
+                    <input type="range" min="0" max="100" value="50" id="HatchingStrokeWidthSlider">
+                    <p class="styleText" id="HatchingStrokeWidthDisplay"></p>
+                </div>
+                <p class="styleText">Source Stroke Intensity Scale:</p>
+                <div class="slidecontainer">
+                    <input type="range" min="0" max="150" value="40" id="SrcStrokeIntensitySlider">
+                    <p class="styleText" id="SrcStrokeIntensityDisplay"></p>
+                </div>
+                <p class="styleText">Max Stroke Angle (degree):</p>
+                <div class="slidecontainer">
+                    <input type="range" min="0" max="450" value="40" id="HatchingStrokeMaxAngleSlider">
+                    <p class="styleText" id="HatchingStrokeMaxAngleDisplay"></p>
+                </div>
+                <p class="styleText">First Stroke Bias:</p>
+                <div class="slidecontainer">
+                    <input type="range" min="0" max="100" value="5" id="FirstStrokeBiasSlider">
+                    <p class="styleText" id="FirstStrokeBiasDisplay"></p>
                 </div>
             </div>
         </div>

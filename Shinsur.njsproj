@@ -58,6 +58,10 @@
     <Content Include="shsrc\gbufferGeometry.vert" />
     <Content Include="shsrc\gbufferLight.frag" />
     <Content Include="shsrc\gbufferLight.vert" />
+    <Content Include="shsrc\hatchingDebug.frag" />
+    <Content Include="shsrc\hatchingDebug.vert" />
+    <Content Include="shsrc\hatchingPrepare.frag" />
+    <Content Include="shsrc\hatchingPrepare.vert" />
     <Content Include="shsrc\PCFFilter.frag" />
     <Content Include="shsrc\PCFFilter.vert" />
     <Content Include="shsrc\pencilGeometry.frag" />

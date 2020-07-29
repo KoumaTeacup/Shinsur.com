@@ -77,34 +77,36 @@ class Framebuffer3D {
   width;
   height;
   lastBoundSlot = 0;
-  depth;
   testTex;
 
-  constructor(_width = 1024, _height = 1024, _depth = 3) {
+  constructor(_width = 1024, _height = 1024) {
     this.width = _width;
     this.height = _height;
-    this.depth = _depth;
 
     // create texture
     this.colorBuffer = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_3D, this.colorBuffer);
-    gl.texImage3D(gl.TEXTURE_3D, 0, gl.RGBA, this.width, this.height, this.depth, 0, gl.RGBA, gl.UNSIGNED_BYTE, null); // 3d texture doesn't support float format
+    gl.texImage3D(gl.TEXTURE_3D, 0, gl.RGBA, this.width, this.height, 8, 0, gl.RGBA, gl.UNSIGNED_BYTE, null); // 3d texture doesn't support float format
 
     // no mip & clamp to edge
     gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    //gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    //gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
     // create framebuffer
     this.fb = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.fb);
-    // render
-    gl.framebufferTextureLayer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, this.colorBuffer, 0, 0);
-    gl.framebufferTextureLayer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT1, this.colorBuffer, 0, 1);
-    gl.framebufferTextureLayer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT2, this.colorBuffer, 0, 2);
 
-    gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1, gl.COLOR_ATTACHMENT2]);
+    // Even though depth can be less, we still create and attch all layers
+    var attachments = [];
+
+    for (var i = 0; i < 8; i++) {
+      gl.framebufferTextureLayer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, this.colorBuffer, 0, i);
+      attachments.push(gl.COLOR_ATTACHMENT0 + i);
+    }
+
+    gl.drawBuffers(attachments);
   }
 
   bindForWriting() {
@@ -126,13 +128,12 @@ class Framebuffer3D {
     Program.setUniform1i(uniform, slot);
   }
 
-  resize(_width, _height, _depth) {
+  resize(_width, _height) {
     this.width = _width;
     this.height = _height;
-    this.depth = _depth;
     // resize color buffer
     gl.bindTexture(gl.TEXTURE_3D, this.colorBuffer);
-    gl.texImage3D(gl.TEXTURE_3D, 0, gl.RGBA, this.width, this.height, this.depth, 0, gl.RGBA, gl.UNSIGNED_BYTE, null); // 3d texture doesn't support float format
+    gl.texImage3D(gl.TEXTURE_3D, 0, gl.RGBA, this.width, this.height, 8, 0, gl.RGBA, gl.UNSIGNED_BYTE, null); // 3d texture doesn't support float format
   }
 }
 
