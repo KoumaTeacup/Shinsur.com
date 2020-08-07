@@ -21,10 +21,12 @@ var contourLightProgram = new Program('contourLight');
 var contourShakingProgram = new Program('contourShaking');
 var hatchingPrepareProgram = new Program('hatchingPrepare');
 var hatchingDebugProgram = new Program('hatchingDebug');
+var normalViewProgram = new Program('normalView');
 
 var floor = new Mesh('floor');
 var bowsette = new Mesh('bowsette');
 var cubes = new Mesh('cubes');
+var cube = new Mesh('cube');
 var screenPlane = new RenderPlane();
 var debugPlane = new RenderPlane(640, 360);
 var squarePlane = new RenderPlane(720, 720);
@@ -39,11 +41,6 @@ lights[0].worldLocation = [6.0, 6.0, 6.0];
 // viewport
 
 var lastTimestamp = 0;
-
-// Hatching Prepare
-//hatchingPrepareProgram.use();
-//viewport.renderToHatchingPrepare();
-//screenPlane.draw();
 
 var fbo = new Framebuffer3D();
 
@@ -153,8 +150,16 @@ function renderLoop(timestamp) {
     // ------------ End of Deferred rendering ------------
   } else {
     // ------------ Pencil Rendering ------------
-
-    if (util.hatchingView) {
+    if (util.normalSmoothingView) {
+      // program
+      normalViewProgram.use();
+      // viewport
+      viewport.renderToDefaultNormalDebug();
+      // camera
+      camera.update();
+      // mesh
+      cube.draw();
+    }else if (util.hatchingView) {
       hatchingPrepareProgram.use();
       viewport.renderToHatchingPrepare();
       screenPlane.draw();

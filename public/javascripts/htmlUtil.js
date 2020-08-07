@@ -8,6 +8,8 @@
   shadowBias;
   shadowExpScale;
   totalTries = 0;
+  normalSmoothingView;
+  contourView;
   hatchingView;
   currentHatchingDepth;
   strokeWidth;
@@ -61,9 +63,31 @@
       this.shadowView = e.target.checked;
     }
 
+    this.normalSmoothingView = document.getElementById('normalSmoothingCheckBox').checked;
+    document.getElementById('normalSmoothingCheckBox').onclick = (e) => {
+      this.normalSmoothingView = e.target.checked;
+      this.hatchingView = !e.target.checked;
+      document.getElementById('viewHatchingCheckBox').checked = false;
+      this.contourView = !e.target.checked;
+      document.getElementById('viewContourCheckBox').checked = false;
+    }
+
+    this.contourView = document.getElementById('viewContourCheckBox').checked;
+    document.getElementById('viewContourCheckBox').onclick = (e) => {
+      this.contourView = e.target.checked;
+      this.hatchingView = !e.target.checked;
+      document.getElementById('viewHatchingCheckBox').checked = false;
+      this.normalSmoothingView = !e.target.checked;
+      document.getElementById('normalSmoothingCheckBox').checked = false;
+    }
+
     this.hatchingView = document.getElementById('viewHatchingCheckBox').checked;
     document.getElementById('viewHatchingCheckBox').onclick = (e) => {
       this.hatchingView = e.target.checked;
+      this.normalSmoothingView = !e.target.checked;
+      document.getElementById('viewContourCheckBox').checked = false;
+      this.contourView = !e.target.checked;
+      document.getElementById('normalSmoothingCheckBox').checked = false;
     }
 
     document.getElementById("PCFFilterCheckbox").onclick = (e) => {
