@@ -17,6 +17,7 @@
   srcStrokeIntensity;
   strokeAngleRange;
   firstStrokeBias;
+  showSmoothedNormal;
 
   constructor() {
     document.getElementById("DebugViewCheckbox").onclick = (e) => {
@@ -70,6 +71,11 @@
       document.getElementById('viewHatchingCheckBox').checked = false;
       this.contourView = !e.target.checked;
       document.getElementById('viewContourCheckBox').checked = false;
+    }
+
+    this.showSmoothedNormal = document.getElementById('normalDebugShowSmoothedCheckBox').checked;
+    document.getElementById('normalDebugShowSmoothedCheckBox').onclick = (e) => {
+      this.showSmoothedNormal = e.target.checked;
     }
 
     this.contourView = document.getElementById('viewContourCheckBox').checked;
