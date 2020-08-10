@@ -101,7 +101,7 @@ class Framebuffer3D {
     // Even though depth can be less, we still create and attch all layers
     var attachments = [];
 
-    for (var i = 0; i < 8; i++) {
+    for (let i = 0; i < 8; i++) {
       gl.framebufferTextureLayer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, this.colorBuffer, 0, i);
       attachments.push(gl.COLOR_ATTACHMENT0 + i);
     }

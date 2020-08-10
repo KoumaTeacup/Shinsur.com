@@ -21,6 +21,7 @@ class Mesh {
   indexCount = [];
   initialized = false;
   materials = [];
+  vertexHashes = [];
 
   // parse the buffer, using the data type we want to pack
   // gl doesn't allow single attribute less than 4 bytes alignment, so we need to pad normal and tanget
@@ -48,7 +49,7 @@ class Mesh {
             this.gltf = data;
 
             // download all binaries
-            for (var i = 0; i < this.gltf.buffers.length; i++) {
+            for (let i = 0; i < this.gltf.buffers.length; i++) {
               // fetch binary file
               fetch(fetchAddr + '/' + this.gltf.buffers[i].uri)
                 .then(response => {
@@ -74,7 +75,7 @@ class Mesh {
     // check if we download all buffers
     if (this.buffers.length !== this.gltf.buffers.length) return;
 
-    for (var material of this.gltf.materials) {
+    for (let material of this.gltf.materials) {
       var newMaterial = new Material(material.name);
       var matDetail = material.pbrMetallicRoughness;
       if (matDetail.baseColorFactor) {
@@ -93,14 +94,14 @@ class Mesh {
     }
 
     // 1 material slot map to 1 vbo and 1 ibo
-    for (var i = 0; i < this.materials.length; i++) {
+    for (let i = 0; i < this.materials.length; i++) {
       this.vertCount[i] = 0;
       this.indexCount[i] = 0;
     }
 
     // calculate the total buf size
-    for (var mesh of this.gltf.meshes) {
-      for (var primitive of mesh.primitives) {
+    for (let mesh of this.gltf.meshes) {
+      for (let primitive of mesh.primitives) {
         var index = primitive.material;
         this.vertCount[index] += this.gltf.accessors[primitive.attributes.POSITION].count;
         this.indexCount[index] += this.gltf.accessors[primitive.indices].count;
@@ -110,21 +111,21 @@ class Mesh {
     // create the final buf arrays
     var outputBuffer = [];
     var indexBuffer = [];
-    for (var i = 0; i < this.materials.length; i++) {
+    for (let i = 0; i < this.materials.length; i++) {
       outputBuffer[i] = new ArrayBuffer(this.vertCount[i] * this.vertexSize);
       indexBuffer[i] = new ArrayBuffer(4 * this.indexCount[i]);
     }
 
     // clear vertex and index count so we can accumulate offsets later
-    for (var i = 0; i < this.materials.length; i++) {
+    for (let i = 0; i < this.materials.length; i++) {
       this.vertCount[i] = 0;
       this.indexCount[i] = 0;
     }
 
     // parse mesh data
     var parsePrimitiveAsync = [];
-    for (var mesh of this.gltf.meshes) {
-      for (var primitive of mesh.primitives) {
+    for (let mesh of this.gltf.meshes) {
+      for (let primitive of mesh.primitives) {
         var index = primitive.material;
         //this.parsePrimitive(primitive, outputBuffer[index], indexBuffer[index]);
 
@@ -193,14 +194,14 @@ class Mesh {
         this.vertCount[matIndex] += accessors[posIndex].count;
         var outputView = new DataView(outputBuffer);
 
-        var normalHash = new Map();
-        for (var i = currVertCount; i < this.vertCount[matIndex]; i++) {
+        var vertexHash = new Map();
+        for (let i = currVertCount; i < this.vertCount[matIndex]; i++) {
+          // assuming position type float32 and 3 components, x100 to compensate Maya scale
           var posVal = [
             posDV.getFloat32(posOffset + (i - currVertCount) * posStride, true) * 100.0,
             posDV.getFloat32(posOffset + 4 + (i - currVertCount) * posStride, true) * 100.0,
             posDV.getFloat32(posOffset + 8 + (i - currVertCount) * posStride, true) * 100.0
           ];
-          // assuming position type float32 and 3 components, x100 to compensate Maya scale
           outputView.setFloat32(i * this.vertexSize + 0, posVal[0], true);
           outputView.setFloat32(i * this.vertexSize + 4, posVal[1], true);
           outputView.setFloat32(i * this.vertexSize + 8, posVal[2], true);
@@ -220,63 +221,119 @@ class Mesh {
           outputView.setInt8(i * this.vertexSize + 16, norVal[0], true);
           outputView.setInt8(i * this.vertexSize + 17, norVal[1], true);
           outputView.setInt8(i * this.vertexSize + 18, norVal[2], true);
-          // padding
-          outputView.setInt8(i * this.vertexSize + 19, 0);
+          outputView.setInt8(i * this.vertexSize + 19, 0); // padding
 
-          // gather and smooth normals
-          if (!normalHash.has(JSON.stringify(posVal))) {
-            normalHash.set(JSON.stringify(posVal), { normal: norVal, count: 1, index: [i] });
+          // Populate vertex hash by key position
+          var posDataAsKey = vec3.fromValues(
+            outputView.getFloat32(i * this.vertexSize + 0, true),
+            outputView.getFloat32(i * this.vertexSize + 4, true),
+            outputView.getFloat32(i * this.vertexSize + 8, true)
+          );
+
+          // Initialize vertex position map, this helps us compute smoothed normal
+          var newElem = { index: i, nativeNormal: norVal, weightedNormal: [0.0, 0.0, 0.0], adjacentElem: new Set() };
+          if (!vertexHash.has(JSON.stringify(posDataAsKey))) {
+            vertexHash.set(JSON.stringify(posDataAsKey), [newElem]);
           } else {
-            var savedNormal = normalHash.get(JSON.stringify(posVal));
-            savedNormal.normal = [
-              (savedNormal.normal[0] * savedNormal.count + norVal[0]) / (savedNormal.count + 1),
-              (savedNormal.normal[1] * savedNormal.count + norVal[1]) / (savedNormal.count + 1),
-              (savedNormal.normal[2] * savedNormal.count + norVal[2]) / (savedNormal.count + 1)
-            ];
-
-            savedNormal.count++;
-            savedNormal.index.push(i);
+            var hashVal = vertexHash.get(JSON.stringify(posDataAsKey));
+            hashVal.push(newElem);
           }
 
-          // initialize smoothed normal with normal
+          // initialize smoothed normal as [100, 0 , 100]
           outputView.setInt8(i * this.vertexSize + 20, 100, true);
           outputView.setInt8(i * this.vertexSize + 21, 0, true);
           outputView.setInt8(i * this.vertexSize + 22, 100, true);
-          // padding
-          outputView.setInt8(i * this.vertexSize + 23, 0);
+          outputView.setInt8(i * this.vertexSize + 23, 0); // padding
 
           // assuming uv type float32 and 4 components
           outputView.setUint16(i * this.vertexSize + 24, uvDV.getFloat32(uvOffset + (i - currVertCount) * uvStride, true) * 0xFFFF, true);
           outputView.setUint16(i * this.vertexSize + 26, uvDV.getFloat32(uvOffset + 4 + (i - currVertCount) * uvStride, true) * 0xFFFF, true);
         }
 
-        for (var hash of normalHash) {
-          var arrIndex = hash[1].index;
-          var snormal = [];
-          vec3.normalize(snormal, hash[1].normal);
-          for (var index of arrIndex) {
-            outputView.setInt8(index * this.vertexSize + 20, snormal[0] * 0x7F, true);
-            outputView.setInt8(index * this.vertexSize + 21, snormal[1] * 0x7F, true);
-            outputView.setInt8(index * this.vertexSize + 22, snormal[2] * 0x7F, true);
-          }
-        }
-
-        // assuming only 1 primitve and 1 mesh
-        this.vbo[matIndex] = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo[matIndex]);
-        gl.bufferData(gl.ARRAY_BUFFER, outputBuffer, gl.STATIC_DRAW);
-
-        // assuming unsigned short
+        // initialize index buffer, assuming data is unsigned short
         var currIndexCount = this.indexCount[matIndex];
         this.indexCount[matIndex] += accessors[indIndex].count;
         var indexView = new DataView(indexBuffer);
 
-        for (var i = currIndexCount; i < this.indexCount[matIndex]; i++) {
-          var index = indDV.getInt16(indOffset + (i - currIndexCount) * 2, true);
-          indexView.setUint32(i * 4, index + currVertCount, true);
+        // Upload index buffer and calculate smoothed normal
+        for (let i = currIndexCount; i < this.indexCount[matIndex]; i += 3) {
+          // Load vertices indices per triangle
+          var index1 = indDV.getInt16(indOffset + (i - currIndexCount) * 2, true) + currVertCount;
+          var index2 = indDV.getInt16(indOffset + (i + 1 - currIndexCount) * 2, true) + currVertCount;
+          var index3 = indDV.getInt16(indOffset + (i + 2 - currIndexCount) * 2, true) + currVertCount;
 
+          // Read their positions from the array buffer
+          var pos1 = vec3.fromValues(
+            outputView.getFloat32(index1 * this.vertexSize + 0, true), // x
+            outputView.getFloat32(index1 * this.vertexSize + 4, true), // y
+            outputView.getFloat32(index1 * this.vertexSize + 8, true)  // z
+          )
+          var pos2 = vec3.fromValues(
+            outputView.getFloat32(index2 * this.vertexSize + 0, true), // x
+            outputView.getFloat32(index2 * this.vertexSize + 4, true), // y
+            outputView.getFloat32(index2 * this.vertexSize + 8, true)  // z
+          )
+          var pos3 = vec3.fromValues(
+            outputView.getFloat32(index3 * this.vertexSize + 0, true), // x
+            outputView.getFloat32(index3 * this.vertexSize + 4, true), // y
+            outputView.getFloat32(index3 * this.vertexSize + 8, true)  // z
+          )
+
+          // fetch the vertex index data from the position hash table
+          var vertexOfPos1 = vertexHash.get(JSON.stringify(pos1));
+          var vertexOfPos2 = vertexHash.get(JSON.stringify(pos2));
+          var vertexOfPos3 = vertexHash.get(JSON.stringify(pos3));
+
+          var indexElem1 = vertexOfPos1.find(element => element.index === index1);
+          var indexElem2 = vertexOfPos2.find(element => element.index === index2);
+          var indexElem3 = vertexOfPos3.find(element => element.index === index3);
+
+          // populate adjacentElem property for each index 
+          indexElem1.adjacentElem.add(vertexOfPos2).add(vertexOfPos3);
+          indexElem2.adjacentElem.add(vertexOfPos1).add(vertexOfPos3);
+          indexElem3.adjacentElem.add(vertexOfPos1).add(vertexOfPos2);
+
+          // calculated weighted normal for each vertex of this triangle and store them in hashtable according to their indices
+          this.calculateWeightedNormal(indexElem1.weightedNormal, pos1, pos2, pos3);
+          this.calculateWeightedNormal(indexElem2.weightedNormal, pos2, pos3, pos1);
+          this.calculateWeightedNormal(indexElem3.weightedNormal, pos3, pos1, pos2);
+
+          // Fill out the index buffer
+          indexView.setUint32(i * 4, index1, true);
+          indexView.setUint32(i * 4 + 4, index2, true);
+          indexView.setUint32(i * 4 + 8, index3, true);
+        }
+        
+        // All vertex indices has been parsed, now normalize and save the smoothed normal
+        for (let perPos of vertexHash) {
+          // we want to divide all weighted normal of this vertex into different sets to combine
+          let arrayOfSets = [];
+          this.clusterNormal(undefined, perPos[1][0], undefined, perPos[1], arrayOfSets, new Set());
+
+          for (let set of arrayOfSets) {
+            // For each set, add up weighted normals
+            let accumulatedNormal = [0.0, 0.0, 0.0];
+            set.forEach(element => {
+              vec3.add(accumulatedNormal, accumulatedNormal, element.weightedNormal);
+            });
+
+            vec3.normalize(accumulatedNormal, accumulatedNormal);
+
+            // upload smoothed normal buffer
+            set.forEach(element => {
+              outputView.setInt8(element.index * this.vertexSize + 20, accumulatedNormal[0] * 0x7F, true);
+              outputView.setInt8(element.index * this.vertexSize + 21, accumulatedNormal[1] * 0x7F, true);
+              outputView.setInt8(element.index * this.vertexSize + 22, accumulatedNormal[2] * 0x7F, true);
+            });
+          }
         }
 
+        // upload vertex buffer, assuming only 1 primitve and per mesh
+        this.vbo[matIndex] = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo[matIndex]);
+        gl.bufferData(gl.ARRAY_BUFFER, outputBuffer, gl.STATIC_DRAW);
+
+        // upload index buffer
         this.ibo[matIndex] = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo[matIndex]);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexBuffer, gl.STATIC_DRAW);
@@ -332,10 +389,107 @@ class Mesh {
     Program.setUniformMatrix4fv('MatModel', matModel);
 
     // draw all meshes
-    for (var i = 0; i < this.indexCount.length; i++) {
+    for (let i = 0; i < this.indexCount.length; i++) {
       this.bind(i);
       gl.drawElements(gl.TRIANGLES, this.indexCount[i], gl.UNSIGNED_INT, 0);
       util.totalTries += this.indexCount[i] / 3;
+    }
+  }
+
+  // Note accumulatedSum is a js array of floats, not vec3
+  calculateWeightedNormal(outNormal, pos1, pos2, pos3) {
+    // weighted normal = v1 x v2 / |v1|^2 / |v2|^2
+    // Paper reference: Weights for Computing Vertex Normals from Facet Normals - Nelson Max
+
+    var v1 = [], v2 = [], weightedNormal = [];
+    vec3.sub(v1, pos2, pos1);
+    vec3.sub(v2, pos3, pos1);
+    vec3.scale(weightedNormal, vec3.cross([], v1, v2), 1.0 / vec3.sqrLen(v1) / vec3.sqrLen(v2));
+
+    // gltf or other mesh format usually output the same vertex as different individual ones (with different 
+    // index) in the vertex array, because their normals can vary, however if a vertex's normal doesn't
+    // change across multiple triangles, only 1 vertex per normal is outputed. To consider this situation,
+    // when doing weighted normals, we have to accumulate weighted normals from all triangles this
+    // vertex is in.
+    vec3.add(outNormal, outNormal, weightedNormal);
+  }
+
+  clusterNormal(instigator, toAdd, setToAdd, indexArray, arrayOfSets, setOfProcessed) {
+    // To add a new weigthed normals to current set, we apply 2 restrictions:
+    // 1. The angle between them must be less than the user specified max
+    // 2. The added normal must share at least one edge(possibly 2 consider a cone) within current set
+    if (!instigator) {
+      // no instigator means this is the starting element, just add it to a new set
+      let newSet = new Set();
+      newSet.add(toAdd);
+      arrayOfSets.push(newSet);
+      setOfProcessed.add(toAdd);
+
+      // recursively trying to add vertex sharing edges on both sides
+      for (let element of indexArray) {
+        if (!setOfProcessed.has(element) && this.hasIntersection(element.adjacentElem, toAdd.adjacentElem)) {
+          this.clusterNormal(toAdd, element, newSet, indexArray, arrayOfSets, setOfProcessed);
+        }
+      }
+
+      return;
+    } else {
+      if (setOfProcessed.has(toAdd)) {
+        // do nothing and return if this element is already in a set
+        return;
+      }
+
+      if (vec3.angle(instigator.nativeNormal, toAdd.nativeNormal) < util.maxSmoothAngle / 180.0 * Math.PI) {
+        setToAdd.add(toAdd);
+        setOfProcessed.add(toAdd);
+        // recursively trying to add vertex sharing edges on the other side (besides instigator)
+        for (let element of indexArray) {
+          if (!setOfProcessed.has(element) && this.hasIntersection(element.adjacentElem, toAdd.adjacentElem)) {
+            this.clusterNormal(toAdd, element, setToAdd, indexArray, arrayOfSets, setOfProcessed);
+            return; // Since there are only 2 edges can be shared, instigator shares one, we just need to find one more
+          }
+        }
+      } else {
+        // if the instigator doesn't satisfy the angle requirement, try the other adjacent triangle
+        
+        for (let set of arrayOfSets) {
+          for (let item of set) {
+            if (this.hasIntersection(item.adjacentElem, toAdd.adjacentElem) && vec3.angle(item.nativeNormal, toAdd.nativeNormal) < util.maxSmoothAngle / 180.0 * Math.PI) {
+              // the other side is valid, add it to the set, since 2 sides are both processed, we stop recursion
+              set.add(toAdd);
+              return;
+            }
+          }
+        }
+
+        // toAdd can't be added to any existing sets, he needs a new set
+        let newSet = new Set();
+        newSet.add(toAdd);
+        arrayOfSets.push(newSet);
+        setOfProcessed.add(toAdd);
+        // recursively trying to add vertex sharing edges on the other side (besides instigator)
+        for (let element of indexArray) {
+          if (!setOfProcessed.has(element) && this.hasIntersection(element.adjacentElem, toAdd.adjacentElem)) {
+            this.clusterNormal(toAdd, element, newSet, indexArray, arrayOfSets, setOfProcessed);
+            return;
+          }
+        }
+      }
+    }
+  }
+
+  hasIntersection(set1, set2) {
+    for (let elem of set1) {
+      if (set2.has(elem)) return true;
+    }
+
+    return false;
+  }
+
+  recomputeSmoothNormal() {
+    if (!this.initialized) {
+      console.log('[Log] Recomputing skipped, mesh: \"' + this.name + '\" is not initialized');
+      return;
     }
   }
 }

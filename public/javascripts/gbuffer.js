@@ -22,7 +22,7 @@ class GBuffer {
 
     // create all buffer textures
     var attachementArray = [];
-    for (var texInfo of this.texturesInfo) {
+    for (let texInfo of this.texturesInfo) {
       // create texture
       var newTexture = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, newTexture);
@@ -59,7 +59,7 @@ class GBuffer {
   bindForWriting() {
     // this is lazy unbind, which can cause surprises, call this before any other texture binding within this draw call
     // unbind textures
-    for (var i = 0; i < this.texturesInfo.length; i++) {
+    for (let i = 0; i < this.texturesInfo.length; i++) {
       gl.activeTexture(gl.TEXTURE0 + i);
       gl.bindTexture(gl.TEXTURE_2D, null);
     }
@@ -71,7 +71,7 @@ class GBuffer {
     gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
 
     // bind textures
-    for (var texInfo of this.texturesInfo) {
+    for (let texInfo of this.texturesInfo) {
       var index = this.texturesInfo.findIndex((element) => element.type === texInfo.type);
       gl.activeTexture(gl.TEXTURE0 + index);
       gl.bindTexture(gl.TEXTURE_2D, texInfo.object);

@@ -27,6 +27,9 @@ var floor = new Mesh('floor');
 var bowsette = new Mesh('bowsette');
 var cubes = new Mesh('cubes');
 var cube = new Mesh('cube');
+var normalTestMesh = new Mesh('normalTestMesh');
+var teapot = new Mesh('UtahTeapot');
+
 var screenPlane = new RenderPlane();
 var debugPlane = new RenderPlane(640, 360);
 var squarePlane = new RenderPlane(720, 720);
@@ -58,7 +61,7 @@ function renderLoop(timestamp) {
   document.getElementById("fps").innerHTML = 'fps: ' + Math.trunc(1000 / deltaTime);
 
   // ----------- Shadow Pass------------
-  for (var light of lights) {
+  for (let light of lights) {
     // program
     shadowProgrm.use();
     // viewport
@@ -158,7 +161,7 @@ function renderLoop(timestamp) {
       // camera
       camera.update();
       // mesh
-      cube.draw();
+      teapot.draw();
     }else if (util.hatchingView) {
       hatchingPrepareProgram.use();
       viewport.renderToHatchingPrepare();

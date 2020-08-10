@@ -62,6 +62,8 @@
     <Content Include="shsrc\hatchingDebug.vert" />
     <Content Include="shsrc\hatchingPrepare.frag" />
     <Content Include="shsrc\hatchingPrepare.vert" />
+    <Content Include="shsrc\normalView.frag" />
+    <Content Include="shsrc\normalView.vert" />
     <Content Include="shsrc\PCFFilter.frag" />
     <Content Include="shsrc\PCFFilter.vert" />
     <Content Include="shsrc\pencilGeometry.frag" />

@@ -27,7 +27,7 @@ class Program {
     this.name = _descName;
 
     // create shaders
-    for (var srcObj of srcArray) {
+    for (let srcObj of srcArray) {
       if (srcObj.descName === this.name) {
         switch (srcObj.type) {
           case 'vert':

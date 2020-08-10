@@ -24,7 +24,7 @@ class Viewport {
 
     // Initialize shadow fbo from html settings
     var shadowResElem = document.shadowResForm.shadowRes;
-    for (var i = 0; i < shadowResElem.length; i++) {
+    for (let i = 0; i < shadowResElem.length; i++) {
       shadowResElem[i].onchange = (e) => {
         var shadowRes = e.target.value;
         this.shadowFBO.resize(shadowRes, shadowRes);
@@ -36,7 +36,7 @@ class Viewport {
 
     // Initialize hatching fbo from html settings
     var hatchingResElem = document.hatchingResForm.hatchingRes;
-    for (var i = 0; i < hatchingResElem.length; i++) {
+    for (let i = 0; i < hatchingResElem.length; i++) {
       hatchingResElem[i].onchange = (e) => {
         this.hatchingRes = e.target.value;
         this.pencilHatchingFBO.resize(this.hatchingRes, this.hatchingRes);
@@ -281,7 +281,7 @@ class Viewport {
 
     var exp = Math.pow(Math.E, -0.5 / this.GaussianWidth / this.GaussianWidth);
     this.PCFKernelSum = 0;
-    for (var i = 0; i < this.PCFKernelSize; i++) {
+    for (let i = 0; i < this.PCFKernelSize; i++) {
       var distance = Math.floor(this.PCFKernelSize / 2) - i;
       this.PCFKernel[i] = Math.pow(exp, distance * distance);
       this.PCFKernelSum += this.PCFKernel[i];

@@ -18,6 +18,7 @@
   strokeAngleRange;
   firstStrokeBias;
   showSmoothedNormal;
+  maxSmoothAngle;
 
   constructor() {
     document.getElementById("DebugViewCheckbox").onclick = (e) => {
@@ -36,11 +37,13 @@
         document.getElementById('shadingModeSection').style.display = 'none';
         document.getElementById('contourSection').style.display = 'block';
         document.getElementById('hatchingSection').style.display = 'block';
+        document.getElementById('normalSmoothingSection').style.display = 'block';
       } else {
         document.getElementById('shadowSection').style.display = 'block';
         document.getElementById('shadingModeSection').style.display = 'block';
         document.getElementById('contourSection').style.display = 'none';
         document.getElementById('hatchingSection').style.display = 'none';
+        document.getElementById('normalSmoothingSection').style.display = 'none';
       }
     }
 
@@ -167,6 +170,14 @@
     firstStrokeBiasSlider.oninput = (e) => {
       this.firstStrokeBias = e.target.value / 100.0;
       document.getElementById('FirstStrokeBiasDisplay').innerHTML = this.firstStrokeBias;
+    }
+
+    var maxSmoothAngleSlider = document.getElementById("maxSmoothAngleSlider");
+    this.maxSmoothAngle = maxSmoothAngleSlider.value;
+    document.getElementById('maxSmoothAngleDisplay').innerHTML = this.maxSmoothAngle;
+    maxSmoothAngleSlider.oninput = (e) => {
+      this.maxSmoothAngle = e.target.value;
+      document.getElementById('maxSmoothAngleDisplay').innerHTML = this.maxSmoothAngle;
     }
   }
 }
