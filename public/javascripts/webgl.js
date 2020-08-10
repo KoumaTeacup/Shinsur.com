@@ -161,6 +161,7 @@ function renderLoop(timestamp) {
       // camera
       camera.update();
       // mesh
+      //bowsette.draw();
       teapot.draw();
     }else if (util.hatchingView) {
       hatchingPrepareProgram.use();

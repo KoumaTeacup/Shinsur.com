@@ -69,6 +69,7 @@ class Mesh {
       })
       .catch(err => console.log(err));
 
+    this.recomputeSmoothNormal();
   }
 
   parse() {
@@ -194,7 +195,15 @@ class Mesh {
         this.vertCount[matIndex] += accessors[posIndex].count;
         var outputView = new DataView(outputBuffer);
 
-        var vertexHash = new Map();
+        // Create the hash map, this will be member data so we can adjust it later at run time
+        let vertexHash;
+        if (this.vertexHashes[matIndex]) {
+          vertexHash = this.vertexHashes[matIndex];
+        } else {
+          vertexHash = new Map();
+          this.vertexHashes[matIndex] = vertexHash;
+        }
+
         for (let i = currVertCount; i < this.vertCount[matIndex]; i++) {
           // assuming position type float32 and 3 components, x100 to compensate Maya scale
           var posVal = [
@@ -229,6 +238,7 @@ class Mesh {
             outputView.getFloat32(i * this.vertexSize + 4, true),
             outputView.getFloat32(i * this.vertexSize + 8, true)
           );
+
 
           // Initialize vertex position map, this helps us compute smoothed normal
           var newElem = { index: i, nativeNormal: norVal, weightedNormal: [0.0, 0.0, 0.0], adjacentElem: new Set() };
@@ -303,30 +313,6 @@ class Mesh {
           indexView.setUint32(i * 4 + 4, index2, true);
           indexView.setUint32(i * 4 + 8, index3, true);
         }
-        
-        // All vertex indices has been parsed, now normalize and save the smoothed normal
-        for (let perPos of vertexHash) {
-          // we want to divide all weighted normal of this vertex into different sets to combine
-          let arrayOfSets = [];
-          this.clusterNormal(undefined, perPos[1][0], undefined, perPos[1], arrayOfSets, new Set());
-
-          for (let set of arrayOfSets) {
-            // For each set, add up weighted normals
-            let accumulatedNormal = [0.0, 0.0, 0.0];
-            set.forEach(element => {
-              vec3.add(accumulatedNormal, accumulatedNormal, element.weightedNormal);
-            });
-
-            vec3.normalize(accumulatedNormal, accumulatedNormal);
-
-            // upload smoothed normal buffer
-            set.forEach(element => {
-              outputView.setInt8(element.index * this.vertexSize + 20, accumulatedNormal[0] * 0x7F, true);
-              outputView.setInt8(element.index * this.vertexSize + 21, accumulatedNormal[1] * 0x7F, true);
-              outputView.setInt8(element.index * this.vertexSize + 22, accumulatedNormal[2] * 0x7F, true);
-            });
-          }
-        }
 
         // upload vertex buffer, assuming only 1 primitve and per mesh
         this.vbo[matIndex] = gl.createBuffer();
@@ -381,6 +367,8 @@ class Mesh {
       console.log('[Log] drawing skipped, mesh: \"' + this.name + '\" is not initialized');
       return;
     }
+
+    this.recomputeSmoothNormal();
 
     // Compute model matrix
     var matModel = mat4.fromRotationTranslationScale([], quat.fromEuler([], this.rotation[0], this.rotation[1], this.rotation[2]), this.translate, this.scale);
@@ -490,6 +478,43 @@ class Mesh {
     if (!this.initialized) {
       console.log('[Log] Recomputing skipped, mesh: \"' + this.name + '\" is not initialized');
       return;
+    }
+
+    let outputBuffer = new Int8Array(3);
+
+    // for all meshes
+    for (let matIndex = 0; matIndex < this.materials.length; matIndex++) {
+      let vertexHash = this.vertexHashes[matIndex];
+
+      for (let perPos of vertexHash) {
+        // we want to divide all weighted normal of this vertex into different sets to combine
+        let arrayOfSets = [];
+        this.clusterNormal(undefined, perPos[1][0], undefined, perPos[1], arrayOfSets, new Set());
+
+        for (let set of arrayOfSets) {
+          // For each set, add up weighted normals
+          let accumulatedNormal = [0.0, 0.0, 0.0];
+          set.forEach(element => {
+            vec3.add(accumulatedNormal, accumulatedNormal, element.weightedNormal);
+          });
+
+          vec3.normalize(accumulatedNormal, accumulatedNormal);
+
+          // upload smoothed normal buffer
+          set.forEach(element => {
+            outputBuffer[0] = accumulatedNormal[0] * 0x7F;
+            outputBuffer[1] = accumulatedNormal[1] * 0x7F;
+            outputBuffer[2] = accumulatedNormal[2] * 0x7F;
+            //outputView.setInt8(element.index * this.vertexSize + 20, accumulatedNormal[0] * 0x7F, true);
+            //outputView.setInt8(element.index * this.vertexSize + 21, accumulatedNormal[1] * 0x7F, true);
+            //outputView.setInt8(element.index * this.vertexSize + 22, accumulatedNormal[2] * 0x7F, true);
+
+            // upload vertex buffer with new smoothed normals
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo[matIndex]);
+            gl.bufferSubData(gl.ARRAY_BUFFER, element.index * this.vertexSize + 20, outputBuffer, 0, 3);
+          });
+        }
+      }
     }
   }
 }
