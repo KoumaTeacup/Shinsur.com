@@ -368,7 +368,7 @@ class Mesh {
       return;
     }
 
-    this.recomputeSmoothNormal();
+    //this.recomputeSmoothNormal();
 
     // Compute model matrix
     var matModel = mat4.fromRotationTranslationScale([], quat.fromEuler([], this.rotation[0], this.rotation[1], this.rotation[2]), this.translate, this.scale);
@@ -427,7 +427,7 @@ class Mesh {
         return;
       }
 
-      if (vec3.angle(instigator.nativeNormal, toAdd.nativeNormal) < util.maxSmoothAngle / 180.0 * Math.PI) {
+      if (vec3.angle(instigator.nativeNormal, toAdd.nativeNormal) < util.maxSmoothAngle.value / 180.0 * Math.PI) {
         setToAdd.add(toAdd);
         setOfProcessed.add(toAdd);
         // recursively trying to add vertex sharing edges on the other side (besides instigator)
@@ -442,7 +442,7 @@ class Mesh {
         
         for (let set of arrayOfSets) {
           for (let item of set) {
-            if (this.hasIntersection(item.adjacentElem, toAdd.adjacentElem) && vec3.angle(item.nativeNormal, toAdd.nativeNormal) < util.maxSmoothAngle / 180.0 * Math.PI) {
+            if (this.hasIntersection(item.adjacentElem, toAdd.adjacentElem) && vec3.angle(item.nativeNormal, toAdd.nativeNormal) < util.maxSmoothAngle.value / 180.0 * Math.PI) {
               // the other side is valid, add it to the set, since 2 sides are both processed, we stop recursion
               set.add(toAdd);
               return;

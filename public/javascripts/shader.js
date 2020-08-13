@@ -70,11 +70,11 @@ class Program {
 
     // Bind some global render settings automatically
     var uniformLoc = gl.getUniformLocation(this.program, 'ShadowBias');
-    gl.uniform1f(uniformLoc, util.shadowBias);
+    gl.uniform1f(uniformLoc, util.shadowBias.value);
     var uniformLoc = gl.getUniformLocation(this.program, 'ShadowView');
-    gl.uniform1i(uniformLoc, util.shadowView);
+    gl.uniform1i(uniformLoc, util.shadowView.value);
     var uniformLoc = gl.getUniformLocation(this.program, 'ShadowExpScale');
-    gl.uniform1f(uniformLoc, util.shadowExpScale);
+    gl.uniform1f(uniformLoc, util.shadowExpScale.value);
   }
 
   static setUniform1f(_uniform, _value) {

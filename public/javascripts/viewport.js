@@ -174,12 +174,12 @@ class Viewport {
 
     this.pencilStrokeTex.bind('StrokeSampler', 0);
 
-    Program.setUniform1f('SourceStrokeScale', util.srcStrokeIntensity);
-    Program.setUniform1i('NumLinesToDraw', util.maxHatchingLines);
-    Program.setUniform1f('AngleRange', util.strokeAngleRange);
+    Program.setUniform1f('SourceStrokeScale', util.srcStrokeIntensity.value);
+    Program.setUniform1i('NumLinesToDraw', util.maxHatchingLines.value);
+    Program.setUniform1f('AngleRange', util.strokeAngleRange.value);
     Program.setUniform2fv('OutputSize', new Float32Array([this.pencilHatchingFBO.width, this.pencilHatchingFBO.height]));
-    Program.setUniform1f('StrokeWidth', util.strokeWidth);
-    Program.setUniform1f('FirstStrokeBias', util.firstStrokeBias);
+    Program.setUniform1f('StrokeWidth', util.strokeWidth.value);
+    Program.setUniform1f('FirstStrokeBias', util.firstStrokeBias.value);
   }
 
   renderToDefaultHatchingDebug() {
@@ -210,7 +210,7 @@ class Viewport {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    Program.setUniform1i('ShowSmoothed', util.showSmoothedNormal);
+    Program.setUniform1i('ShowSmoothed', util.showSmoothedNormal.value);
   }
 
   bindShadowMap() {
@@ -270,7 +270,7 @@ class Viewport {
     this.pencilHatchingFBO.bindForReading(0, 'HatchingSampler');
 
     Program.setUniform1i('NumHatchingSlices', this.hatchingTexDepth);
-    Program.setUniform1f('HatchingSliceCoord', util.currentHatchingDepth);
+    Program.setUniform1f('HatchingSliceCoord', util.currentHatchingDepth.value);
   }
 
   SetPCFKernelSize(_size, _width) {

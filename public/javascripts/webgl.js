@@ -153,7 +153,7 @@ function renderLoop(timestamp) {
     // ------------ End of Deferred rendering ------------
   } else {
     // ------------ Pencil Rendering ------------
-    if (util.normalSmoothingView) {
+    if (util.normalSmoothingView.value) {
       // program
       normalViewProgram.use();
       // viewport
@@ -163,7 +163,7 @@ function renderLoop(timestamp) {
       // mesh
       //bowsette.draw();
       teapot.draw();
-    }else if (util.hatchingView) {
+    }else if (util.hatchingView.value) {
       hatchingPrepareProgram.use();
       viewport.renderToHatchingPrepare();
       screenPlane.draw();
