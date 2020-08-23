@@ -48,12 +48,13 @@ class Program {
     gl.attachShader(this.program, this.vShader.shader);
     gl.attachShader(this.program, this.fShader.shader);
 
-    // set attribute location
+    // set attribute location, max 16
     gl.bindAttribLocation(this.program, 0, 'a_position');
     gl.bindAttribLocation(this.program, 1, 'a_tangent');
     gl.bindAttribLocation(this.program, 2, 'a_normal');
     gl.bindAttribLocation(this.program, 3, 'a_uv');
     gl.bindAttribLocation(this.program, 4, 'a_snormal');
+    gl.bindAttribLocation(this.program, 5, 'a_curvature');
 
     // link program
     gl.linkProgram(this.program);

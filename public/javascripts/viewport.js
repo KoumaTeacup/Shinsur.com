@@ -213,6 +213,21 @@ class Viewport {
     Program.setUniform1i('ShowSmoothed', util.showSmoothedNormal.value);
   }
 
+  renderToDefaultCurvatureDebug() {
+    // unbind framebuffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    // canvas size
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+    gl.disable(gl.BLEND);
+    gl.enable(gl.CULL_FACE);
+    gl.enable(gl.DEPTH_TEST);
+
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  }
+
   bindShadowMap() {
     this.shadowFBO.bindForReading(7, 'ShadowSampler');
   }

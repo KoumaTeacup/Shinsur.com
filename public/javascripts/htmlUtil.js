@@ -20,6 +20,7 @@
   firstStrokeBias = { value: 0.0 };
   showSmoothedNormal = { value: false };
   maxSmoothAngle = { value: 0.0 };
+  recomputeSmoothNormal;
 
   constructor() {
     document.getElementById("DebugViewCheckbox").onclick = (e) => {
@@ -65,15 +66,6 @@
       this.slectedBufferIndex = e.target.selectedIndex;
     }
 
-
-    this.setupNPRMutexCheckbox(this.normalSmoothingView, 'normalSmoothingCheckBox')
-    this.setupNPRMutexCheckbox(this.curvatureView, 'curvatureViewCheckBox')
-    this.setupNPRMutexCheckbox(this.contourView, 'viewContourCheckBox')
-    this.setupNPRMutexCheckbox(this.hatchingView, 'viewHatchingCheckBox')
-
-    this.setupStandaloneCheckbox(this.shadowView, 'ShadowViewCheckbox');
-    this.setupStandaloneCheckbox(this.showSmoothedNormal, 'normalDebugShowSmoothedCheckBox');
-
     document.getElementById("PCFFilterCheckbox").onclick = (e) => {
       this.PCFEnabled = e.target.checked;
       if (!this.PCFEnabled) {
@@ -82,6 +74,14 @@
         document.getElementById("PCFFilterDiv").style.display = 'block';
       }
     }
+
+    this.setupNPRMutexCheckbox(this.normalSmoothingView, 'normalSmoothingCheckBox')
+    this.setupNPRMutexCheckbox(this.curvatureView, 'curvatureViewCheckBox')
+    this.setupNPRMutexCheckbox(this.contourView, 'viewContourCheckBox')
+    this.setupNPRMutexCheckbox(this.hatchingView, 'viewHatchingCheckBox')
+
+    this.setupStandaloneCheckbox(this.shadowView, 'ShadowViewCheckbox');
+    this.setupStandaloneCheckbox(this.showSmoothedNormal, 'normalDebugShowSmoothedCheckBox');
 
     this.setupNumericalSlider(
       this.shadowBias,
@@ -144,7 +144,8 @@
     this.setupNumericalSlider(
       this.maxSmoothAngle,
       "maxSmoothAngleSlider",
-      'maxSmoothAngleDisplay'
+      'maxSmoothAngleDisplay',
+      (val) => { this.recomputeSmoothNormal = true; return val; }
     );
   }
 

@@ -22,13 +22,14 @@ var contourShakingProgram = new Program('contourShaking');
 var hatchingPrepareProgram = new Program('hatchingPrepare');
 var hatchingDebugProgram = new Program('hatchingDebug');
 var normalViewProgram = new Program('normalView');
+var curvatureViewProgram = new Program('curvatureView');
 
-var floor = new Mesh('floor');
-var bowsette = new Mesh('bowsette');
-var cubes = new Mesh('cubes');
-var cube = new Mesh('cube');
-var normalTestMesh = new Mesh('normalTestMesh');
-var teapot = new Mesh('UtahTeapot');
+//var floor = new Mesh('floor');
+//var bowsette = new Mesh('bowsette');
+//var cubes = new Mesh('cubes');
+//var cube = new Mesh('cube');
+var test = new Mesh('test');
+//var teapot = new Mesh('UtahTeapot');
 
 var screenPlane = new RenderPlane();
 var debugPlane = new RenderPlane(640, 360);
@@ -61,31 +62,31 @@ function renderLoop(timestamp) {
   document.getElementById("fps").innerHTML = 'fps: ' + Math.trunc(1000 / deltaTime);
 
   // ----------- Shadow Pass------------
-  for (let light of lights) {
-    // program
-    shadowProgrm.use();
-    // viewport
-    viewport.renderToShadowMap();
-    // light
-    light.bindForShadow();
-    // mesh
-    bowsette.draw();
-    floor.draw();
+  //for (let light of lights) {
+  //  // program
+  //  shadowProgrm.use();
+  //  // viewport
+  //  viewport.renderToShadowMap();
+  //  // light
+  //  light.bindForShadow();
+  //  // mesh
+  //  bowsette.draw();
+  //  floor.draw();
 
-    if (util.PCFEnabled) {
-      // program
-      PCFHorizontalProgram.use();
-      // viewport
-      viewport.bindPCFHorizontal();
-      // mesh
-      screenPlane.draw();
+  //  if (util.PCFEnabled) {
+  //    // program
+  //    PCFHorizontalProgram.use();
+  //    // viewport
+  //    viewport.bindPCFHorizontal();
+  //    // mesh
+  //    screenPlane.draw();
 
-      // viewprot
-      viewport.bindPCFVertical();
-      // mesh
-      screenPlane.draw();
-    }
-  }
+  //    // viewprot
+  //    viewport.bindPCFVertical();
+  //    // mesh
+  //    screenPlane.draw();
+  //  }
+  //}
   // ----------- End of Shadow Pass ------------
 
   // clear html per frame data
@@ -161,9 +162,18 @@ function renderLoop(timestamp) {
       // camera
       camera.update();
       // mesh
-      //bowsette.draw();
-      teapot.draw();
-    }else if (util.hatchingView.value) {
+      //teapot.draw();
+      test.draw();
+    } else if (util.curvatureView.value) {
+      // program
+      curvatureViewProgram.use();
+      // viewport
+      viewport.renderToDefaultCurvatureDebug();
+      // camera
+      camera.update();
+      // mesh
+      test.draw();
+    } else if(util.hatchingView.value) {
       hatchingPrepareProgram.use();
       viewport.renderToHatchingPrepare();
       screenPlane.draw();
@@ -213,6 +223,8 @@ function renderLoop(timestamp) {
   }
   // update html
   document.getElementById('triCount').innerHTML = 'Tries Drawn: ' + util.totalTries;
+
+  util.recomputeSmoothNormal = false;
 
   // request next frame
   window.requestAnimationFrame(renderLoop);
