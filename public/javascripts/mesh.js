@@ -44,30 +44,11 @@ class FaceData {
   vertex1;
   vertex2;
   vertex3;
-  //angle1;
-  //angle2;
-  //angle3;
   constructor(v1, v2, v3) {
     this.vertex1 = v1;
     this.vertex2 = v2;
     this.vertex3 = v3;
-
-    //let pos1 = v1.getPositionVector();
-    //let pos2 = v2.getPositionVector();
-    //let pos3 = v3.getPositionVector();
-
-    //this.angle1 = this.angleOf(pos1, pos2, pos3);
-    //this.angle2 = this.angleOf(pos2, pos1, pos3);
-    //this.angle3 = this.angleOf(pos3, pos2, pos1);
   }
-
-  //angleOf(v1, v2, v3) {
-  //  let e1 = [0.0, 0.0, 0.0];
-  //  let e2 = [0.0, 0.0, 0.0];
-  //  vec3.sub(e1, v2, v1);
-  //  vec3.sub(e2, v3, v1);
-  //  return vec3.angle(e1, e2);
-  //}
 
   calculateWeightedNormal() {
     this.calculateWeightedNormalHelper(this.vertex1, this.vertex2, this.vertex3);
@@ -524,11 +505,6 @@ class VertexCluster {
 
       vec3.normalize(this.maxCurvatureDir, this.maxCurvatureDir);
       vec3.normalize(this.minCurvatureDir, this.minCurvatureDir);
-
-      //this.vertices.forEach(vertex => {
-      //  vertex.maxCurvatureDir = this.;
-      //  vertex.minCurvatureDir = this.minCurvatureDir;
-      //});
     }
   }
 
