@@ -12,5 +12,6 @@ uniform bool ShowSmoothed;
 out vec4 OutColor;
  
 void main() {
-	OutColor = vec4(PrimaryCurvatureDir, 1.0);
+	OutColor = vec4(PrimaryCurvatureDir * 0.5 + 0.5, 1.0);
+//	OutColor = vec4(vec3(Curvature), 1.0);
 }
