@@ -7,16 +7,10 @@ precision highp float;
 uniform sampler2D InputSampler;
 out vec4 OutColor;
 
-//float rand(vec2 co){
-//    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
-//}
-
 void main() {
 	ivec2 TexutreSize = textureSize(InputSampler, 0);
 	vec2 SampleUV = gl_FragCoord.xy / vec2(TexutreSize);
 	
-//	float fRand = (rand(SampleUV) - 0.5) / 500.0;
-//	SampleUV += vec2(fRand, fRand);
 	int NumberRedraw = 3;
 
 	float Period = 0.05;

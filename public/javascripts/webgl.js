@@ -17,6 +17,7 @@ var gbufferGeometryProg = new Program('gbufferGeometry');
 var shadowProgrm = new Program('shadow');
 var PCFHorizontalProgram = new Program('PCFFilter');
 var pencilGeometryProgram = new Program('pencilGeometry');
+var pencilLightProgram = new Program('pencilLight');
 var contourLightProgram = new Program('contourLight');
 var contourShakingProgram = new Program('contourShaking');
 var hatchingPrepareProgram = new Program('hatchingPrepare');
@@ -130,6 +131,7 @@ function renderLoop(timestamp) {
       // program
       gbufferLightProg.use();
       // viewport
+      viewport.bindGBuffer();
       viewport.renderToDefaultDeferredShading();
       viewport.bindShadowMap();
       // camera
@@ -146,6 +148,7 @@ function renderLoop(timestamp) {
         // program
         debugProg.use();
         // viewport
+        viewport.bindGBuffer();
         viewport.renderToDefaultDeferredShadingDebug();
         // mesh
         debugPlane.draw();
@@ -162,7 +165,6 @@ function renderLoop(timestamp) {
       // camera
       camera.update();
       // mesh
-      //teapot.draw();
       test.draw();
     } else if (util.curvatureView.value) {
       // program
@@ -172,6 +174,7 @@ function renderLoop(timestamp) {
       // camera
       camera.update();
       // mesh
+      //teapot.draw();
       test.draw();
     } else if(util.hatchingView.value) {
       hatchingPrepareProgram.use();
@@ -180,10 +183,7 @@ function renderLoop(timestamp) {
       hatchingDebugProgram.use();
       viewport.renderToDefaultHatchingDebug();
       squarePlane.draw();
-
-      //const data = new Uint8Array(2 * 2 * 4);
-      //gl.readPixels(0, 0, 2, 2, gl.RGBA, gl.UNSIGNED_BYTE, data);
-      //console.log(data);
+      
     } else {
 
       // ------------ Contour Geometry pass ------------
@@ -214,10 +214,17 @@ function renderLoop(timestamp) {
       // program
       contourShakingProgram.use();
       // viewport
+      viewport.bindGBuffer();
       viewport.renderToDefaultDeferredShading();
       viewport.bindScreenSizeFBO(0);
       // mesh
       screenPlane.draw();
+
+      // ------------ Pencil Lighting pass ------------
+      // program
+      //pencilLightProgram.use();
+      // viewport
+
     }
     // ------------ End of Pencil rendering ------------
   }

@@ -54,7 +54,9 @@ class Program {
     gl.bindAttribLocation(this.program, 2, 'a_normal');
     gl.bindAttribLocation(this.program, 3, 'a_uv');
     gl.bindAttribLocation(this.program, 4, 'a_snormal');
-    gl.bindAttribLocation(this.program, 5, 'a_curvature');
+    gl.bindAttribLocation(this.program, 5, 'a_curvature1');
+    gl.bindAttribLocation(this.program, 6, 'a_curvature2');
+    gl.bindAttribLocation(this.program, 7, 'a_curvature3');
 
     // link program
     gl.linkProgram(this.program);

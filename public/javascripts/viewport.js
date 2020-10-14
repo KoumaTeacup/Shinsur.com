@@ -89,7 +89,7 @@ class Viewport {
   }
 
   renderToDefaultDeferredShading() {
-    this.gBuffer.bindAllForReading();
+    //this.gBuffer.bindAllForReading();
     // canvas size
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
@@ -226,6 +226,10 @@ class Viewport {
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  }
+
+  bindGBuffer() {
+    this.gBuffer.bindAllForReading();
   }
 
   bindShadowMap() {

@@ -9,6 +9,8 @@ in vec3 Tanget;
 in vec3 Normal;
 in vec3 SNormal;
 in vec2 UV;
+in float Curvature;
+in vec3 MaxCurvatureDir;
 
 uniform float Roughness;
 uniform sampler2D DiffuseSampler;
@@ -20,6 +22,7 @@ layout (location = 1) out vec4 DiffuseOut;
 layout (location = 2) out vec3 NormalOut;
 layout (location = 3) out vec3 SNormalOut;
 layout (location = 4) out vec2 TexCoordOut;
+layout (location = 5) out vec4 CurvatureOut;
  
 void main() {
 	WorldPosOut = WorldPos;
@@ -27,5 +30,6 @@ void main() {
 	DiffuseOut.a = Roughness;
 	NormalOut = Normal;
 	SNormalOut = SNormal;
+	CurvatureOut = vec4(MaxCurvatureDir, Curvature);
 	TexCoordOut = UV;
 }

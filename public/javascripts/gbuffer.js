@@ -10,7 +10,8 @@ class GBuffer {
     { type: 'diffuse', uniform: 'DiffuseSampler', object: 0 },
     { type: 'normal', uniform: 'NormalSampler', object: 0 },
     { type: 'snormal', uniform: 'SNormalSampler', object: 0 },
-    { type: 'texCoord', uniform: 'TexCoordSampler', object: 0 }];
+    { type: 'texCoord', uniform: 'TexCoordSampler', object: 0 },
+    { type: 'curvature', uniform: 'CurvatureSampler', object: 0 }];
   width = gl.canvas.width;
   height = gl.canvas.height;
   plane;
@@ -88,6 +89,7 @@ class GBuffer {
       case 2: bufferType = 'normal'; break;
       case 3: bufferType = 'snormal'; break;
       case 4: bufferType = 'texCoord'; break;
+      case 5: bufferType = 'curvature'; break;
       default: return;
     }
     var index = this.texturesInfo.findIndex((element) => element.type === bufferType);

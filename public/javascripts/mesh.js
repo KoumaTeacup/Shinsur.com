@@ -472,7 +472,7 @@ class VertexCluster {
   }
 
   tryComputePrincipalCurvatures() {
-    if (this.hasValidCurvature) return;
+    if (this.hasValidCurvature) alert('Trying to compute principal curvature problem: principal curvature already exists!');
 
     // First we compute eigen vector (principal direction) with our current fundamental tensor
     let principal1 = [0.0, 0.0, 0.0];
@@ -483,7 +483,7 @@ class VertexCluster {
     // We don't like uncertainty so I'm gonna skip this one and deal with it later after it's smoothed by surrounding fundamental tensors
     let maxCurvature = principal1[2];
     let minCurvature = principal2[2];
-    if (maxCurvature - minCurvature > 0.0001) {
+    if (Math.abs(maxCurvature) - Math.abs(minCurvature) > 0.0001) {
       // Save the weighted tensor
       this.hasValidCurvature = true;
 
@@ -527,23 +527,60 @@ class VertexCluster {
     });
   }
 
-  smoothFundTensor() {
+  smoothPrincipalDir() {
+    // This funciton guarantee that this cluster will have valid curvature.
+    this.hasValidCurvature = true;
+
     if (this.maxNeighbourAngle === 0.0) {
       // no valid neighbour, we have to come up with an arbitrary principal direction
       // this will only affect principal direction, not curvature magnitude (since it's computed )
-      this.clusterTensor = [1.0, 2.0, 3.0];
+      this.maxCurvatureDir = [1.0, 1.0, 0.0];
+      this.minCurvatureDir = [1.0, -1.0, 0.0];
+
+      // project principle curvature direction from cluster space to object space, so we won't burden GPU for calculation
+      let m = mat3.fromValues(
+        this.smoothedTangent[0], this.smoothedBiTangent[0], this.smoothedNormal[0],
+        this.smoothedTangent[1], this.smoothedBiTangent[1], this.smoothedNormal[1],
+        this.smoothedTangent[2], this.smoothedBiTangent[2], this.smoothedNormal[2]
+      )
+
+      mat3.invert(m, m);
+
+      vec3.transformMat3(this.maxCurvatureDir, this.maxCurvatureDir, m);
+      vec3.transformMat3(this.minCurvatureDir, this.minCurvatureDir, m);
+
+      vec3.normalize(this.maxCurvatureDir, this.maxCurvatureDir);
+      vec3.normalize(this.maxCurvatureDir, this.maxCurvatureDir);
     } else {
-      // average fundamental tensor of all valid neighbour
-      let count = 0;
-      let sum = [0.0, 0.0, 0.0];
-      this.neighbours.forEach(neighbourCluster => {
-        if (neighbourCluster.hasValidCurvature) {
-          vec3.add(sum, sum, neighbourCluster.clusterTensor);
-          ++count;
+      // We have some neighbours, average those neighbour direction data for this cluster
+      if (this.neighbours.size < 1) alert('No neighbours found for smoothing curvature, this should not happen');
+
+      this.maxCurvatureDir = [0.0, 0.0, 0.0];
+      this.minCurvatureDir = [0.0, 0.0, 0.0];
+
+      // at this point, all the neighbours curvature direction data is not unified, meaning they can go opposite direction from each other
+      // we use the first neighbour to be the compare frame, and unify before average
+      // this will fail if the curvature changes too abruptly between neighbours, which I don't want to bother 
+      let chosenNeighbour;
+      this.neighbours.forEach(neighbour => {
+        if (neighbour.hasValidCurvature) {
+          if (!chosenNeighbour) {
+            chosenNeighbour = neighbour;
+          } else {
+            // Reverse the direction if this neighbour is going opposite of our chosen frame
+            if (vec3.angle(neighbour.maxCurvatureDir, chosenNeighbour.maxCurvatureDir) > Math.PI / 2.0) {
+              vec3.negate(neighbour.maxCurvatureDir, neighbour.maxCurvatureDir);
+            }
+            if (vec3.angle(neighbour.minCurvatureDir, chosenNeighbour.minCurvatureDir) > Math.PI / 2.0) {
+              vec3.negate(neighbour.minCurvatureDir, neighbour.minCurvatureDir);
+            }
+          }
+          vec3.add(this.maxCurvatureDir, this.maxCurvatureDir, neighbour.maxCurvatureDir);
+          vec3.add(this.minCurvatureDir, this.minCurvatureDir, neighbour.minCurvatureDir);
         }
       });
-
-      vec3.scale(this.clusterTensor, sum, 1.0 / count);
+      vec3.normalize(this.maxCurvatureDir, this.maxCurvatureDir);
+      vec3.normalize(this.minCurvatureDir, this.minCurvatureDir);
     }
   }
 
@@ -611,7 +648,7 @@ class VertexCluster {
     eigenVec2[1] = v[1];
 
     // we swap them so that the first vector has a larger eigen value, used to determine the larger principle curvature
-    if (eigenVec1[2] < eigenVec2[2]) {
+    if (Math.abs(eigenVec1[2]) < Math.abs(eigenVec2[2])) {
       let temp = eigenVec1;
       eigenVec1 = eigenVec2;
       eigenVec2 = temp;
@@ -619,25 +656,30 @@ class VertexCluster {
   }
 
   unifyPrincipalDirections() {
-    this.neighbours.forEach(neighbourCluster => {
+    for (let neighbourCluster of this.neighbours) {
       if (!neighbourCluster.hasUnifiedDirection) {
-        if (vec3.angle(this.maxCurvatureDir, neighbourCluster.maxCurvatureDir) > Math.PI / 2.0) {
+        let isContinuous = false;
+        if (vec3.angle(this.maxCurvatureDir, neighbourCluster.maxCurvatureDir) > Math.PI * 0.75) {
           vec3.negate(neighbourCluster.maxCurvatureDir, neighbourCluster.maxCurvatureDir);
+          isContinuous = true;
         }
-        if (vec3.angle(this.minCurvatureDir, neighbourCluster.minCurvatureDir) > Math.PI / 2.0) {
+        if (vec3.angle(this.minCurvatureDir, neighbourCluster.minCurvatureDir) > Math.PI * 0.75) {
           vec3.negate(neighbourCluster.minCurvatureDir, neighbourCluster.minCurvatureDir);
+          isContinuous = true;
         }
 
-        neighbourCluster.hasUnifiedDirection = true;
+        if (isContinuous) {
+          neighbourCluster.hasUnifiedDirection = true;
 
-        neighbourCluster.vertices.forEach(vertex => {
-          vertex.maxCurvatureDir = neighbourCluster.maxCurvatureDir;
-          vertex.minCurvatureDir = neighbourCluster.minCurvatureDir;
-        });
+          neighbourCluster.vertices.forEach(vertex => {
+            vertex.maxCurvatureDir = neighbourCluster.maxCurvatureDir;
+            vertex.minCurvatureDir = neighbourCluster.minCurvatureDir;
+          });
 
-        neighbourCluster.unifyPrincipalDirections();
+          neighbourCluster.unifyPrincipalDirections();
+        }
       }
-    })
+    }
   }
 }
 
@@ -875,8 +917,11 @@ class Mesh {
   // Normal - Byte: (1, 1, 1, padding-1)
   // Smoothed Normal - Byte: (1, 1, 1, padding-1)
   // Texture Coordinate - Unsigned Short: (2, 2) 
-  // Curvature - Byte: (1, 1, 1, 1)
-  vertexSize = 32;
+  // Curvature 1 - Byte: (1, 1, 1, 1)
+  // Curvature 2 - Byte: (1, 1, 1, 1)
+  // Curvature 3 - Byte: (1, 1, 1, 1)
+
+  vertexSize = 40;
 
   constructor(filename) {
     this.name = filename;
@@ -1118,12 +1163,19 @@ class Mesh {
           outputView.setUint16(i * this.vertexSize + 24, uvDV.getFloat32(uvOffset + (i - currVertCount) * uvStride, true) * 0xFFFF, true);
           outputView.setUint16(i * this.vertexSize + 26, uvDV.getFloat32(uvOffset + 4 + (i - currVertCount) * uvStride, true) * 0xFFFF, true);
 
-          // Curvature, only upload default here, calculate will be done after all vertices have been processed
-          // initialize curvature as [0, 100, 0]
-          outputView.setInt8(i * this.vertexSize + 28, 0, true);
-          outputView.setInt8(i * this.vertexSize + 29, 100, true);
+          // Curvatures, only upload default here, calculate will be done after all vertices have been processed
+          outputView.setInt8(i * this.vertexSize + 28, 100, true);
+          outputView.setInt8(i * this.vertexSize + 29, 0, true);
           outputView.setInt8(i * this.vertexSize + 30, 0, true);
           outputView.setInt8(i * this.vertexSize + 31, 100, true);
+          outputView.setInt8(i * this.vertexSize + 32, 0, true);
+          outputView.setInt8(i * this.vertexSize + 33, 100, true);
+          outputView.setInt8(i * this.vertexSize + 34, 0, true);
+          outputView.setInt8(i * this.vertexSize + 35, 100, true);
+          outputView.setInt8(i * this.vertexSize + 36, 0, true);
+          outputView.setInt8(i * this.vertexSize + 37, 0, true);
+          outputView.setInt8(i * this.vertexSize + 38, 100, true);
+          outputView.setInt8(i * this.vertexSize + 39, 100, true);
         }
 
         // initialize index buffer, assuming data is unsigned short
@@ -1215,10 +1267,17 @@ class Mesh {
     gl.enableVertexAttribArray(3);
     gl.vertexAttribPointer(3, 2, gl.UNSIGNED_SHORT, true, this.vertexSize, 24);
 
-    // curvature
+    // curvature I
     gl.enableVertexAttribArray(5);
     gl.vertexAttribPointer(5, 4, gl.BYTE, true, this.vertexSize, 28);
 
+    // curvature II
+    gl.enableVertexAttribArray(6);
+    gl.vertexAttribPointer(6, 4, gl.BYTE, true, this.vertexSize, 32);
+
+    // curvature III
+    gl.enableVertexAttribArray(7);
+    gl.vertexAttribPointer(7, 4, gl.BYTE, true, this.vertexSize, 36);
   }
 
   draw() {
@@ -1282,8 +1341,7 @@ class Mesh {
       while (!finish) {
         let clusterToSmooth = posHashTable.getInvalidClusterWithMaxAngle();
         if (clusterToSmooth) {
-          clusterToSmooth.smoothFundTensor();
-          clusterToSmooth.tryComputePrincipalCurvatures();
+          clusterToSmooth.smoothPrincipalDir();
           clusterToSmooth.neighbours.forEach(neighbourCluster=> {
             neighbourCluster.updateMaxNeighbourAngle();
           })
@@ -1293,34 +1351,51 @@ class Mesh {
       }
 
       // since principal directions can go either way, we have to make sure they maintain roughly the same direciton
-      // inverse each vector that goes the other way from surrounding ones
-      while (true) {
-        // loop through all clusters to find the first one that doesn't have unified direction
-        let startingCluster;
-        for (let posData of posHashTable.table) {
-          if (!startingCluster) {
-            for (let cluster of posData[1].vertexClusters) {
-              if (!cluster.hasUnifiedDirection) {
-                startingCluster = cluster;
-                break;
-              }
+      // i.e. negate each vector that goes the other way from surrounding ones
+      // loop through all clusters to find the first one that doesn't have unified direction
+      for (let posData of posHashTable.table) {
+        for (let cluster of posData[1].vertexClusters) {
+          if (!cluster.hasUnifiedDirection) {
+            // breadth first search all the neighbours
+            let set = new Set();
+            set.add(cluster);
+
+            while (set.size > 0) {
+              let currentCluster = set.values().next().value;
+
+              // remove from the set
+              set.delete(currentCluster);
+
+              // process this cluster
+              currentCluster.hasUnifiedDirection = true;
+              currentCluster.vertices.forEach(vertex => {
+                vertex.maxCurvatureDir = currentCluster.maxCurvatureDir;
+                vertex.minCurvatureDir = currentCluster.minCurvatureDir;
+              });
+
+              // now breadth first search the neighbours
+              currentCluster.neighbours.forEach(neighbour => {
+                // skip processed clusters
+                if (neighbour.hasUnifiedDirection) return;
+
+                // This basically means we don't consider any neighbours with a difference of principal direction between 45 and 135 degrees as needed for negation
+                // technically this can be a broader range like 10 ~ 170, here we use a smaller range to accommodate irregular surfaces with vast changes of
+                // principal directions
+                if (Math.abs(vec3.angle(neighbour.maxCurvatureDir, currentCluster.maxCurvatureDir) - Math.PI / 2.0) < Math.PI / 4.0) return;
+
+                // negate the max/min direction if the angle between neighbour and the current is larger than 90 degrees.
+                if (vec3.angle(neighbour.maxCurvatureDir, currentCluster.maxCurvatureDir) > Math.PI / 2.0) {
+                  vec3.negate(neighbour.maxCurvatureDir, neighbour.maxCurvatureDir);
+                }
+                if (vec3.angle(neighbour.minCurvatureDir, currentCluster.minCurvatureDir) > Math.PI / 2.0) {
+                  vec3.negate(neighbour.minCurvatureDir, neighbour.minCurvatureDir);
+                }
+
+                set.add(neighbour);
+              });
             }
-          } else {
-            break;
           }
         }
-
-        if (!startingCluster) break;
-
-        // initialize the starting cluster
-        startingCluster.hasUnifiedDirection = true;
-        startingCluster.vertices.forEach(vertex => {
-          vertex.maxCurvatureDir = startingCluster.maxCurvatureDir;
-          vertex.minCurvatureDir = startingCluster.minCurvatureDir;
-        });
-
-        // deep first search all the neighbours
-        startingCluster.unifyPrincipalDirections();
       }
 
       // upload our updated vertex data
