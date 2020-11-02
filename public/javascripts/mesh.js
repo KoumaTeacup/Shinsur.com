@@ -18,6 +18,7 @@ class VertexData {
   weightedNormal = [0.0, 0.0, 0.0];
   nativeTangent = [0.0, 0.0, 0.0];
   biTangent = [0.0, 0.0, 0.0];
+  texCoord = [0.0, 0.0];
   fundTensor = [0.0, 0.0, 0.0];
   totalTensorWeight = 0.0;
   maxCurvature = 0.0;
@@ -28,10 +29,11 @@ class VertexData {
   ownerCluster;
   ownerPositionData;
 
-  constructor(_index, _normal, _tangent) {
+  constructor(_index, _normal, _tangent, _uv) {
     this.index = _index;
     this.nativeNormal = _normal;
     this.nativeTangent = _tangent;
+    this.texCoord = _uv;
     vec3.cross(this.biTangent, this.nativeNormal, this.nativeTangent);
   }
 
@@ -900,9 +902,8 @@ class Mesh {
   scale = vec3.fromValues(1.0, 1.0, 1.0);
   gltf;
   buffers = [];
-  vbo = [];
-  ibo = [];
-  vertCount = [];
+  vao = [];
+  positionCount = [];
   indexCount = [];
   initialized = false;
   materials = [];
@@ -987,44 +988,31 @@ class Mesh {
       this.materials.push(newMaterial);
     }
 
-    // 1 material slot map to 1 vbo and 1 ibo
+    var indexCountPerMat = [];
+
+    // 1 material slot map to 1 vertex array object
     for (let i = 0; i < this.materials.length; i++) {
-      this.vertCount[i] = 0;
+      this.positionCount[i] = 0;
       this.indexCount[i] = 0;
+      indexCountPerMat[i] = 0;
     }
 
     // calculate the total buf size
     for (let mesh of this.gltf.meshes) {
       for (let primitive of mesh.primitives) {
         var index = primitive.material;
-        this.vertCount[index] += this.gltf.accessors[primitive.attributes.POSITION].count;
-        this.indexCount[index] += this.gltf.accessors[primitive.indices].count;
+        indexCountPerMat[index] += this.gltf.accessors[primitive.indices].count;
       }
     }
-
-    // create the final buf arrays
-    var outputBuffer = [];
-    var indexBuffer = [];
-    for (let i = 0; i < this.materials.length; i++) {
-      outputBuffer[i] = new ArrayBuffer(this.vertCount[i] * this.vertexSize);
-      indexBuffer[i] = new ArrayBuffer(4 * this.indexCount[i]);
-    }
-
-    // clear vertex and index count so we can accumulate offsets later
-    for (let i = 0; i < this.materials.length; i++) {
-      this.vertCount[i] = 0;
-      this.indexCount[i] = 0;
-    }
-
+    
     // parse mesh data
     var parsePrimitiveAsync = [];
     for (let mesh of this.gltf.meshes) {
       for (let primitive of mesh.primitives) {
         var index = primitive.material;
-        //this.parsePrimitive(primitive, outputBuffer[index], indexBuffer[index]);
 
         parsePrimitiveAsync.push(new Promise((resolve, reject) => {
-          return this.parsePrimitive(primitive, outputBuffer[index], indexBuffer[index], resolve);
+          return this.parsePrimitive(primitive, indexCountPerMat[index], resolve);
         }));
       }
     }
@@ -1034,8 +1022,10 @@ class Mesh {
     });
   }
 
-  parsePrimitive(primitive, outputBuffer, indexBuffer, resolve) {
+  parsePrimitive(primitive, NumIndices, resolve) {
     var matIndex = primitive.material;
+
+    var outputBuffer = new ArrayBuffer(NumIndices * this.vertexSize);
 
     var accessors = this.gltf.accessors;
     var bufferViews = this.gltf.bufferViews;
@@ -1085,8 +1075,8 @@ class Mesh {
         var uvStride = bufferViews[uvBV].byteStride;
 
         // vertex count is accumulative, used to determine offset of this mesh
-        var currVertCount = this.vertCount[matIndex];
-        this.vertCount[matIndex] += accessors[posIndex].count;
+        var currVertCount = this.positionCount[matIndex];
+        this.positionCount[matIndex] += accessors[posIndex].count;
         var outputView = new DataView(outputBuffer);
 
         // Create the hash tables, these hash tables are used in later calculation for smoothed normal & curvature
@@ -1108,8 +1098,8 @@ class Mesh {
           this.indexHashes[matIndex] = indexHashTable;
         }
 
-        // Processing input and upload data to GPU
-        for (let i = currVertCount; i < this.vertCount[matIndex]; i++) {
+        // Processing input and populate hash table
+        for (let i = currVertCount; i < this.positionCount[matIndex]; i++) {
           // Position
           // assuming position type float32 and 3 components, x100 to compensate Maya scale
           var posVal = [
@@ -1117,9 +1107,6 @@ class Mesh {
             posDV.getFloat32(posOffset + 4 + (i - currVertCount) * posStride, true) * 100.0,
             posDV.getFloat32(posOffset + 8 + (i - currVertCount) * posStride, true) * 100.0
           ];
-          outputView.setFloat32(i * this.vertexSize + 0, posVal[0], true);
-          outputView.setFloat32(i * this.vertexSize + 4, posVal[1], true);
-          outputView.setFloat32(i * this.vertexSize + 8, posVal[2], true);
 
           // Native tangent
           // assuming tangent type float32 and 4 components
@@ -1129,10 +1116,6 @@ class Mesh {
             tanDV.getFloat32(tanOffset + 8 + (i - currVertCount) * tanStride, true),
             tanDV.getFloat32(tanOffset + 12 + (i - currVertCount) * tanStride, true)
           ];
-          outputView.setInt8(i * this.vertexSize + 12, tanVal[0] * 0x7F, true);
-          outputView.setInt8(i * this.vertexSize + 13, tanVal[1] * 0x7F, true);
-          outputView.setInt8(i * this.vertexSize + 14, tanVal[2] * 0x7F, true);
-          outputView.setInt8(i * this.vertexSize + 15, tanVal[3], true); // bitangent sign, no need to convert
 
           // Native normal
           // assuming normal type float32 and 3 components
@@ -1141,47 +1124,32 @@ class Mesh {
             norDV.getFloat32(norOffset + 4 + (i - currVertCount) * norStride, true) * 0x7F,
             norDV.getFloat32(norOffset + 8 + (i - currVertCount) * norStride, true) * 0x7F
           ];
-          outputView.setInt8(i * this.vertexSize + 16, norVal[0], true);
-          outputView.setInt8(i * this.vertexSize + 17, norVal[1], true);
-          outputView.setInt8(i * this.vertexSize + 18, norVal[2], true);
-          outputView.setInt8(i * this.vertexSize + 19, 0); // padding
-
-          // Populate hash maps
-          let vertexData = new VertexData(i, norVal, tanVal);
-          posHashTable.addVertex(posVal, vertexData);
-          indexHashTable.addVertex(vertexData);
-
-          // Smoothed normal, only upload default here, calculate will be done after all vertices have been processed
-          // initialize smoothed normal as [100, 0 , 100]
-          outputView.setInt8(i * this.vertexSize + 20, 100, true);
-          outputView.setInt8(i * this.vertexSize + 21, 0, true);
-          outputView.setInt8(i * this.vertexSize + 22, 100, true);
-          outputView.setInt8(i * this.vertexSize + 23, 0); // padding
 
           // Texture Coordinate
           // assuming uv type float32 and 4 components
-          outputView.setUint16(i * this.vertexSize + 24, uvDV.getFloat32(uvOffset + (i - currVertCount) * uvStride, true) * 0xFFFF, true);
-          outputView.setUint16(i * this.vertexSize + 26, uvDV.getFloat32(uvOffset + 4 + (i - currVertCount) * uvStride, true) * 0xFFFF, true);
+          var texVal = [
+            uvDV.getFloat32(uvOffset + (i - currVertCount) * uvStride, true) * 0xFFFF,
+            uvDV.getFloat32(uvOffset + 4 + (i - currVertCount) * uvStride, true) * 0xFFFF,
+          ];
 
-          // Curvatures, only upload default here, calculate will be done after all vertices have been processed
-          outputView.setInt8(i * this.vertexSize + 28, 100, true);
-          outputView.setInt8(i * this.vertexSize + 29, 0, true);
-          outputView.setInt8(i * this.vertexSize + 30, 0, true);
-          outputView.setInt8(i * this.vertexSize + 31, 100, true);
-          outputView.setInt8(i * this.vertexSize + 32, 0, true);
-          outputView.setInt8(i * this.vertexSize + 33, 100, true);
-          outputView.setInt8(i * this.vertexSize + 34, 0, true);
-          outputView.setInt8(i * this.vertexSize + 35, 100, true);
-          outputView.setInt8(i * this.vertexSize + 36, 0, true);
-          outputView.setInt8(i * this.vertexSize + 37, 0, true);
-          outputView.setInt8(i * this.vertexSize + 38, 100, true);
-          outputView.setInt8(i * this.vertexSize + 39, 100, true);
+          // Populate hash maps
+          let vertexData = new VertexData(i, norVal, tanVal, texVal);
+          posHashTable.addVertex(posVal, vertexData);
+          indexHashTable.addVertex(vertexData);
         }
 
         // initialize index buffer, assuming data is unsigned short
         var currIndexCount = this.indexCount[matIndex];
         this.indexCount[matIndex] += accessors[indIndex].count;
-        var indexView = new DataView(indexBuffer);
+
+        // Get or create the face array
+        let faceArray;
+        if (this.faceArrays[matIndex]) {
+          faceArray = this.faceArrays[matIndex];
+        } else {
+          faceArray = [];
+          this.faceArrays[matIndex] = faceArray;
+        }
 
         // Upload index buffer and calculate smoothed normal
         for (let i = currIndexCount; i < this.indexCount[matIndex]; i += 3) {
@@ -1195,15 +1163,6 @@ class Mesh {
           let vertexObj2 = indexHashTable.getVertex(index2);
           let vertexObj3 = indexHashTable.getVertex(index3);
 
-          // Get or create the face array
-          let faceArray;
-          if (this.faceArrays[matIndex]) {
-            faceArray = this.faceArrays[matIndex];
-          } else {
-            faceArray = [];
-            this.faceArrays[matIndex] = faceArray;
-          }
-
           // Populate face array with this face
           let faceData = new FaceData(vertexObj1, vertexObj2, vertexObj3);
           faceData.calculateWeightedNormal();
@@ -1214,21 +1173,60 @@ class Mesh {
           vertexObj2.neighbours.add(vertexObj1).add(vertexObj3);
           vertexObj3.neighbours.add(vertexObj1).add(vertexObj2);
 
-          // Fill out the index buffer
-          indexView.setUint32(i * 4, index1, true);
-          indexView.setUint32(i * 4 + 4, index2, true);
-          indexView.setUint32(i * 4 + 8, index3, true);
+          // populate the vertex buffer
+          let j = i;
+          [vertexObj1, vertexObj2, vertexObj3].forEach(vertexObj => {
+            // Position
+            let posVal = vertexObj.getPositionVector();
+            outputView.setFloat32(j * this.vertexSize + 0, posVal[0], true);
+            outputView.setFloat32(j * this.vertexSize + 4, posVal[1], true);
+            outputView.setFloat32(j * this.vertexSize + 8, posVal[2], true);
+
+            // Native Tangent
+            outputView.setInt8(j * this.vertexSize + 12, vertexObj.nativeTangent[0] * 0x7F, true);
+            outputView.setInt8(j * this.vertexSize + 13, vertexObj.nativeTangent[1] * 0x7F, true);
+            outputView.setInt8(j * this.vertexSize + 14, vertexObj.nativeTangent[2] * 0x7F, true);
+            outputView.setInt8(j * this.vertexSize + 15, 0, true); // bitangent sign, no need to convert
+
+            // Native Normal
+            outputView.setInt8(j * this.vertexSize + 16, vertexObj.nativeNormal[0] * 0x7F, true);
+            outputView.setInt8(j * this.vertexSize + 17, vertexObj.nativeNormal[1] * 0x7F, true);
+            outputView.setInt8(j * this.vertexSize + 18, vertexObj.nativeNormal[2] * 0x7F, true);
+            outputView.setInt8(j * this.vertexSize + 19, 0); // padding
+
+            // Smoothed normal, only upload default here, calculation will be done after all vertices have been processed
+            // initialize smoothed normal as [100, 0, 100]
+            outputView.setInt8(j * this.vertexSize + 20, 100, true);
+            outputView.setInt8(j * this.vertexSize + 21, 0, true);
+            outputView.setInt8(j * this.vertexSize + 22, 100, true);
+            outputView.setInt8(j * this.vertexSize + 23, 0); // padding
+
+            // UV
+            outputView.setUint16(j * this.vertexSize + 24, vertexObj.texCoord[0] * 0xFFFF, true);
+            outputView.setUint16(j * this.vertexSize + 26, vertexObj.texCoord[1] * 0xFFFF, true);
+
+            // Curvatures, only upload default here, calculation will be done after all vertices have been processed
+            outputView.setInt8(j * this.vertexSize + 28, 100, true);
+            outputView.setInt8(j * this.vertexSize + 29, 0, true);
+            outputView.setInt8(j * this.vertexSize + 30, 0, true);
+            outputView.setInt8(j * this.vertexSize + 31, 100, true);
+            outputView.setInt8(j * this.vertexSize + 32, 0, true);
+            outputView.setInt8(j * this.vertexSize + 33, 100, true);
+            outputView.setInt8(j * this.vertexSize + 34, 0, true);
+            outputView.setInt8(j * this.vertexSize + 35, 100, true);
+            outputView.setInt8(j * this.vertexSize + 36, 0, true);
+            outputView.setInt8(j * this.vertexSize + 37, 0, true);
+            outputView.setInt8(j * this.vertexSize + 38, 100, true);
+            outputView.setInt8(j * this.vertexSize + 39, 100, true);
+
+            ++j;
+          })
         }
 
-        // upload vertex buffer, assuming only 1 primitve and per mesh
-        this.vbo[matIndex] = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo[matIndex]);
+        // upload vertex buffer
+        this.vao[matIndex] = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vao[matIndex]);
         gl.bufferData(gl.ARRAY_BUFFER, outputBuffer, gl.STATIC_DRAW);
-
-        // upload index buffer
-        this.ibo[matIndex] = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo[matIndex]);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexBuffer, gl.STATIC_DRAW);
 
         resolve('success');
       })
@@ -1244,8 +1242,7 @@ class Mesh {
     // bind material
     this.materials[Index].bind();
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo[Index]);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo[Index]);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vao[Index]);
 
     // position
     gl.enableVertexAttribArray(0);
@@ -1299,7 +1296,7 @@ class Mesh {
     // draw all meshes
     for (let i = 0; i < this.indexCount.length; i++) {
       this.bind(i);
-      gl.drawElements(gl.TRIANGLES, this.indexCount[i], gl.UNSIGNED_INT, 0);
+      gl.drawArrays(gl.TRIANGLES, 0, this.indexCount[i]);
       util.totalTries += this.indexCount[i] / 3;
     }
   }
@@ -1399,27 +1396,59 @@ class Mesh {
       }
 
       // upload our updated vertex data
-      indexHashTable.table.forEach(vertData => {
-        // smooth normal
-        let outputBuffer = new Int8Array(4);
-        outputBuffer[0] = vertData.smoothedNormal[0] * 0x7F;
-        outputBuffer[1] = vertData.smoothedNormal[1] * 0x7F;
-        outputBuffer[2] = vertData.smoothedNormal[2] * 0x7F;
+      let outputBuffer = new Int8Array(4);
+      for (let i = 0; i < faceArray.length; ++i)
+      {
+        let face = faceArray[i];
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo[matIndex]);
-        gl.bufferSubData(gl.ARRAY_BUFFER, vertData.index * this.vertexSize + 20, outputBuffer, 0, 3);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vao[matIndex]);
 
-        // max principal curvature
-        outputBuffer[0] = vertData.maxCurvatureDir[0] * 0x7F;
-        outputBuffer[1] = vertData.maxCurvatureDir[1] * 0x7F;
-        outputBuffer[2] = vertData.maxCurvatureDir[2] * 0x7F;
-        outputBuffer[3] = vertData.maxCurvature * 0x7F;
+        // update smoothed normal
+        outputBuffer[0] = face.vertex1.smoothedNormal[0] * 0x7F;
+        outputBuffer[1] = face.vertex1.smoothedNormal[1] * 0x7F;
+        outputBuffer[2] = face.vertex1.smoothedNormal[2] * 0x7F;
+        gl.bufferSubData(gl.ARRAY_BUFFER, i * 3 * this.vertexSize + 20, outputBuffer, 0, 3);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo[matIndex]);
-        gl.bufferSubData(gl.ARRAY_BUFFER, vertData.index * this.vertexSize + 28, outputBuffer, 0, 4);
+        outputBuffer[0] = face.vertex2.smoothedNormal[0] * 0x7F;
+        outputBuffer[1] = face.vertex2.smoothedNormal[1] * 0x7F;
+        outputBuffer[2] = face.vertex2.smoothedNormal[2] * 0x7F;
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 1) * this.vertexSize + 20, outputBuffer, 0, 3);
 
-        // TODO: we probably need to upload smoothed tangent as well, if we are gonna implement normal mapping later
-      });
+        outputBuffer[0] = face.vertex3.smoothedNormal[0] * 0x7F;
+        outputBuffer[1] = face.vertex3.smoothedNormal[1] * 0x7F;
+        outputBuffer[2] = face.vertex3.smoothedNormal[2] * 0x7F;
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 2) * this.vertexSize + 20, outputBuffer, 0, 3);
+
+        // update curvatures
+        outputBuffer[0] = face.vertex1.maxCurvatureDir[0] * 0x7F;
+        outputBuffer[1] = face.vertex1.maxCurvatureDir[1] * 0x7F;
+        outputBuffer[2] = face.vertex1.maxCurvatureDir[2] * 0x7F;
+        outputBuffer[3] = face.vertex1.maxCurvature * 0x7F;
+
+        gl.bufferSubData(gl.ARRAY_BUFFER, i * 3 * this.vertexSize + 28, outputBuffer, 0, 4);
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 1) * this.vertexSize + 28, outputBuffer, 0, 4);
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 2) * this.vertexSize + 28, outputBuffer, 0, 4);
+
+        outputBuffer[0] = face.vertex2.maxCurvatureDir[0] * 0x7F;
+        outputBuffer[1] = face.vertex2.maxCurvatureDir[1] * 0x7F;
+        outputBuffer[2] = face.vertex2.maxCurvatureDir[2] * 0x7F;
+        outputBuffer[3] = face.vertex2.maxCurvature * 0x7F;
+
+        gl.bufferSubData(gl.ARRAY_BUFFER, i * 3 * this.vertexSize + 32, outputBuffer, 0, 4);
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 1) * this.vertexSize + 32, outputBuffer, 0, 4);
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 2) * this.vertexSize + 32, outputBuffer, 0, 4);
+
+        outputBuffer[0] = face.vertex3.maxCurvatureDir[0] * 0x7F;
+        outputBuffer[1] = face.vertex3.maxCurvatureDir[1] * 0x7F;
+        outputBuffer[2] = face.vertex3.maxCurvatureDir[2] * 0x7F;
+        outputBuffer[3] = face.vertex3.maxCurvature * 0x7F;
+
+        gl.bufferSubData(gl.ARRAY_BUFFER, i * 3 * this.vertexSize + 36, outputBuffer, 0, 4);
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 1) * this.vertexSize + 36, outputBuffer, 0, 4);
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 2) * this.vertexSize + 36, outputBuffer, 0, 4);
+
+         // TODO: we probably need to upload smoothed tangent as well, if we are gonna implement normal mapping later
+      }
     }
   }
 }

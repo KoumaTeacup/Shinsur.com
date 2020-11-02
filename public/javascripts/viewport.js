@@ -73,75 +73,42 @@ class Viewport {
     gl.cullFace(gl.BACK);
   }
 
-  renderToDefaultForwardShading() {
-    // unbind framebuffer
+  renderToDefault() {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-    // canvas size
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-    gl.disable(gl.BLEND);
-    gl.enable(gl.CULL_FACE); // use back face culling for forward shading
-    gl.enable(gl.DEPTH_TEST); // use depth test
-
-    gl.clearColor(0.22, 0.77, 0.73, 1.0); // use miku blue for forward shading
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  }
-
-  renderToDefaultDeferredShading() {
-    //this.gBuffer.bindAllForReading();
-    // canvas size
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-    gl.enable(gl.BLEND);
-    gl.blendEquation(gl.FUNC_ADD);
-    gl.blendFunc(gl.ONE, gl.ONE);
-
-    gl.disable(gl.CULL_FACE); // we don't need face culling
-    gl.disable(gl.DEPTH_TEST); // we don't need depth testing for deferred shading
-
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  }
-
-  // this is expected to be called only after normal deferred shading render pass
-  renderToDefaultDeferredShadingDebug() {
-    gl.disable(gl.BLEND);
-
-    this.gBuffer.bindDebugBuffer();
+    return this;
   }
 
   renderToShadowMap() {
     this.shadowFBO.bindForWriting();
-
-    // canvas size
     gl.viewport(0, 0, this.shadowFBO.width, this.shadowFBO.height);
-
-    gl.disable(gl.BLEND);
-    gl.enable(gl.CULL_FACE);
-    gl.enable(gl.DEPTH_TEST);
-
-    gl.clearColor(0, 0, 0, 1); // use red for debug buffer
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    return this;
   }
 
   renderToGBuffer() {
     this.gBuffer.bindForWriting();
-
-    // canvas size
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-    gl.disable(gl.BLEND);
-    gl.enable(gl.CULL_FACE);
-    gl.enable(gl.DEPTH_TEST);
-
-    gl.clearColor(0, 0, 0, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    return this;
   }
 
-  renderToContourShadingFBO(index) {
-    this.gBuffer.bindAllForReading();
+  renderToHatchingBuffer() {
+    this.pencilHatchingFBO.bindForWriting();
 
+    gl.viewport(0, 0, this.pencilHatchingFBO.width, this.pencilHatchingFBO.height);
+
+    this.pencilStrokeTex.bind('StrokeSampler', 0);
+
+    Program.setUniform1f('SourceStrokeScale', util.srcStrokeIntensity.value);
+    Program.setUniform1i('NumLinesToDraw', util.maxHatchingLines.value);
+    Program.setUniform1f('AngleRange', util.strokeAngleRange.value);
+    Program.setUniform2fv('OutputSize', new Float32Array([this.pencilHatchingFBO.width, this.pencilHatchingFBO.height]));
+    Program.setUniform1f('StrokeWidth', util.strokeWidth.value);
+    Program.setUniform1f('FirstStrokeBias', util.firstStrokeBias.value);
+
+    return this;
+  }
+
+  renderToGenericFBO(index) {
     // check if fbo avaialble
     if (!this.screenSizeFBOs[index]) {
       this.screenSizeFBOs.push(new Framebuffer(gl.canvas.width, gl.canvas.height));
@@ -152,92 +119,73 @@ class Viewport {
     // canvas size
     gl.viewport(0, 0, this.screenSizeFBOs[index].width, this.screenSizeFBOs[index].height);
 
-    gl.disable(gl.BLEND);
-    gl.disable(gl.CULL_FACE); // we don't need face culling
-    gl.disable(gl.DEPTH_TEST); // we don't need depth testing for deferred shading
-
-    gl.clearColor(1.0, 1.0, 1.0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    return this;
   }
 
-  renderToHatchingPrepare() {
-    this.pencilHatchingFBO.bindForWriting();
+  resizeViewport(left, bottom, width, height) {
+    // use canvas if not specified
+    gl.viewport(left ? left : 0, bottom ? bottom : 0, width ? width : gl.canvas.width, height ? height : gl.canvas.height);
+    return this;
+  } 
 
-    gl.viewport(0, 0, this.pencilHatchingFBO.width, this.pencilHatchingFBO.height);
-
-    gl.disable(gl.BLEND);
-    gl.disable(gl.CULL_FACE);
-    gl.disable(gl.DEPTH_TEST);
-
-    gl.clearColor(1, 1, 1, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    this.pencilStrokeTex.bind('StrokeSampler', 0);
-
-    Program.setUniform1f('SourceStrokeScale', util.srcStrokeIntensity.value);
-    Program.setUniform1i('NumLinesToDraw', util.maxHatchingLines.value);
-    Program.setUniform1f('AngleRange', util.strokeAngleRange.value);
-    Program.setUniform2fv('OutputSize', new Float32Array([this.pencilHatchingFBO.width, this.pencilHatchingFBO.height]));
-    Program.setUniform1f('StrokeWidth', util.strokeWidth.value);
-    Program.setUniform1f('FirstStrokeBias', util.firstStrokeBias.value);
+  enableBlend(enable, blendRGB, blendAlpha) {
+    if (enable) {
+      gl.enable(gl.BLEND);
+      gl.blendEquationSeparate(blendRGB ? blendRGB : gl.FUNC_ADD, blendAlpha ? blendAlpha:gl.FUNC_ADD);
+      gl.blendFunc(gl.ONE, gl.ONE);
+    }
+    else gl.disable(gl.BLEND);
+    return this;
   }
 
-  renderToDefaultHatchingDebug() {
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    this.bindHatchingFBO();
-
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-    gl.disable(gl.BLEND);
-    gl.disable(gl.CULL_FACE);
-    gl.disable(gl.DEPTH_TEST);
-
-    gl.clearColor(1, 1, 1, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  enableFaceCull(enable) {
+    if (enable) gl.enable(gl.CULL_FACE);
+    else gl.disable(gl.CULL_FACE);
+    return this;
   }
 
-  renderToDefaultNormalDebug() {
-    // unbind framebuffer
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-    // canvas size
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-    gl.disable(gl.BLEND);
-    gl.enable(gl.CULL_FACE);
-    gl.enable(gl.DEPTH_TEST);
-
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    Program.setUniform1i('ShowSmoothed', util.showSmoothedNormal.value);
+  enableDepthTest(enable) {
+    if (enable) gl.enable(gl.DEPTH_TEST);
+    else gl.disable(gl.DEPTH_TEST);
+    return this;
   }
 
-  renderToDefaultCurvatureDebug() {
-    // unbind framebuffer
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-    // canvas size
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-    gl.disable(gl.BLEND);
-    gl.enable(gl.CULL_FACE);
-    gl.enable(gl.DEPTH_TEST);
-
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  clearFrame(R, G, B, A) {
+    gl.clearColor(R ? R : 0.0, G ? G : 0.0, B ? B : 0.0, A ? A : 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    return this;
   }
 
-  bindGBuffer() {
+  readGBuffer() {
     this.gBuffer.bindAllForReading();
+    return this;
   }
 
-  bindShadowMap() {
-    this.shadowFBO.bindForReading(7, 'ShadowSampler');
+  readShadowMap() {
+    this.shadowFBO.bindForReading(8, 'ShadowSampler');
+    return this;
   }
 
-  bindCustomFBForDebug() {
-    this.shadowFBO.bindForReading(0, 'DebugBufferSampler');
+  readDebugBuffer() {
+    this.gBuffer.bindDebugBuffer();
+    return this;
+  }
+
+  readHatchingBuffer() {
+    this.pencilHatchingFBO.bindForReading(10, 'HatchingSampler');
+
+    Program.setUniform1i('NumHatchingSlices', this.hatchingTexDepth);
+    Program.setUniform1f('HatchingSliceCoord', util.currentHatchingDepth.value);
+    return this;
+  }
+
+  readGenericFBO(index) {
+    if (!this.screenSizeFBOs[index]) {
+      alert('Cannot read empty fbo, check your pipe!');
+    }
+    this.screenSizeFBOs[index].bindForReading(9, 'InputSampler');
+
+    return this;
   }
 
   bindPCFHorizontal() {
@@ -251,18 +199,14 @@ class Viewport {
     this.shadowFBO.bindForReading(0, 'InputSampler');
 
     gl.viewport(0, 0, this.GaussianBlurFBO.width, this.GaussianBlurFBO.height);
-    gl.disable(gl.BLEND);
-    gl.disable(gl.CULL_FACE);
-    gl.disable(gl.DEPTH_TEST);
-
-    gl.clearColor(0, 0, 0, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // Set uniform
     Program.setUniform1i('KernelSize', this.PCFKernelSize);
     Program.setUniform1f('KernelSum', this.PCFKernelSum);
     Program.setUniform1fv('Kernel', new Float32Array(this.PCFKernel));
     Program.setUniform1i('IsHorizontal', true);
+
+    return this;
   }
 
   // must be coupled with horizontal filter above
@@ -272,24 +216,21 @@ class Viewport {
     this.GaussianBlurFBO.bindForReading(0, 'InputSampler');
 
     gl.viewport(0, 0, this.shadowFBO.width, this.shadowFBO.height);
-    gl.clearColor(0, 0, 0, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     Program.setUniform1i('IsHorizontal', false);
+
+    return this;
   }
 
-  bindScreenSizeFBO(index) {
-    if (!this.screenSizeFBOs[index]) {
-      alert('Cannot read empty fbo, check your pipe!');
-    }
-    this.screenSizeFBOs[index].bindForReading(7, 'InputSampler');
+  showSmoothedNormal(show) {
+    Program.setUniform1i('ShowSmoothed', show);
+    return this;
   }
 
-  bindHatchingFBO() {
-    this.pencilHatchingFBO.bindForReading(0, 'HatchingSampler');
-
-    Program.setUniform1i('NumHatchingSlices', this.hatchingTexDepth);
-    Program.setUniform1f('HatchingSliceCoord', util.currentHatchingDepth.value);
+  // this is expected to be called only after normal deferred shading render pass
+  
+  bindCustomFBForDebug() {
+    this.shadowFBO.bindForReading(0, 'DebugBufferSampler');
   }
 
   SetPCFKernelSize(_size, _width) {

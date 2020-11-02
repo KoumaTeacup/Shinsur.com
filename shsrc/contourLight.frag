@@ -32,7 +32,7 @@ void main() {
 	vec3 DiffuseColor = texture(DiffuseSampler, GBufferUV.st).rgb;
 	float Roughness = texture(DiffuseSampler, GBufferUV.st).a;
 	vec3 Normal = texture(NormalSampler, GBufferUV.st).rgb;
-	vec3 SNormal = texture(SNormalSampler, GBufferUV.st).rgb;
+	vec3 SNormal = normalize(texture(SNormalSampler, GBufferUV.st).rgb);
 	vec2 TexCoord = texture(TexCoordSampler, GBufferUV.st).rg;
 	
 	vec3 V = normalize(CameraPos - WorldPos);
@@ -60,8 +60,8 @@ void main() {
 		SampleUV.t += sin(UnitAngle * float(i)) * SampleRadius / float(GBufferSize.y);
 
 		// Normal Sample
-		vec3 SampleNormal = texture(NormalSampler, SampleUV.st).rgb;
-		NormalFactor *= max(dot(SampleNormal, Normal), 0.0) < 0.5 ? 0.0 : 1.0;
+		vec3 SampleNormal = normalize(texture(SNormalSampler, SampleUV.st).rgb);
+		NormalFactor *= max(dot(SampleNormal, SNormal), 0.0) < 0.5 ? 0.0 : 1.0;
 		float SampleNdotV = dot(SampleNormal, V);
 		Max = Max < SampleNdotV ? SampleNdotV : Max;
 		NumDarker = NdotV > SampleNdotV ? NumDarker + 1: NumDarker;
@@ -75,4 +75,5 @@ void main() {
 	float ContourFactor = DepthFactor * NormalFactor;
 
 	OutColor = (Normal == vec3(0.0, 0.0, 0.0)) ? vec4(1.0, 1.0, 1.0, 0.0) : vec4(vec3(ContourFactor), 1.0);
+//	OutColor = vec4(1.0, 0.0, 0.0, 1.0);
 }

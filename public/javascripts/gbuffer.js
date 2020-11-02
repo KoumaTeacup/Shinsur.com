@@ -11,7 +11,9 @@ class GBuffer {
     { type: 'normal', uniform: 'NormalSampler', object: 0 },
     { type: 'snormal', uniform: 'SNormalSampler', object: 0 },
     { type: 'texCoord', uniform: 'TexCoordSampler', object: 0 },
-    { type: 'curvature', uniform: 'CurvatureSampler', object: 0 }];
+    { type: 'curvature1', uniform: 'CurvatureSampler1', object: 0 },
+    { type: 'curvature2', uniform: 'CurvatureSampler2', object: 0 },
+    { type: 'curvature3', uniform: 'CurvatureSampler3', object: 0 }];
   width = gl.canvas.width;
   height = gl.canvas.height;
   plane;
@@ -69,8 +71,6 @@ class GBuffer {
   }
 
   bindAllForReading() {
-    gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
-
     // bind textures
     for (let texInfo of this.texturesInfo) {
       var index = this.texturesInfo.findIndex((element) => element.type === texInfo.type);
@@ -89,7 +89,9 @@ class GBuffer {
       case 2: bufferType = 'normal'; break;
       case 3: bufferType = 'snormal'; break;
       case 4: bufferType = 'texCoord'; break;
-      case 5: bufferType = 'curvature'; break;
+      case 5: bufferType = 'curvature1'; break;
+      case 6: bufferType = 'curvature2'; break;
+      case 7: bufferType = 'curvature3'; break;
       default: return;
     }
     var index = this.texturesInfo.findIndex((element) => element.type === bufferType);

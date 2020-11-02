@@ -50,6 +50,8 @@
     <Content Include="shsrc\contourLight.vert" />
     <Content Include="shsrc\contourShaking.frag" />
     <Content Include="shsrc\contourShaking.vert" />
+    <Content Include="shsrc\curvatureView.frag" />
+    <Content Include="shsrc\curvatureView.vert" />
     <Content Include="shsrc\debug.frag" />
     <Content Include="shsrc\debug.vert" />
     <Content Include="shsrc\default.frag" />
@@ -68,6 +70,8 @@
     <Content Include="shsrc\PCFFilter.vert" />
     <Content Include="shsrc\pencilGeometry.frag" />
     <Content Include="shsrc\pencilGeometry.vert" />
+    <Content Include="shsrc\pencilLight.frag" />
+    <Content Include="shsrc\pencilLight.vert" />
     <Content Include="shsrc\shadow.frag" />
     <Content Include="shsrc\shadow.vert" />
     <Content Include="views\Default.html" />

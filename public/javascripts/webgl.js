@@ -5,6 +5,7 @@ import { PointLight } from './pointLight.js';
 import { Viewport } from './viewport.js';
 import { util } from './htmlUtil.js';
 import { Framebuffer3D} from './framebuffer.js'
+import { gl } from './context.js';
 import * as vec3 from './gl-matrix/vec3.js';
 
 // Contructor needed, don't delete
@@ -27,7 +28,7 @@ var curvatureViewProgram = new Program('curvatureView');
 
 //var floor = new Mesh('floor');
 //var bowsette = new Mesh('bowsette');
-//var cubes = new Mesh('cubes');
+var cubes = new Mesh('cubes');
 //var cube = new Mesh('cube');
 var test = new Mesh('test');
 //var teapot = new Mesh('UtahTeapot');
@@ -50,9 +51,28 @@ var lastTimestamp = 0;
 var fbo = new Framebuffer3D();
 
 // Genrate Hatching Texture
+// program
 hatchingPrepareProgram.use();
-viewport.renderToHatchingPrepare();
+// viewport
+viewport.renderToHatchingBuffer()
+  .enableBlend(false)
+  .enableFaceCull(false)
+  .enableDepthTest(false)
+  .clearFrame(1, 1, 1, 1);
+// mesh
 screenPlane.draw();
+
+// program
+hatchingDebugProgram.use();
+// viewport
+viewport.renderToDefault()
+  .readHatchingBuffer()
+  .enableBlend(false)
+  .enableFaceCull(false)
+  .enableDepthTest(false)
+  .clearFrame(1, 1, 1, 1);
+// mesh
+squarePlane.draw();
 
 function renderLoop(timestamp) {
   // update delta time
@@ -67,7 +87,11 @@ function renderLoop(timestamp) {
   //  // program
   //  shadowProgrm.use();
   //  // viewport
-  //  viewport.renderToShadowMap();
+  //viewport.renderToShadowMap()
+  //  .enableBlend(false)
+  //  .enableFaceCull(true)
+  //  .enableDepthTest(true)
+  //  .clearFrame();
   //  // light
   //  light.bindForShadow();
   //  // mesh
@@ -78,12 +102,17 @@ function renderLoop(timestamp) {
   //    // program
   //    PCFHorizontalProgram.use();
   //    // viewport
-  //    viewport.bindPCFHorizontal();
+  //viewport.bindPCFHorizontal()
+  //  .enableBlend(false)
+  //  .enableFaceCull(false)
+  //  .enableDepthTest(false)
+  //  .clearFrame();
   //    // mesh
   //    screenPlane.draw();
 
   //    // viewprot
-  //    viewport.bindPCFVertical();
+  //viewport.bindPCFVertical()
+  //  .clearFrame();
   //    // mesh
   //    screenPlane.draw();
   //  }
@@ -100,8 +129,12 @@ function renderLoop(timestamp) {
       // program
       defaultProg.use();
       // viewport
-      viewport.renderToDefaultForwardShading();
-      viewport.bindShadowMap();
+      viewport.renderToDefault()
+        .enableBlend(false)
+        .enableFaceCull(true)
+        .enableDepthTest(true)
+        .clearFrame(0.22, 0.77, 0.73, 1.0) // use miku blue for forward shading
+        .readShadowMap();
       // camera
       camera.update();
       // light
@@ -120,7 +153,11 @@ function renderLoop(timestamp) {
       // program
       gbufferGeometryProg.use();
       // viewport
-      viewport.renderToGBuffer();
+      viewport.renderToGBuffer()
+        .enableBlend(false)
+        .enableFaceCull(true)
+        .enableDepthTest(true)
+        .clearFrame();
       // camera
       camera.update();
       // mesh
@@ -131,9 +168,13 @@ function renderLoop(timestamp) {
       // program
       gbufferLightProg.use();
       // viewport
-      viewport.bindGBuffer();
-      viewport.renderToDefaultDeferredShading();
-      viewport.bindShadowMap();
+      viewport.renderToDefault()
+        .readGBuffer()
+        .readShadowMap()
+        .enableBlend(true)
+        .enableFaceCull(false)
+        .enableDepthTest(false)
+        .clearFrame();
       // camera
       camera.update();
       // light
@@ -148,8 +189,11 @@ function renderLoop(timestamp) {
         // program
         debugProg.use();
         // viewport
-        viewport.bindGBuffer();
-        viewport.renderToDefaultDeferredShadingDebug();
+        viewport.renderToDefault()
+          .readDebugBuffer()
+          .enableBlend(false)
+          .enableFaceCull(false)
+          .enableDepthTest(false)
         // mesh
         debugPlane.draw();
       }
@@ -161,7 +205,12 @@ function renderLoop(timestamp) {
       // program
       normalViewProgram.use();
       // viewport
-      viewport.renderToDefaultNormalDebug();
+      viewport.renderToDefault()
+        .enableBlend(false)
+        .enableFaceCull(true)
+        .enableDepthTest(true)
+        .clearFrame()
+        .showSmoothedNormal(util.showSmoothedNormal.value);
       // camera
       camera.update();
       // mesh
@@ -170,18 +219,39 @@ function renderLoop(timestamp) {
       // program
       curvatureViewProgram.use();
       // viewport
-      viewport.renderToDefaultCurvatureDebug();
+      viewport.renderToDefault()
+        .enableBlend(false)
+        .enableFaceCull(true)
+        .enableDepthTest(true)
+        .clearFrame()
+        .clearFrame(1, 1, 1, 1);
       // camera
       camera.update();
       // mesh
       //teapot.draw();
       test.draw();
     } else if(util.hatchingView.value) {
+      // program
       hatchingPrepareProgram.use();
-      viewport.renderToHatchingPrepare();
+      // viewport
+      viewport.renderToHatchingBuffer()
+        .enableBlend(false)
+        .enableFaceCull(false)
+        .enableDepthTest(false)
+        .clearFrame(1, 1, 1, 1);
+      // mesh
       screenPlane.draw();
+
+      // program
       hatchingDebugProgram.use();
-      viewport.renderToDefaultHatchingDebug();
+      // viewport
+      viewport.renderToDefault()
+        .readHatchingBuffer()
+        .enableBlend(false)
+        .enableFaceCull(false)
+        .enableDepthTest(false)
+        .clearFrame(1, 1, 1, 1);
+      // mesh
       squarePlane.draw();
       
     } else {
@@ -190,18 +260,30 @@ function renderLoop(timestamp) {
       // program
       pencilGeometryProgram.use();
       // viewport
-      viewport.renderToGBuffer();
+      viewport.renderToGBuffer()
+        .enableBlend(false)
+        .enableFaceCull(true)
+        .enableDepthTest(true)
+        .clearFrame();
       // camera
       camera.update();
       // mesh
       cubes.draw();
+      //test.draw();
 
       // ------------ Contour Light pass ------------
       // program
       contourLightProgram.use();
       // viewport
-      viewport.renderToContourShadingFBO(0);
-      viewport.bindShadowMap();
+      viewport.renderToGenericFBO(0)
+        .readGBuffer()
+        .enableBlend(false)
+        .enableFaceCull(false)
+        .enableDepthTest(false)
+        .clearFrame(1, 1, 1, 1);
+
+      //viewport.bindShadowMap();
+
       // camera
       camera.update();
       // light
@@ -214,17 +296,28 @@ function renderLoop(timestamp) {
       // program
       contourShakingProgram.use();
       // viewport
-      viewport.bindGBuffer();
-      viewport.renderToDefaultDeferredShading();
-      viewport.bindScreenSizeFBO(0);
+      viewport.renderToDefault()
+        .readGenericFBO(0)
+        //.readShadowMap()
+        .enableBlend(false)
+        .enableFaceCull(false)
+        .enableDepthTest(false)
+        .clearFrame(1, 1, 1, 1);
       // mesh
       screenPlane.draw();
 
       // ------------ Pencil Lighting pass ------------
       // program
-      //pencilLightProgram.use();
+      pencilLightProgram.use();
       // viewport
-
+      viewport.renderToDefault()
+        .readGBuffer()
+        .readHatchingBuffer()
+        .enableBlend(true, gl.FUNC_REVERSE_SUBTRACT)
+        .enableFaceCull(false)
+        .enableDepthTest(false)
+      // mesh
+      screenPlane.draw();
     }
     // ------------ End of Pencil rendering ------------
   }
