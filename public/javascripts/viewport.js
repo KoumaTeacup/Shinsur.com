@@ -18,9 +18,12 @@ class Viewport {
   hatchingRes;
   hatchingTexDepth;
   pencilStrokeTex;
+  initialized = false;
 
-  constructor() {
-    this.pencilStrokeTex = new Texture2D('./pencilStroke.png');
+  constructor(onLoad) {
+    this.pencilStrokeTex = new Texture2D('./pencilStroke.png', () => {
+      if (onLoad) onLoad();
+    });
 
     // Initialize shadow fbo from html settings
     var shadowResElem = document.shadowResForm.shadowRes;

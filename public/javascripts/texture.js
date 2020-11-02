@@ -7,7 +7,7 @@ class Texture2D {
   image = new Image();
   initialized = false;
 
-  constructor(file) {
+  constructor(file, onLoad) {
     if (file) {
       this.name = file;
     } else {
@@ -30,6 +30,8 @@ class Texture2D {
       gl.generateMipmap(gl.TEXTURE_2D);
 
       this.initialized = true;
+
+      if (onLoad) onLoad();
     }
   }
 

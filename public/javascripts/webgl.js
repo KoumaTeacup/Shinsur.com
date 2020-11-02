@@ -8,8 +8,6 @@ import { Framebuffer3D} from './framebuffer.js'
 import { gl } from './context.js';
 import * as vec3 from './gl-matrix/vec3.js';
 
-// Contructor needed, don't delete
-var viewport = new Viewport();
 
 var defaultProg = new Program('default');
 var debugProg = new Program('debug');
@@ -50,31 +48,23 @@ var lastTimestamp = 0;
 
 var fbo = new Framebuffer3D();
 
-// Genrate Hatching Texture
-// program
-hatchingPrepareProgram.use();
-// viewport
-viewport.renderToHatchingBuffer()
-  .enableBlend(false)
-  .enableFaceCull(false)
-  .enableDepthTest(false)
-  .clearFrame(1, 1, 1, 1);
-// mesh
-screenPlane.draw();
-
-// program
-hatchingDebugProgram.use();
-// viewport
-viewport.renderToDefault()
-  .readHatchingBuffer()
-  .enableBlend(false)
-  .enableFaceCull(false)
-  .enableDepthTest(false)
-  .clearFrame(1, 1, 1, 1);
-// mesh
-squarePlane.draw();
+// Initialize our pipe, Contructor needed, don't delete
+var viewport = new Viewport(() => {
+  // When loaded, genrate Hatching Texture
+  // program
+  hatchingPrepareProgram.use();
+  // viewport
+  viewport.renderToHatchingBuffer()
+    .enableBlend(false)
+    .enableFaceCull(false)
+    .enableDepthTest(false)
+    .clearFrame(1, 1, 1, 1);
+  // mesh
+  screenPlane.draw();
+});
 
 function renderLoop(timestamp) {
+  
   // update delta time
   var deltaTime = timestamp - lastTimestamp;
   lastTimestamp = timestamp;
