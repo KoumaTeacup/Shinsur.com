@@ -17,14 +17,22 @@ out float Curvature3;
 out vec3 PrimaryCurvatureDir1;
 out vec3 PrimaryCurvatureDir2;
 out vec3 PrimaryCurvatureDir3;
+out vec3 PrimaryCurvatureProj1;
+out vec3 PrimaryCurvatureProj2;
+out vec3 PrimaryCurvatureProj3;
 
 void main() {
   gl_Position = MatProj * MatView * MatModel * vec4(a_position, 1.0);
   Normal = (MatModel * a_normal).xyz;
   SNormal = (MatModel * a_snormal).xyz;
   Curvature1 = a_curvature1.w;
+  Curvature2 = a_curvature1.w;
+  Curvature3 = a_curvature1.w;
 //  PrimaryCurvatureDir = (MatView * MatModel * vec4(a_curvature.xyz, 0.0)).xyz;
   PrimaryCurvatureDir1 = a_curvature1.xyz;
   PrimaryCurvatureDir2 = a_curvature2.xyz;
   PrimaryCurvatureDir3 = a_curvature3.xyz;
+  PrimaryCurvatureProj1 = (MatProj * MatView * MatModel * vec4(a_curvature1.xyz, 0.0)).xyz;
+  PrimaryCurvatureProj2 = (MatProj * MatView * MatModel * vec4(a_curvature2.xyz, 0.0)).xyz;
+  PrimaryCurvatureProj3 = (MatProj * MatView * MatModel * vec4(a_curvature3.xyz, 0.0)).xyz;
 }

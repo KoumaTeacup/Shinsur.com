@@ -9,12 +9,9 @@ in vec3 Tanget;
 in vec3 Normal;
 in vec3 SNormal;
 in vec2 UV;
-in float Curvature1;
-in float Curvature2;
-in float Curvature3;
-in vec3 PrimaryCurvatureDir1;
-in vec3 PrimaryCurvatureDir2;
-in vec3 PrimaryCurvatureDir3;
+in vec4 Curvature1;
+in vec4 Curvature2;
+in vec4 Curvature3;
 
 uniform float Roughness;
 uniform sampler2D DiffuseSampler;
@@ -37,7 +34,7 @@ void main() {
 	NormalOut = Normal;
 	SNormalOut = SNormal;
 	TexCoordOut = UV;
-	CurvatureOut1 = vec4(PrimaryCurvatureDir1, Curvature1);
-	CurvatureOut2 = vec4(PrimaryCurvatureDir2, Curvature2);
-	CurvatureOut3 = vec4(PrimaryCurvatureDir3, Curvature3);
+	CurvatureOut1 = Curvature1;
+	CurvatureOut2 = Curvature2;
+	CurvatureOut3 = Curvature3;
 }

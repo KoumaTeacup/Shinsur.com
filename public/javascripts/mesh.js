@@ -921,8 +921,11 @@ class Mesh {
   // Curvature 1 - Byte: (1, 1, 1, 1)
   // Curvature 2 - Byte: (1, 1, 1, 1)
   // Curvature 3 - Byte: (1, 1, 1, 1)
+  // Curvature Pos 1 - Float: (4,4,4)
+  // Curvature Pos 2 - Float: (4,4,4)
+  // Curvature Pos 3 - Float: (4,4,4)
 
-  vertexSize = 40;
+  vertexSize = 76;
 
   constructor(filename) {
     this.name = filename;
@@ -1120,16 +1123,16 @@ class Mesh {
           // Native normal
           // assuming normal type float32 and 3 components
           var norVal = [
-            norDV.getFloat32(norOffset + (i - currVertCount) * norStride, true) * 0x7F,
-            norDV.getFloat32(norOffset + 4 + (i - currVertCount) * norStride, true) * 0x7F,
-            norDV.getFloat32(norOffset + 8 + (i - currVertCount) * norStride, true) * 0x7F
+            norDV.getFloat32(norOffset + (i - currVertCount) * norStride, true),
+            norDV.getFloat32(norOffset + 4 + (i - currVertCount) * norStride, true),
+            norDV.getFloat32(norOffset + 8 + (i - currVertCount) * norStride, true)
           ];
 
           // Texture Coordinate
           // assuming uv type float32 and 4 components
           var texVal = [
-            uvDV.getFloat32(uvOffset + (i - currVertCount) * uvStride, true) * 0xFFFF,
-            uvDV.getFloat32(uvOffset + 4 + (i - currVertCount) * uvStride, true) * 0xFFFF,
+            uvDV.getFloat32(uvOffset + (i - currVertCount) * uvStride, true),
+            uvDV.getFloat32(uvOffset + 4 + (i - currVertCount) * uvStride, true),
           ];
 
           // Populate hash maps
@@ -1151,7 +1154,7 @@ class Mesh {
           this.faceArrays[matIndex] = faceArray;
         }
 
-        // Upload index buffer and calculate smoothed normal
+        // construct vertex array
         for (let i = currIndexCount; i < this.indexCount[matIndex]; i += 3) {
           // Load vertices indices per triangle from input
           let index1 = indDV.getInt16(indOffset + (i - currIndexCount) * 2, true) + currVertCount;
@@ -1219,6 +1222,17 @@ class Mesh {
             outputView.setInt8(j * this.vertexSize + 38, 100, true);
             outputView.setInt8(j * this.vertexSize + 39, 100, true);
 
+            // Curvatures positions, only upload default here, calculation will be done after all vertices have been processed
+            outputView.setFloat32(j * this.vertexSize + 40, 0.0, true);
+            outputView.setFloat32(j * this.vertexSize + 44, 0.0, true);
+            outputView.setFloat32(j * this.vertexSize + 48, 0.0, true);
+            outputView.setFloat32(j * this.vertexSize + 52, 0.0, true);
+            outputView.setFloat32(j * this.vertexSize + 56, 0.0, true);
+            outputView.setFloat32(j * this.vertexSize + 60, 0.0, true);
+            outputView.setFloat32(j * this.vertexSize + 64, 0.0, true);
+            outputView.setFloat32(j * this.vertexSize + 68, 0.0, true);
+            outputView.setFloat32(j * this.vertexSize + 72, 0.0, true);
+
             ++j;
           })
         }
@@ -1275,6 +1289,18 @@ class Mesh {
     // curvature III
     gl.enableVertexAttribArray(7);
     gl.vertexAttribPointer(7, 4, gl.BYTE, true, this.vertexSize, 36);
+
+    // curvature pos I
+    gl.enableVertexAttribArray(8);
+    gl.vertexAttribPointer(8, 3, gl.FLOAT, false, this.vertexSize, 40);
+
+    // curvature pos II
+    gl.enableVertexAttribArray(9);
+    gl.vertexAttribPointer(9, 3, gl.FLOAT, false, this.vertexSize, 52);
+
+    // curvature pos III
+    gl.enableVertexAttribArray(10);
+    gl.vertexAttribPointer(10, 3, gl.FLOAT, false, this.vertexSize, 64);
   }
 
   draw() {
@@ -1310,7 +1336,6 @@ class Mesh {
     // for all meshes
     for (let matIndex = 0; matIndex < this.materials.length; matIndex++) {
       let posHashTable = this.positionHashes[matIndex];
-      let indexHashTable = this.indexHashes[matIndex];
       let faceArray = this.faceArrays[matIndex];
 
       posHashTable.clusterByNormal(); // Divde all vertices at this position into clusters depending on their normal differences
@@ -1396,7 +1421,8 @@ class Mesh {
       }
 
       // upload our updated vertex data
-      let outputBuffer = new Int8Array(4);
+      let outputBuffer8 = new Int8Array(4);
+      let outputBuffer32 = new Float32Array(3);
       for (let i = 0; i < faceArray.length; ++i)
       {
         let face = faceArray[i];
@@ -1404,48 +1430,61 @@ class Mesh {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vao[matIndex]);
 
         // update smoothed normal
-        outputBuffer[0] = face.vertex1.smoothedNormal[0] * 0x7F;
-        outputBuffer[1] = face.vertex1.smoothedNormal[1] * 0x7F;
-        outputBuffer[2] = face.vertex1.smoothedNormal[2] * 0x7F;
-        gl.bufferSubData(gl.ARRAY_BUFFER, i * 3 * this.vertexSize + 20, outputBuffer, 0, 3);
+        outputBuffer8[0] = face.vertex1.smoothedNormal[0] * 0x7F;
+        outputBuffer8[1] = face.vertex1.smoothedNormal[1] * 0x7F;
+        outputBuffer8[2] = face.vertex1.smoothedNormal[2] * 0x7F;
+        gl.bufferSubData(gl.ARRAY_BUFFER, i * 3 * this.vertexSize + 20, outputBuffer8, 0, 3);
 
-        outputBuffer[0] = face.vertex2.smoothedNormal[0] * 0x7F;
-        outputBuffer[1] = face.vertex2.smoothedNormal[1] * 0x7F;
-        outputBuffer[2] = face.vertex2.smoothedNormal[2] * 0x7F;
-        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 1) * this.vertexSize + 20, outputBuffer, 0, 3);
+        outputBuffer8[0] = face.vertex2.smoothedNormal[0] * 0x7F;
+        outputBuffer8[1] = face.vertex2.smoothedNormal[1] * 0x7F;
+        outputBuffer8[2] = face.vertex2.smoothedNormal[2] * 0x7F;
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 1) * this.vertexSize + 20, outputBuffer8, 0, 3);
 
-        outputBuffer[0] = face.vertex3.smoothedNormal[0] * 0x7F;
-        outputBuffer[1] = face.vertex3.smoothedNormal[1] * 0x7F;
-        outputBuffer[2] = face.vertex3.smoothedNormal[2] * 0x7F;
-        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 2) * this.vertexSize + 20, outputBuffer, 0, 3);
+        outputBuffer8[0] = face.vertex3.smoothedNormal[0] * 0x7F;
+        outputBuffer8[1] = face.vertex3.smoothedNormal[1] * 0x7F;
+        outputBuffer8[2] = face.vertex3.smoothedNormal[2] * 0x7F;
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 2) * this.vertexSize + 20, outputBuffer8, 0, 3);
 
         // update curvatures
-        outputBuffer[0] = face.vertex1.maxCurvatureDir[0] * 0x7F;
-        outputBuffer[1] = face.vertex1.maxCurvatureDir[1] * 0x7F;
-        outputBuffer[2] = face.vertex1.maxCurvatureDir[2] * 0x7F;
-        outputBuffer[3] = face.vertex1.maxCurvature * 0x7F;
+        outputBuffer8[0] = face.vertex1.minCurvatureDir[0] * 0x7F;
+        outputBuffer8[1] = face.vertex1.minCurvatureDir[1] * 0x7F;
+        outputBuffer8[2] = face.vertex1.minCurvatureDir[2] * 0x7F;
+        outputBuffer8[3] = face.vertex1.minCurvature * 0x7F;
 
-        gl.bufferSubData(gl.ARRAY_BUFFER, i * 3 * this.vertexSize + 28, outputBuffer, 0, 4);
-        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 1) * this.vertexSize + 28, outputBuffer, 0, 4);
-        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 2) * this.vertexSize + 28, outputBuffer, 0, 4);
+        gl.bufferSubData(gl.ARRAY_BUFFER, i * 3 * this.vertexSize + 28, outputBuffer8, 0, 4);
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 1) * this.vertexSize + 28, outputBuffer8, 0, 4);
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 2) * this.vertexSize + 28, outputBuffer8, 0, 4);
 
-        outputBuffer[0] = face.vertex2.maxCurvatureDir[0] * 0x7F;
-        outputBuffer[1] = face.vertex2.maxCurvatureDir[1] * 0x7F;
-        outputBuffer[2] = face.vertex2.maxCurvatureDir[2] * 0x7F;
-        outputBuffer[3] = face.vertex2.maxCurvature * 0x7F;
+        outputBuffer8[0] = face.vertex2.minCurvatureDir[0] * 0x7F;
+        outputBuffer8[1] = face.vertex2.minCurvatureDir[1] * 0x7F;
+        outputBuffer8[2] = face.vertex2.minCurvatureDir[2] * 0x7F;
+        outputBuffer8[3] = face.vertex2.minCurvature * 0x7F;
 
-        gl.bufferSubData(gl.ARRAY_BUFFER, i * 3 * this.vertexSize + 32, outputBuffer, 0, 4);
-        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 1) * this.vertexSize + 32, outputBuffer, 0, 4);
-        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 2) * this.vertexSize + 32, outputBuffer, 0, 4);
+        gl.bufferSubData(gl.ARRAY_BUFFER, i * 3 * this.vertexSize + 32, outputBuffer8, 0, 4);
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 1) * this.vertexSize + 32, outputBuffer8, 0, 4);
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 2) * this.vertexSize + 32, outputBuffer8, 0, 4);
 
-        outputBuffer[0] = face.vertex3.maxCurvatureDir[0] * 0x7F;
-        outputBuffer[1] = face.vertex3.maxCurvatureDir[1] * 0x7F;
-        outputBuffer[2] = face.vertex3.maxCurvatureDir[2] * 0x7F;
-        outputBuffer[3] = face.vertex3.maxCurvature * 0x7F;
+        outputBuffer8[0] = face.vertex3.minCurvatureDir[0] * 0x7F;
+        outputBuffer8[1] = face.vertex3.minCurvatureDir[1] * 0x7F;
+        outputBuffer8[2] = face.vertex3.minCurvatureDir[2] * 0x7F;
+        outputBuffer8[3] = face.vertex3.minCurvature * 0x7F;
 
-        gl.bufferSubData(gl.ARRAY_BUFFER, i * 3 * this.vertexSize + 36, outputBuffer, 0, 4);
-        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 1) * this.vertexSize + 36, outputBuffer, 0, 4);
-        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 2) * this.vertexSize + 36, outputBuffer, 0, 4);
+        gl.bufferSubData(gl.ARRAY_BUFFER, i * 3 * this.vertexSize + 36, outputBuffer8, 0, 4);
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 1) * this.vertexSize + 36, outputBuffer8, 0, 4);
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 2) * this.vertexSize + 36, outputBuffer8, 0, 4);
+
+        // update curvature positions
+        gl.bufferSubData(gl.ARRAY_BUFFER, i * 3 * this.vertexSize + 40, new Float32Array(face.vertex1.getPositionVector()), 0, 3);
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 1) * this.vertexSize + 40, new Float32Array(face.vertex1.getPositionVector()), 0, 3);
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 2) * this.vertexSize + 40, new Float32Array(face.vertex1.getPositionVector()), 0, 3);
+
+        gl.bufferSubData(gl.ARRAY_BUFFER, i * 3 * this.vertexSize + 52, new Float32Array(face.vertex2.getPositionVector()), 0, 3);
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 1) * this.vertexSize + 52, new Float32Array(face.vertex2.getPositionVector()), 0, 3);
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 2) * this.vertexSize + 52, new Float32Array(face.vertex2.getPositionVector()), 0, 3);
+
+        gl.bufferSubData(gl.ARRAY_BUFFER, i * 3 * this.vertexSize + 64, new Float32Array(face.vertex3.getPositionVector()), 0, 3);
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 1) * this.vertexSize + 64, new Float32Array(face.vertex3.getPositionVector()), 0, 3);
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 2) * this.vertexSize + 64, new Float32Array(face.vertex3.getPositionVector()), 0, 3);
 
          // TODO: we probably need to upload smoothed tangent as well, if we are gonna implement normal mapping later
       }

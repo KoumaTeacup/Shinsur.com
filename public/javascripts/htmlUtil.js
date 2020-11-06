@@ -1,7 +1,8 @@
 ﻿class Utility {
   useNPR;
   showDebugView = false;
-  slectedBufferIndex;
+  selectedDebugGBufferIndex;
+  selectedDebugCurvatureIndex;
   useForwardShading;
   PCFEnabled = true;
   shadowView = { value: false };
@@ -25,9 +26,9 @@
   constructor() {
     document.getElementById("DebugViewCheckbox").onclick = (e) => {
       if (this.showDebugView = e.target.checked) {
-        document.getElementsByClassName('styleHideable')[0].style.display = 'block';
+        document.getElementById('DebugBufferSelector').style.display = 'block';
       } else {
-        document.getElementsByClassName('styleHideable')[0].style.display = 'none';
+        document.getElementById('DebugBufferSelector').style.display = 'none';
       }
     }
 
@@ -61,9 +62,14 @@
       }
     }
 
-    this.slectedBufferIndex = document.getElementById('debugViewOptions').selectedIndex;
+    this.selectedDebugGBufferIndex = document.getElementById('debugViewOptions').selectedIndex;
     document.getElementById('debugViewOptions').onchange = (e) => {
-      this.slectedBufferIndex = e.target.selectedIndex;
+      this.selectedDebugGBufferIndex = e.target.selectedIndex;
+    }
+
+    this.selectedDebugCurvatureIndex = document.getElementById('curvatureDebugViewOptions').selectedIndex;
+    document.getElementById('curvatureDebugViewOptions').onchange = (e) => {
+      this.selectedDebugCurvatureIndex = e.target.selectedIndex;
     }
 
     document.getElementById("PCFFilterCheckbox").onclick = (e) => {
@@ -76,7 +82,13 @@
     }
 
     this.setupNPRMutexCheckbox(this.normalSmoothingView, 'normalSmoothingCheckBox')
-    this.setupNPRMutexCheckbox(this.curvatureView, 'curvatureViewCheckBox')
+    this.setupNPRMutexCheckbox(this.curvatureView, 'curvatureViewCheckBox',
+      () => {
+        document.getElementById('CurvatureDebugBufferSelector').style.display = 'block';
+      },
+      () => {
+        document.getElementById('CurvatureDebugBufferSelector').style.display = 'none';
+      })
     this.setupNPRMutexCheckbox(this.contourView, 'viewContourCheckBox')
     this.setupNPRMutexCheckbox(this.hatchingView, 'viewHatchingCheckBox')
 
@@ -166,13 +178,17 @@
     }
   }
 
-  setupNPRMutexCheckbox(localVar, elementId) {
+  setupNPRMutexCheckbox(localVar, elementId, onChecked, onUnchecked) {
     localVar.value = document.getElementById(elementId).checked;
     document.getElementById(elementId).onclick = (e) => {
       if (e.target.checked) {
         this.closeAllMutualExclusiveViews();
         localVar.value = true;
         document.getElementById(elementId).checked = true;
+
+        if (onChecked) onChecked();
+      } else {
+        if (onUnchecked) onUnchecked();
       }
     }
   }

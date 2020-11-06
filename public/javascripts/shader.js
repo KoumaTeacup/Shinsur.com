@@ -57,6 +57,9 @@ class Program {
     gl.bindAttribLocation(this.program, 5, 'a_curvature1');
     gl.bindAttribLocation(this.program, 6, 'a_curvature2');
     gl.bindAttribLocation(this.program, 7, 'a_curvature3');
+    gl.bindAttribLocation(this.program, 8, 'a_curvaturePos1');
+    gl.bindAttribLocation(this.program, 9, 'a_curvaturePos2');
+    gl.bindAttribLocation(this.program, 10, 'a_curvaturePos3');
 
     // link program
     gl.linkProgram(this.program);
@@ -72,12 +75,18 @@ class Program {
     gl.useProgram(this.program);
 
     // Bind some global render settings automatically
+
+    // Shadow
     var uniformLoc = gl.getUniformLocation(this.program, 'ShadowBias');
     gl.uniform1f(uniformLoc, util.shadowBias.value);
     var uniformLoc = gl.getUniformLocation(this.program, 'ShadowView');
     gl.uniform1i(uniformLoc, util.shadowView.value);
     var uniformLoc = gl.getUniformLocation(this.program, 'ShadowExpScale');
     gl.uniform1f(uniformLoc, util.shadowExpScale.value);
+
+    // Curvature Debug
+    var uniformLoc = gl.getUniformLocation(this.program, 'CurvatureDebugOption');
+    gl.uniform1i(uniformLoc, util.selectedDebugCurvatureIndex);
   }
 
   static setUniform1f(_uniform, _value) {

@@ -13,26 +13,21 @@ in float Curvature3;
 in vec3 PrimaryCurvatureDir1;
 in vec3 PrimaryCurvatureDir2;
 in vec3 PrimaryCurvatureDir3;
+in vec3 PrimaryCurvatureProj1;
+in vec3 PrimaryCurvatureProj2;
+in vec3 PrimaryCurvatureProj3;
 uniform bool ShowSmoothed;
-uniform sampler3D HatchingSampler;
+uniform int CurvatureDebugOption;
 out vec4 OutColor;
  
 void main() {
 	float PI = 3.1415926;
 //	vec2 SampleUV = gl_FragCoord.xy / vec2(1280.0, 720.0);
 
-	OutColor = vec4(PrimaryCurvatureDir3 * 0.5 + 0.5, 1.0);
-//	float angle = atan(PrimaryCurvatureDir1.y / PrimaryCurvatureDir1.x);
+	vec3 Color = vec3(0.0);
+	Color += CurvatureDebugOption == 0 ? vec3(Curvature1) : vec3(0.0);
+	Color += CurvatureDebugOption == 1 ? (PrimaryCurvatureDir1 + vec3(1.0)) / 2.0 : vec3(0.0);
+	Color += CurvatureDebugOption == 2 ? (PrimaryCurvatureProj1 + vec3(1.0)) / 2.0 : vec3(0.0);
 
-//	angle = PI / 4.0;
-//	mat2 rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
-//	SampleUV = rot * SampleUV;
-
-//	float val = mod(SampleUV.y, 0.05) * 20.0;
-//	OutColor = vec4(vec3(angle), 1.0);
-//	OutColor = vec4(SampleUV, 0.0, 1.0);
-//	OutColor = vec4(vec3(Curvature), 1.0);
-
-	vec3 SampleUV = vec3(gl_FragCoord.xy / vec2(1280.0, 720.0), 3.0);
-	OutColor = texture(HatchingSampler, SampleUV);
+	OutColor = vec4(Color, 1.0);
 }

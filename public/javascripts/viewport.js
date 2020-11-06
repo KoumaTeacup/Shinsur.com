@@ -112,6 +112,8 @@ class Viewport {
   }
 
   renderToGenericFBO(index) {
+    if (index == undefined) alert('Render to Generic FBO must be given a valid index');
+
     // check if fbo avaialble
     if (!this.screenSizeFBOs[index]) {
       this.screenSizeFBOs.push(new Framebuffer(gl.canvas.width, gl.canvas.height));
@@ -131,11 +133,11 @@ class Viewport {
     return this;
   } 
 
-  enableBlend(enable, blendRGB, blendAlpha) {
+  enableBlend(enable, blendRGB, blendAlpha, scaleSRGB, scaleDRGB) {
     if (enable) {
       gl.enable(gl.BLEND);
       gl.blendEquationSeparate(blendRGB ? blendRGB : gl.FUNC_ADD, blendAlpha ? blendAlpha:gl.FUNC_ADD);
-      gl.blendFunc(gl.ONE, gl.ONE);
+      gl.blendFuncSeparate(scaleSRGB != undefined ? scaleSRGB : gl.ONE, scaleDRGB != undefined ? scaleDRGB : gl.ONE, gl.ONE, gl.ONE);
     }
     else gl.disable(gl.BLEND);
     return this;

@@ -83,7 +83,7 @@ class GBuffer {
 
   bindDebugBuffer() {
     var bufferType;
-    switch (util.slectedBufferIndex) {
+    switch (util.selectedDebugGBufferIndex) {
       case 0: bufferType = 'position'; break;
       case 1: bufferType = 'diffuse'; break;
       case 2: bufferType = 'normal'; break;

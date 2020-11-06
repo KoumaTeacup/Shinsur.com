@@ -24,8 +24,8 @@ var hatchingDebugProgram = new Program('hatchingDebug');
 var normalViewProgram = new Program('normalView');
 var curvatureViewProgram = new Program('curvatureView');
 
-//var floor = new Mesh('floor');
-//var bowsette = new Mesh('bowsette');
+var floor = new Mesh('floor');
+var bowsette = new Mesh('bowsette');
 var cubes = new Mesh('cubes');
 //var cube = new Mesh('cube');
 var test = new Mesh('test');
@@ -73,40 +73,40 @@ function renderLoop(timestamp) {
   document.getElementById("fps").innerHTML = 'fps: ' + Math.trunc(1000 / deltaTime);
 
   // ----------- Shadow Pass------------
-  //for (let light of lights) {
-  //  // program
-  //  shadowProgrm.use();
-  //  // viewport
-  //viewport.renderToShadowMap()
-  //  .enableBlend(false)
-  //  .enableFaceCull(true)
-  //  .enableDepthTest(true)
-  //  .clearFrame();
-  //  // light
-  //  light.bindForShadow();
-  //  // mesh
-  //  bowsette.draw();
-  //  floor.draw();
+  for (let light of lights) {
+    // program
+    shadowProgrm.use();
+    // viewport
+  viewport.renderToShadowMap()
+    .enableBlend(false)
+    .enableFaceCull(true)
+    .enableDepthTest(true)
+    .clearFrame();
+    // light
+    light.bindForShadow();
+    // mesh
+    bowsette.draw();
+    floor.draw();
 
-  //  if (util.PCFEnabled) {
-  //    // program
-  //    PCFHorizontalProgram.use();
-  //    // viewport
-  //viewport.bindPCFHorizontal()
-  //  .enableBlend(false)
-  //  .enableFaceCull(false)
-  //  .enableDepthTest(false)
-  //  .clearFrame();
-  //    // mesh
-  //    screenPlane.draw();
+    if (util.PCFEnabled) {
+      // program
+      PCFHorizontalProgram.use();
+      // viewport
+  viewport.bindPCFHorizontal()
+    .enableBlend(false)
+    .enableFaceCull(false)
+    .enableDepthTest(false)
+    .clearFrame();
+      // mesh
+      screenPlane.draw();
 
-  //    // viewprot
-  //viewport.bindPCFVertical()
-  //  .clearFrame();
-  //    // mesh
-  //    screenPlane.draw();
-  //  }
-  //}
+      // viewprot
+  viewport.bindPCFVertical()
+    .clearFrame();
+      // mesh
+      screenPlane.draw();
+    }
+  }
   // ----------- End of Shadow Pass ------------
 
   // clear html per frame data
@@ -133,6 +133,7 @@ function renderLoop(timestamp) {
       // mesh
       bowsette.draw();
       floor.draw();
+      //test.draw();
     }
     // ------------ End of Forward Rendering ------------
 
@@ -153,6 +154,7 @@ function renderLoop(timestamp) {
       // mesh
       bowsette.draw();
       floor.draw();
+      //test.draw();
 
       // ------------ Light pass ------------
       // program
@@ -204,7 +206,8 @@ function renderLoop(timestamp) {
       // camera
       camera.update();
       // mesh
-      test.draw();
+      cubes.draw();
+      //test.draw();
     } else if (util.curvatureView.value) {
       // program
       curvatureViewProgram.use();
@@ -219,7 +222,8 @@ function renderLoop(timestamp) {
       camera.update();
       // mesh
       //teapot.draw();
-      test.draw();
+      cubes.draw();
+      //test.draw();
     } else if(util.hatchingView.value) {
       // program
       hatchingPrepareProgram.use();
@@ -303,7 +307,8 @@ function renderLoop(timestamp) {
       viewport.renderToDefault()
         .readGBuffer()
         .readHatchingBuffer()
-        .enableBlend(true, gl.FUNC_REVERSE_SUBTRACT)
+        //.enableBlend(true, gl.FUNC_REVERSE_SUBTRACT, gl.FUNC_ADD, gl.ONE_MINUS_SRC_COLOR, gl.ONE)
+        .enableBlend(true, gl.MIN)
         .enableFaceCull(false)
         .enableDepthTest(false)
       // mesh

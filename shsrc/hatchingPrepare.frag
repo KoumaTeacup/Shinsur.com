@@ -89,4 +89,16 @@ void main() {
 	Hatching5 = OutColor[5];
 	Hatching6 = OutColor[6];
 	Hatching7 = OutColor[7];
+
+//	SampleUV = gl_FragCoord.xy / OutputSize * StrokeWidth;
+//	vec4 multiplier = vec4(SampleUV.x, SampleUV.y, 1.0, 1.0);
+//
+//	Hatching0 *= multiplier;
+//	Hatching1 *= multiplier;
+//	Hatching2 *= multiplier;
+//	Hatching3 *= multiplier;
+//	Hatching4 *= multiplier;
+//	Hatching5 *= multiplier;
+//	Hatching6 *= multiplier;
+//	Hatching7 *= multiplier; 
 }
