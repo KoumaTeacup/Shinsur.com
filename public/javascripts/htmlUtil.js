@@ -5,6 +5,7 @@
   selectedDebugCurvatureIndex;
   useForwardShading;
   PCFEnabled = true;
+  shadowEnabled;
   shadowView = { value: false };
   shadowBias = { value: 0.0 };
   shadowExpScale = { value: 0.0 };
@@ -32,10 +33,8 @@
       }
     }
 
-    this.useNPR = document.getElementById('shadingStyleCheckbox').checked;
-    document.getElementById("shadingStyleCheckbox").onclick = (e) => {
-      this.useNPR = e.target.checked;
-      if (this.useNPR) {
+    function styleChanged(checked) {
+      if (checked) {
         document.getElementById('shadowSection').style.display = 'none';
         document.getElementById('shadingModeSection').style.display = 'none';
         document.getElementById('contourSection').style.display = 'block';
@@ -50,6 +49,12 @@
         document.getElementById('normalSmoothingSection').style.display = 'none';
         document.getElementById('curvatureViewSection').style.display = 'none';
       }
+    }
+    this.useNPR = document.getElementById('shadingStyleCheckbox').checked;
+    styleChanged(this.useNPR);
+    document.getElementById("shadingStyleCheckbox").onclick = (e) => {
+      this.useNPR = e.target.checked;
+      styleChanged(this.useNPR);
     }
 
     this.useForwardShading = !document.getElementById('shadingModeCheckBox').checked;
@@ -79,6 +84,13 @@
       } else {
         document.getElementById("PCFFilterDiv").style.display = 'block';
       }
+    }
+
+    this.shadowDisabled = document.getElementById('ShadowDisabledCheckbox').checked;
+    document.getElementById('ShadowDiv').style.display = this.shadowDisabled ? 'none' : 'block';
+    document.getElementById('ShadowDisabledCheckbox').onclick = (e) => {
+      this.shadowDisabled = e.target.checked;
+      document.getElementById('ShadowDiv').style.display = this.shadowDisabled ? 'none' : 'block';
     }
 
     this.setupNPRMutexCheckbox(this.normalSmoothingView, 'normalSmoothingCheckBox')

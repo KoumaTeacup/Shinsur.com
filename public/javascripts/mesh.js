@@ -1030,6 +1030,13 @@ class Mesh {
 
     var outputBuffer = new ArrayBuffer(NumIndices * this.vertexSize);
 
+    // Since we already know the size of vao, we can initialize it here
+    if (!this.vao[matIndex]) {
+      this.vao[matIndex] = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.vao[matIndex]);
+      gl.bufferData(gl.ARRAY_BUFFER, outputBuffer, gl.STATIC_DRAW);
+    }
+
     var accessors = this.gltf.accessors;
     var bufferViews = this.gltf.bufferViews;
 
@@ -1077,11 +1084,6 @@ class Mesh {
         var norStride = bufferViews[norBV].byteStride;
         var uvStride = bufferViews[uvBV].byteStride;
 
-        // vertex count is accumulative, used to determine offset of this mesh
-        var currVertCount = this.positionCount[matIndex];
-        this.positionCount[matIndex] += accessors[posIndex].count;
-        var outputView = new DataView(outputBuffer);
-
         // Create the hash tables, these hash tables are used in later calculation for smoothed normal & curvature
         // Position hash table
         let posHashTable;
@@ -1100,6 +1102,10 @@ class Mesh {
           indexHashTable = new IndexHashTable();
           this.indexHashes[matIndex] = indexHashTable;
         }
+
+        // vertex count is accumulative, used to determine offset of this mesh
+        var currVertCount = this.positionCount[matIndex];
+        this.positionCount[matIndex] += accessors[posIndex].count;
 
         // Processing input and populate hash table
         for (let i = currVertCount; i < this.positionCount[matIndex]; i++) {
@@ -1141,10 +1147,6 @@ class Mesh {
           indexHashTable.addVertex(vertexData);
         }
 
-        // initialize index buffer, assuming data is unsigned short
-        var currIndexCount = this.indexCount[matIndex];
-        this.indexCount[matIndex] += accessors[indIndex].count;
-
         // Get or create the face array
         let faceArray;
         if (this.faceArrays[matIndex]) {
@@ -1154,12 +1156,20 @@ class Mesh {
           this.faceArrays[matIndex] = faceArray;
         }
 
+        // initialize index buffer
+        var currIndexCount = this.indexCount[matIndex];
+        var currIndexSize = accessors[indIndex].count;
+        this.indexCount[matIndex] += currIndexSize;
+
+        outputBuffer = new ArrayBuffer(currIndexSize * this.vertexSize);
+        var outputView = new DataView(outputBuffer);
+
         // construct vertex array
-        for (let i = currIndexCount; i < this.indexCount[matIndex]; i += 3) {
+        for (let i = 0; i < currIndexSize; i += 3) {
           // Load vertices indices per triangle from input
-          let index1 = indDV.getInt16(indOffset + (i - currIndexCount) * 2, true) + currVertCount;
-          let index2 = indDV.getInt16(indOffset + (i + 1 - currIndexCount) * 2, true) + currVertCount;
-          let index3 = indDV.getInt16(indOffset + (i + 2 - currIndexCount) * 2, true) + currVertCount;
+          let index1 = indDV.getInt16(indOffset + (i) * 2, true) + currVertCount;
+          let index2 = indDV.getInt16(indOffset + (i + 1) * 2, true) + currVertCount;
+          let index3 = indDV.getInt16(indOffset + (i + 2) * 2, true) + currVertCount;
 
           // Get the three vertex object from hash table
           let vertexObj1 = indexHashTable.getVertex(index1);
@@ -1238,9 +1248,10 @@ class Mesh {
         }
 
         // upload vertex buffer
-        this.vao[matIndex] = gl.createBuffer();
+        if (!this.vao[matIndex]) alert('VAO should be created by now');
+
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vao[matIndex]);
-        gl.bufferData(gl.ARRAY_BUFFER, outputBuffer, gl.STATIC_DRAW);
+        gl.bufferSubData(gl.ARRAY_BUFFER, currIndexCount * this.vertexSize, outputView);
 
         resolve('success');
       })
@@ -1422,7 +1433,6 @@ class Mesh {
 
       // upload our updated vertex data
       let outputBuffer8 = new Int8Array(4);
-      let outputBuffer32 = new Float32Array(3);
       for (let i = 0; i < faceArray.length; ++i)
       {
         let face = faceArray[i];

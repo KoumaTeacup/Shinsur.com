@@ -12,7 +12,7 @@
         <div class="shadingSytleControlDiv">
             PBR
             <label class="switch">
-                <input id="shadingStyleCheckbox" type="checkbox" checked>
+                <input id="shadingStyleCheckbox" type="checkbox">
                 <span class="slider"></span>
             </label>
             NPR
@@ -56,49 +56,61 @@
             </div>
             <div class="debugInfoDiv" id="shadowSection" style="display:none">
                 <p class="debugInfoCategory">Shadow</p>
-                <p class="styleText">Shadow View: Off</p>
+
+                <p class="styleText">Shadow Enabled</p>
                 <label class="switch">
-                    <input id="ShadowViewCheckbox" type="checkbox">
+                    <input id="ShadowDisabledCheckbox" type="checkbox">
                     <span class="slider round"></span>
                 </label>
-                <p class="styleText">On</p><br>
-                <p class="styleText">Resolution: </p>
-                <form name="shadowResForm">
-                    <input type="radio" id="shadowRes1k" name="shadowRes" value="1024">
-                    <label for="shadowRes1k" style="color:snow">1k</label>
-                    <input type="radio" id="shadowRes2k" name="shadowRes" value="2048">
-                    <label for="shadowRes2k" style="color:snow">2k</label>
-                    <input type="radio" id="shadowRes4k" name="shadowRes" value="4096" checked>
-                    <label for="shadowRes4k" style="color:snow">4k</label>
-                    <input type="radio" id="shadowRes8k" name="shadowRes" value="8192">
-                    <label for="shadowRes8k" style="color:snow">8k</label>
-                </form>
-                <p class="styleText">Bias: </p>
-                <div class="slidecontainer">
-                    <input type="range" min="0" max="300" value="152" id="ShadowBiasSlider">
-                    <p class="styleText" id="shadowBiasDisplay"></p>
-                </div>
-                <p class="styleText">Exponential Scale: </p>
-                <div class="slidecontainer">
-                    <input type="range" min="1" max="100" value="50" id="ShadowExpScaleSlider">
-                    <p class="styleText" id="ShadowExpScaleDisplay"></p>
-                </div>
-                <p class="styleText">PCF Filter</p>
-                <label class="switch">
-                    <input id="PCFFilterCheckbox" type="checkbox" checked>
-                    <span class="slider round"></span>
-                </label>
-                <p class="styleText">On</p><br>
-                <div id="PCFFilterDiv">
-                    <p class="styleText">PCF Kernel Size: </p>
+                <p class="styleText">Disabled</p><br>
+
+                <div id="ShadowDiv">
+                    <p class="styleText">Shadow View: Off</p>
+                    <label class="switch">
+                        <input id="ShadowViewCheckbox" type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <p class="styleText">On</p><br>
+
+                    <p class="styleText">Resolution: </p>
+                    <form name="shadowResForm">
+                        <input type="radio" id="shadowRes1k" name="shadowRes" value="1024">
+                        <label for="shadowRes1k" style="color:snow">1k</label>
+                        <input type="radio" id="shadowRes2k" name="shadowRes" value="2048">
+                        <label for="shadowRes2k" style="color:snow">2k</label>
+                        <input type="radio" id="shadowRes4k" name="shadowRes" value="4096" checked>
+                        <label for="shadowRes4k" style="color:snow">4k</label>
+                        <input type="radio" id="shadowRes8k" name="shadowRes" value="8192">
+                        <label for="shadowRes8k" style="color:snow">8k</label>
+                    </form>
+
+                    <p class="styleText">Bias: </p>
                     <div class="slidecontainer">
-                        <input type="range" min="1" max="15" value="3" id="PCFKernelSizeSlider">
-                        <p class="styleText" id="PCFKernelSizeDisplay"></p>
+                        <input type="range" min="0" max="300" value="152" id="ShadowBiasSlider">
+                        <p class="styleText" id="shadowBiasDisplay"></p>
                     </div>
-                    <p class="styleText">PCF Gauss Width: </p>
+                    <p class="styleText">Exponential Scale: </p>
                     <div class="slidecontainer">
-                        <input type="range" min="1" max="100" value="7" id="PCFGaussianWidthSlider">
-                        <p class="styleText" id="PCFGaussianWidthDisplay"></p>
+                        <input type="range" min="1" max="100" value="50" id="ShadowExpScaleSlider">
+                        <p class="styleText" id="ShadowExpScaleDisplay"></p>
+                    </div>
+                    <p class="styleText">PCF Filter</p>
+                    <label class="switch">
+                        <input id="PCFFilterCheckbox" type="checkbox" checked>
+                        <span class="slider round"></span>
+                    </label>
+                    <p class="styleText">On</p><br>
+                    <div id="PCFFilterDiv">
+                        <p class="styleText">PCF Kernel Size: </p>
+                        <div class="slidecontainer">
+                            <input type="range" min="1" max="15" value="3" id="PCFKernelSizeSlider">
+                            <p class="styleText" id="PCFKernelSizeDisplay"></p>
+                        </div>
+                        <p class="styleText">PCF Gauss Width: </p>
+                        <div class="slidecontainer">
+                            <input type="range" min="1" max="100" value="7" id="PCFGaussianWidthSlider">
+                            <p class="styleText" id="PCFGaussianWidthDisplay"></p>
+                        </div>
                     </div>
                 </div>
             </div>

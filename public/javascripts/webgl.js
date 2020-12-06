@@ -73,38 +73,40 @@ function renderLoop(timestamp) {
   document.getElementById("fps").innerHTML = 'fps: ' + Math.trunc(1000 / deltaTime);
 
   // ----------- Shadow Pass------------
-  for (let light of lights) {
-    // program
-    shadowProgrm.use();
-    // viewport
-  viewport.renderToShadowMap()
-    .enableBlend(false)
-    .enableFaceCull(true)
-    .enableDepthTest(true)
-    .clearFrame();
-    // light
-    light.bindForShadow();
-    // mesh
-    bowsette.draw();
-    floor.draw();
-
-    if (util.PCFEnabled) {
+  if (!util.shadowDisabled) {
+    for (let light of lights) {
       // program
-      PCFHorizontalProgram.use();
+      shadowProgrm.use();
       // viewport
-  viewport.bindPCFHorizontal()
-    .enableBlend(false)
-    .enableFaceCull(false)
-    .enableDepthTest(false)
-    .clearFrame();
+      viewport.renderToShadowMap()
+        .enableBlend(false)
+        .enableFaceCull(true)
+        .enableDepthTest(true)
+        .clearFrame();
+      // light
+      light.bindForShadow();
       // mesh
-      screenPlane.draw();
+      bowsette.draw();
+      floor.draw();
 
-      // viewprot
-  viewport.bindPCFVertical()
-    .clearFrame();
-      // mesh
-      screenPlane.draw();
+      if (util.PCFEnabled) {
+        // program
+        PCFHorizontalProgram.use();
+        // viewport
+        viewport.bindPCFHorizontal()
+          .enableBlend(false)
+          .enableFaceCull(false)
+          .enableDepthTest(false)
+          .clearFrame();
+        // mesh
+        screenPlane.draw();
+
+        // viewprot
+        viewport.bindPCFVertical()
+          .clearFrame();
+        // mesh
+        screenPlane.draw();
+      }
     }
   }
   // ----------- End of Shadow Pass ------------
