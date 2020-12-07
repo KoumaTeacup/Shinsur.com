@@ -27,22 +27,26 @@
                 <p class="styleText" id="triCount">0</p><br>
             </div>
             <div class="debugInfoDiv" id="shadingModeSection" style="display:none">
-                <p class="debugInfoCategory">Shading Mode</p><br />
-                <p class="styleText">Forward</p>
-                <label class="switch">
-                    <input id="shadingModeCheckBox" type="checkbox">
-                    <span class="slider round"></span>
-                </label>
-                <p class="styleText">Deferred</p>
+                <p class="debugInfoCategory">Shading Mode</p>
+                <center>
+                    <p class="styleText">Forward</p>
+                    <label class="switch">
+                        <input id="shadingModeCheckBox" type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <p class="styleText">Deferred</p>
+                </center>
             </div>
             <div class="debugInfoDiv" id="GbufferViewerSection" style="display:none">
-                <p class="debugInfoCategory">Gbuffer Viewer</p><br>
-                <p class="styleText">Off</p>
-                <label class="switch">
-                    <input id="DebugViewCheckbox" type="checkbox">
-                    <span class="slider round"></span>
-                </label>
-                <p class="styleText">On</p><br>
+                <p class="debugInfoCategory">Gbuffer Viewer</p>
+                <center>
+                    <p class="styleText">Off</p>
+                    <label class="switch">
+                        <input id="DebugViewCheckbox" type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <p class="styleText">On</p><br>
+                </center><br>
                 <span class="styleHideable" id="DebugBufferSelector">
                     Buffer:
                     <select class="styleDropdown" name="DebugViewType" id="debugViewOptions">
@@ -56,14 +60,15 @@
             </div>
             <div class="debugInfoDiv" id="shadowSection" style="display:none">
                 <p class="debugInfoCategory">Shadow</p>
-
-                <p class="styleText">Shadow Enabled</p>
-                <label class="switch">
-                    <input id="ShadowDisabledCheckbox" type="checkbox">
-                    <span class="slider round"></span>
-                </label>
-                <p class="styleText">Disabled</p><br>
-
+                <center>
+                    <p class="styleText">Enabled</p>
+                    <label class="switch">
+                        <input id="ShadowDisabledCheckbox" type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <p class="styleText">Disabled</p><br>
+                </center>
+                <br>
                 <div id="ShadowDiv">
                     <p class="styleText">Shadow View: Off</p>
                     <label class="switch">

@@ -15,7 +15,7 @@ var gbufferLightProg = new Program('gbufferLight');
 var gbufferGeometryProg = new Program('gbufferGeometry');
 var shadowProgrm = new Program('shadow');
 var PCFHorizontalProgram = new Program('PCFFilter');
-var pencilGeometryProgram = new Program('pencilGeometry');
+//var pencilGeometryProgram = new Program('pencilGeometry');
 var pencilLightProgram = new Program('pencilLight');
 var contourLightProgram = new Program('contourLight');
 var contourShakingProgram = new Program('contourShaking');
@@ -254,7 +254,7 @@ function renderLoop(timestamp) {
 
       // ------------ Contour Geometry pass ------------
       // program
-      pencilGeometryProgram.use();
+      gbufferGeometryProg.use();
       // viewport
       viewport.renderToGBuffer()
         .enableBlend(false)
