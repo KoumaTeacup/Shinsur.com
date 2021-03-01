@@ -16,65 +16,65 @@ uniform sampler2D CurvatureSampler3;
 uniform sampler3D HatchingSampler;
 
 uniform int NumHatchingSlices;
+uniform float HatchingSampleScale;
 uniform float HatchingSliceCoord;
 
 out vec4 OutColor;
 
-void main() {
+vec3 CalculateHatchingColor(vec2 HatchingSampleUV, vec2 ScreenSampleUV, sampler2D CurvatureSampler, float SliceCoord)
+{
 	float PI = 3.1415926;
 
+	vec3 CurvatureDir = texture(CurvatureSampler, ScreenSampleUV).rgb;
+	float angle = atan(CurvatureDir.y, CurvatureDir.x);
+	mat2 rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
+	HatchingSampleUV = rot * (HatchingSampleUV - vec2(0.5)) + vec2(0.5);
+
+	vec3 HatchingColor = texture(HatchingSampler, vec3(HatchingSampleUV, SliceCoord)).rgb;
+	return length(CurvatureDir) > 0.0 ? HatchingColor : vec3(1.0);
+}
+
+void main() {
+	// Calculate coordinate of the curvature sample
 	ivec2 ScreenTexutreSize = textureSize(WorldPosSampler, 0);
-	ivec2 HatchingTexutreSize = textureSize(HatchingSampler, 0).xy;
 	vec2 ScreenSampleUV = gl_FragCoord.xy / vec2(ScreenTexutreSize);
-	vec2 HatchingSampleUV = gl_FragCoord.xy / vec2(HatchingTexutreSize);
 	
+	// Calculate coordinate of the hatching texture sample
+	ivec2 HatchingTexutreSize = textureSize(HatchingSampler, 0).xy;
+	vec2 HatchingSampleUV = mod(gl_FragCoord.xy / vec2(HatchingTexutreSize) * HatchingSampleScale, 1.0);
+
 	vec3 Color = vec3(1.0, 1.0, 1.0);
-	mat2 rot;
-	float angle;
-	vec3 CurvatureDir;
-	vec3 HatchingColor;
+	vec3 HatchingColor, HatchingColor1, HatchingColor2;
 	float SliceCoord = (HatchingSliceCoord - 0.5) / float(NumHatchingSlices);
 
-	HatchingSampleUV = gl_FragCoord.xy / vec2(HatchingTexutreSize);
-	CurvatureDir = texture(CurvatureSampler1, ScreenSampleUV).rgb;
-	angle = atan(CurvatureDir.y, CurvatureDir.x);
-	angle += PI / 4.0;
-	rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
-	HatchingSampleUV = rot * HatchingSampleUV;
+	vec2 v1 = HatchingSampleUV - vec2(0.5);
+	vec2 v2 = vec2(0.5) - abs(HatchingSampleUV - vec2(0.5));
+	float len1 = length(v1) * 2.0;
+	len1 = max(1.0 - len1, 0.0);
+	float len2 = length(v2) * 2.0;
+	len2 = max(1.0 - len2, 0.0);
+	float weight1 = len1 / (len1 + len2);
+	float weight2 = 1.0 - weight1;
 
-	HatchingColor = texture(HatchingSampler, vec3(HatchingSampleUV * 2.0, SliceCoord)).rgb;
-	Color = min(Color, length(CurvatureDir) > 0.0 ? HatchingColor : vec3(1.0));
-//	Color += vec3(sin(HatchingSampleUV.x * 100.0));
+	vec2 AltHatchingUV = mod(abs(HatchingSampleUV + vec2(0.5)), 1.0);
 	
-	HatchingSampleUV = gl_FragCoord.xy / vec2(HatchingTexutreSize);
-	CurvatureDir = texture(CurvatureSampler2, ScreenSampleUV).rgb;
-	angle = atan(CurvatureDir.y, CurvatureDir.x);
-	angle += PI / 4.0;
-	rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
-	HatchingSampleUV = rot * HatchingSampleUV;
+	HatchingColor1 = CalculateHatchingColor(HatchingSampleUV, ScreenSampleUV, CurvatureSampler1, SliceCoord);
+	HatchingColor2 = CalculateHatchingColor(AltHatchingUV, ScreenSampleUV, CurvatureSampler1, SliceCoord);
 
-	HatchingColor = texture(HatchingSampler, vec3(HatchingSampleUV * 2.0, SliceCoord)).rgb;
-	Color = min(Color, length(CurvatureDir) > 0.0 ? HatchingColor : vec3(1.0));
-//	Color += vec3(sin(HatchingSampleUV.x * 100.0));
+	HatchingColor = vec3(1.0) - (vec3(1.0) - HatchingColor1) * weight1 - (vec3(1.0) - HatchingColor2) * weight2;
+	Color = min(Color, HatchingColor);
 
-	HatchingSampleUV = gl_FragCoord.xy / vec2(HatchingTexutreSize);
-	CurvatureDir = texture(CurvatureSampler3, ScreenSampleUV).rgb;
-	angle = atan(CurvatureDir.y, CurvatureDir.x);
-	angle += PI / 4.0;
-	rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
-	HatchingSampleUV = rot * HatchingSampleUV;
+	HatchingColor1 = CalculateHatchingColor(HatchingSampleUV, ScreenSampleUV, CurvatureSampler2, SliceCoord);
+	HatchingColor2 = CalculateHatchingColor(AltHatchingUV, ScreenSampleUV, CurvatureSampler2, SliceCoord);
 
-	HatchingColor = texture(HatchingSampler, vec3(HatchingSampleUV * 2.0, SliceCoord)).rgb;
-	Color = min(Color, length(CurvatureDir) > 0.0 ? HatchingColor : vec3(1.0));
+	HatchingColor = vec3(1.0) - (vec3(1.0) - HatchingColor1) * weight1 - (vec3(1.0) - HatchingColor2) * weight2;
+	Color = min(Color, HatchingColor);
 
-//	Color += vec3(sin(HatchingSampleUV.x * 100.0));
+	HatchingColor1 = CalculateHatchingColor(HatchingSampleUV, ScreenSampleUV, CurvatureSampler3, SliceCoord);
+	HatchingColor2 = CalculateHatchingColor(AltHatchingUV, ScreenSampleUV, CurvatureSampler3, SliceCoord);
 
+	HatchingColor = vec3(1.0) - (vec3(1.0) - HatchingColor1) * weight1 - (vec3(1.0) - HatchingColor2) * weight2;
+	Color = min(Color, HatchingColor);
 
-//	OutColor = length(CurvatureDir) > 0.0? vec4(vec3(sin(HatchingSampleUV.x * 100.0)), 1.0): vec4(1.0);
-//	OutColor = length(CurvatureDir) > 0.0? vec4(((CurvatureDir) + 1.0) / 2.0 , 1.0): vec4(1.0);
-//	OutColor = length(CurvatureDir) > 0.0? vec4((CurvatureDir + 1.0) / 2.0 , 1.0): vec4(1.0);
-//	OutColor = length(CurvatureDir) > 0.0? vec4(vec3(angle / 5.0) , 1.0): vec4(1.0);
-//	OutColor = length(CurvatureDir) > 0.0? vec4(vec3((angle + PI) / 2.0 / PI), 1.0): vec4(1.0);
-//	OutColor = vec4(vec3(sin(angle)), 1.0);
 	OutColor = vec4(Color, 1.0);
 }

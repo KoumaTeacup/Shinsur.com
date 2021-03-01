@@ -3,6 +3,7 @@
   showDebugView = false;
   selectedDebugGBufferIndex;
   selectedDebugCurvatureIndex;
+  selectedDebugCurvatureVertexIndex;
   useForwardShading;
   PCFEnabled = true;
   shadowEnabled;
@@ -10,6 +11,7 @@
   shadowBias = { value: 0.0 };
   shadowExpScale = { value: 0.0 };
   totalTries = 0;
+  hatchingSampleScale = { value: 0 };
   normalSmoothingView = { value: false };
   contourView = { value: false };
   hatchingView = { value: false };
@@ -77,6 +79,21 @@
       this.selectedDebugCurvatureIndex = e.target.selectedIndex;
     }
 
+    // Curvature view vertex index radio button group
+    var CurvatureViewVertexRadios = document.getElementsByName('CurvatureViewVertexIndexRadioGroup');
+    for (var i = 0, length = CurvatureViewVertexRadios.length; i < length; i++) {
+      if (CurvatureViewVertexRadios[i].checked) {
+        this.selectedDebugCurvatureVertexIndex = CurvatureViewVertexRadios[i].value;
+      }
+
+      CurvatureViewVertexRadios[i].onchange = (e) => {
+        var radio = e.target;
+        if (radio.checked) {
+          this.selectedDebugCurvatureVertexIndex = radio.value;
+        }
+      }
+    }
+
     document.getElementById("PCFFilterCheckbox").onclick = (e) => {
       this.PCFEnabled = e.target.checked;
       if (!this.PCFEnabled) {
@@ -97,15 +114,25 @@
     this.setupNPRMutexCheckbox(this.curvatureView, 'curvatureViewCheckBox',
       () => {
         document.getElementById('CurvatureDebugBufferSelector').style.display = 'block';
+        document.getElementById('CurvatureViewVertexRadioButtons').style.display = 'block';
       },
       () => {
         document.getElementById('CurvatureDebugBufferSelector').style.display = 'none';
+        document.getElementById('CurvatureViewVertexRadioButtons').style.display = 'none';
       })
     this.setupNPRMutexCheckbox(this.contourView, 'viewContourCheckBox')
     this.setupNPRMutexCheckbox(this.hatchingView, 'viewHatchingCheckBox')
 
     this.setupStandaloneCheckbox(this.shadowView, 'ShadowViewCheckbox');
     this.setupStandaloneCheckbox(this.showSmoothedNormal, 'normalDebugShowSmoothedCheckBox');
+
+    this.setupNumericalSlider(
+      this.hatchingSampleScale,
+      'hatchingSampleScaleSlider',
+      'hatchingSampleScaleDisplay',
+      (val) => { return val * 0.19 + 1 },
+      (val) => { return val.toFixed(2) }
+    );
 
     this.setupNumericalSlider(
       this.shadowBias,
@@ -200,6 +227,7 @@
 
         if (onChecked) onChecked();
       } else {
+        localVar.value = false;
         if (onUnchecked) onUnchecked();
       }
     }
@@ -214,6 +242,17 @@
     document.getElementById('viewHatchingCheckBox').checked = false;
     this.contourView.value = false;
     document.getElementById('viewContourCheckBox').checked = false;
+  }
+
+  GetCheckedRadioButton(RadioGroupName) {
+    var CurvatureViewVertexRadios = document.getElementsByName(RadioGroupName);
+    for (var i = 0, length = CurvatureViewVertexRadios.length; i < length; i++) {
+      if (CurvatureViewVertexRadios[i].checked) {
+        return i;
+      }
+    }
+
+    return 0;
   }
 }
 

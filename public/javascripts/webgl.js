@@ -24,9 +24,9 @@ var hatchingDebugProgram = new Program('hatchingDebug');
 var normalViewProgram = new Program('normalView');
 var curvatureViewProgram = new Program('curvatureView');
 
-var floor = new Mesh('floor');
-var bowsette = new Mesh('bowsette');
-var cubes = new Mesh('cubes');
+//var floor = new Mesh('floor');
+//var bowsette = new Mesh('bowsette');
+//var cubes = new Mesh('cubes');
 //var cube = new Mesh('cube');
 var test = new Mesh('test');
 //var teapot = new Mesh('UtahTeapot');
@@ -42,11 +42,7 @@ camera.distance = 20.0;
 var lights = [new PointLight()];
 lights[0].worldLocation = [6.0, 6.0, 6.0];
 
-// viewport
-
 var lastTimestamp = 0;
-
-var fbo = new Framebuffer3D();
 
 // Initialize our pipe, Contructor needed, don't delete
 var viewport = new Viewport(() => {
@@ -208,8 +204,8 @@ function renderLoop(timestamp) {
       // camera
       camera.update();
       // mesh
-      cubes.draw();
-      //test.draw();
+      //cubes.draw();
+      test.draw();
     } else if (util.curvatureView.value) {
       // program
       curvatureViewProgram.use();
@@ -224,8 +220,8 @@ function renderLoop(timestamp) {
       camera.update();
       // mesh
       //teapot.draw();
-      cubes.draw();
-      //test.draw();
+      //cubes.draw();
+      test.draw();
     } else if(util.hatchingView.value) {
       // program
       hatchingPrepareProgram.use();
@@ -264,8 +260,9 @@ function renderLoop(timestamp) {
       // camera
       camera.update();
       // mesh
-      cubes.draw();
-      //test.draw();
+      //cubes.draw();
+      //bowsette.draw();
+      test.draw();
 
       // ------------ Contour Light pass ------------
       // program
@@ -302,19 +299,21 @@ function renderLoop(timestamp) {
       // mesh
       screenPlane.draw();
 
-      // ------------ Pencil Lighting pass ------------
-      // program
-      pencilLightProgram.use();
-      // viewport
-      viewport.renderToDefault()
-        .readGBuffer()
-        .readHatchingBuffer()
-        //.enableBlend(true, gl.FUNC_REVERSE_SUBTRACT, gl.FUNC_ADD, gl.ONE_MINUS_SRC_COLOR, gl.ONE)
-        .enableBlend(true, gl.MIN)
-        .enableFaceCull(false)
-        .enableDepthTest(false)
-      // mesh
-      screenPlane.draw();
+      if (!util.contourView.value) {
+        // ------------ Pencil Lighting pass ------------
+        // program
+        pencilLightProgram.use();
+        // viewport
+        viewport.renderToDefault()
+          .readGBuffer()
+          .readHatchingBuffer()
+          //.enableBlend(true, gl.FUNC_REVERSE_SUBTRACT, gl.FUNC_ADD, gl.ONE_MINUS_SRC_COLOR, gl.ONE)
+          .enableBlend(true, gl.MIN)
+          .enableFaceCull(false)
+          .enableDepthTest(false)
+        // mesh
+        screenPlane.draw();
+      }
     }
     // ------------ End of Pencil rendering ------------
   }

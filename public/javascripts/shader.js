@@ -89,6 +89,8 @@ class Program {
     // Curvature Debug
     var uniformLoc = gl.getUniformLocation(this.program, 'CurvatureDebugOption');
     gl.uniform1i(uniformLoc, util.selectedDebugCurvatureIndex);
+    var uniformLoc = gl.getUniformLocation(this.program, 'CurvatureDebugVertexId');
+    gl.uniform1i(uniformLoc, util.selectedDebugCurvatureVertexIndex);
   }
 
   static setUniform1f(_uniform, _value) {

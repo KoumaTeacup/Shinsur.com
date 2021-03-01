@@ -651,9 +651,10 @@ class VertexCluster {
 
     // we swap them so that the first vector has a larger eigen value, used to determine the larger principle curvature
     if (Math.abs(eigenVec1[2]) < Math.abs(eigenVec2[2])) {
-      let temp = eigenVec1;
-      eigenVec1 = eigenVec2;
-      eigenVec2 = temp;
+      let temp = [3];
+      eigenVec1.forEach((value, index) => { temp[index] = value });
+      eigenVec2.forEach((value, index) => { eigenVec1[index] = value });
+      temp.forEach((value, index) => { eigenVec2[index] = value });
     }
   }
 
@@ -914,7 +915,7 @@ class Mesh {
   // parse the buffer, using the data type we want to pack
   // gl doesn't allow single attribute less than 4 bytes alignment, so we need to pad normal and tanget
   // Position - Float: (4, 4, 4)
-  // Tangent - Byte: (1, 1, 1, padding-1)
+  // Tangent - Byte: (1, 1, 1, CurvatureVertexIndex-1)
   // Normal - Byte: (1, 1, 1, padding-1)
   // Smoothed Normal - Byte: (1, 1, 1, padding-1)
   // Texture Coordinate - Unsigned Short: (2, 2) 
@@ -946,6 +947,12 @@ class Mesh {
         response.json()
           .then(data => {
             this.gltf = data;
+
+            if (this.gltf.buffers == undefined) {
+              // No mesh, skip loading
+              alert('No mesh asset found in file' + filename + '.gltf, loading skipped');
+              return;
+            }
 
             // download all binaries
             for (let i = 0; i < this.gltf.buffers.length; i++) {
@@ -1438,6 +1445,14 @@ class Mesh {
         let face = faceArray[i];
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vao[matIndex]);
+
+        // update curvature vertex index
+        outputBuffer8[0] = -0x7F;
+        gl.bufferSubData(gl.ARRAY_BUFFER, i * 3 * this.vertexSize + 15, outputBuffer8, 0, 1);
+        outputBuffer8[0] = 0;
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 1) * this.vertexSize + 15, outputBuffer8, 0, 1);
+        outputBuffer8[0] = 0x7F;
+        gl.bufferSubData(gl.ARRAY_BUFFER, (i * 3 + 2) * this.vertexSize + 15, outputBuffer8, 0, 1);
 
         // update smoothed normal
         outputBuffer8[0] = face.vertex1.smoothedNormal[0] * 0x7F;

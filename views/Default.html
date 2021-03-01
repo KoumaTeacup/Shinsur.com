@@ -12,7 +12,7 @@
         <div class="shadingSytleControlDiv">
             PBR
             <label class="switch">
-                <input id="shadingStyleCheckbox" type="checkbox">
+                <input id="shadingStyleCheckbox" type="checkbox" checked>
                 <span class="slider"></span>
             </label>
             NPR
@@ -63,7 +63,7 @@
                 <center>
                     <p class="styleText">Enabled</p>
                     <label class="switch">
-                        <input id="ShadowDisabledCheckbox" type="checkbox">
+                        <input id="ShadowDisabledCheckbox" type="checkbox" checked>
                         <span class="slider round"></span>
                     </label>
                     <p class="styleText">Disabled</p><br>
@@ -119,14 +119,24 @@
                     </div>
                 </div>
             </div>
+            <div class="debugInfoDiv" id="pencilShadingSection">
+                <p class="debugInfoCategory">Pencil Shading</p>
+                <p class="styleText">Hatching Sample Scale:</p>
+                <div class="slidecontainer">
+                    <input type="range" min="0" max="100" value="0" id="hatchingSampleScaleSlider">
+                    <p class="styleText" id="hatchingSampleScaleDisplay"></p>
+                </div>
+            </div>
             <div class="debugInfoDiv" id="normalSmoothingSection">
-                <p class="debugInfoCategory">Normal Smoothing</p><br />
-                <p class="styleText">Normal Test View: Off</p>
-                <label class="switch">
-                    <input id="normalSmoothingCheckBox" type="checkbox" >
-                    <span class="slider round"></span>
-                </label>
-                <p class="styleText">On</p>
+                <p class="debugInfoCategory">Normal Smoothing</p>
+                <center>
+                    <p class="styleText">Normal Test View: Off</p>
+                    <label class="switch">
+                        <input id="normalSmoothingCheckBox" type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <p class="styleText">On</p>
+                </center>
                 <br>
                 <p class="styleText">Normal Smooth: Off</p>
                 <label class="switch">
@@ -142,40 +152,55 @@
                 </div>
             </div>
             <div class="debugInfoDiv" id="curvatureViewSection">
-                <p class="debugInfoCategory">Curvature</p><br />
-                <p class="styleText">Curvature View: Off</p>
-                <label class="switch">
-                    <input id="curvatureViewCheckBox" type="checkbox">
-                    <span class="slider round"></span>
-                </label>
-                <p class="styleText">On</p>
+                <p class="debugInfoCategory">Curvature</p>
+                <center>
+                    <p class="styleText">Curvature View: Off</p>
+                    <label class="switch">
+                        <input id="curvatureViewCheckBox" type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <p class="styleText">On</p>
+                </center><br />
                 <span class="styleHideable" id="CurvatureDebugBufferSelector">
-                    Display property of max principal curvature:
+                    Display property of min principal curvature:
                     <select class="styleDropdown" name="CurvatureDebugViewType" id="curvatureDebugViewOptions">
                         <option value="Curvature">Magnitude</option>
                         <option value="CurvatureDir">Direction</option>
                         <option value="CurvatureProj">Projected Direction</option>
                     </select>
                 </span>
+                <center id="CurvatureViewVertexRadioButtons" class="styleHideable">
+                    <input type="radio" id="CurvatureViewVertexIndex1" name="CurvatureViewVertexIndexRadioGroup" value=0 checked>
+                    <label for="CurvatureViewVertexIndex0">Self</label><br>
+                    <input type="radio" id="CurvatureViewVertexIndex1" name="CurvatureViewVertexIndexRadioGroup" value=1>
+                    <label for="CurvatureViewVertexIndex1">Vertex 1</label><br>
+                    <input type="radio" id="CurvatureViewVertexIndex2" name="CurvatureViewVertexIndexRadioGroup" value=2>
+                    <label for="CurvatureViewVertexIndex2">Vertex 2</label><br>
+                    <input type="radio" id="CurvatureViewVertexIndex3" name="CurvatureViewVertexIndexRadioGroup" value=3>
+                    <label for="CurvatureViewVertexIndex3">Vertex 3</label>
+                </center>
             </div>
             <div class="debugInfoDiv" id="contourSection">
-                <p class="debugInfoCategory">Contour</p><br />
-                <p class="styleText">Contour View: Off</p>
-                <label class="switch">
-                    <input id="viewContourCheckBox" type="checkbox">
-                    <span class="slider round"></span>
-                </label>
-                <p class="styleText">On</p>
+                <p class="debugInfoCategory">Contour</p>
+                <center>
+                    <p class="styleText">Contour View: Off</p>
+                    <label class="switch">
+                        <input id="viewContourCheckBox" type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <p class="styleText">On</p>
+                </center><br />
             </div>
             <div class="debugInfoDiv" id="hatchingSection">
-                <p class="debugInfoCategory">Hatching</p><br />
-                <p class="styleText">View Hatching Texture: Off</p>
-                <label class="switch">
-                    <input id="viewHatchingCheckBox" type="checkbox">
-                    <span class="slider round"></span>
-                </label>
-                <p class="styleText">On</p>
-                <br>
+                <p class="debugInfoCategory">Hatching</p>
+                <center>
+                    <p class="styleText">Hatching Generation: Off</p>
+                    <label class="switch">
+                        <input id="viewHatchingCheckBox" type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <p class="styleText">On</p>
+                </center><br>
                 <p class="styleText">Resolution: </p>
                 <form name="hatchingResForm">
                     <input type="radio" id="hatchingRes128" name="hatchingRes" value="128">
@@ -226,15 +251,15 @@
         </div>
     </div>
 
-        <div>
-            <a href="/summer.html">I love summer</a>
-        </div>
+    <div>
+        <a href="/summer.html">I love summer</a>
+    </div>
 
-        <address>
-            Developed by <a href="mailto:shingleex@gmail.com">Shin Chen</a>.<br>
-            <a href="https://www.linkedin.com/in/koumakan/">Linkedin</a><br>
-            <a href="https://github.com/KoumaTeacup/Shinsur.com">Git of this page</a><br>
-        </address>
+    <address>
+        Developed by <a href="mailto:shingleex@gmail.com">Shin Chen</a>.<br>
+        <a href="https://www.linkedin.com/in/koumakan/">Linkedin</a><br>
+        <a href="https://github.com/KoumaTeacup/Shinsur.com">Git of this page</a><br>
+    </address>
 </body>
 
 </html>

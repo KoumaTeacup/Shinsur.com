@@ -42,12 +42,4 @@ void main() {
   Curvature1 = vec4(ProjectCurvature(a_curvature1.xyz, a_curvaturePos1, MVP), a_curvature1.w);
   Curvature2 = vec4(ProjectCurvature(a_curvature2.xyz, a_curvaturePos2, MVP), a_curvature2.w);
   Curvature3 = vec4(ProjectCurvature(a_curvature3.xyz, a_curvaturePos3, MVP), a_curvature3.w);
-//  CurvatureEndPoint1 = (MatProj * MatView * MatModel* vec4(a_curvature1.xyz, 0.0)).xyz;
-//  CurvatureEndPoint2 = (MatProj * MatView * MatModel* vec4(a_curvature2.xyz, 0.0)).xyz;
-//  CurvatureEndPoint3 = (MatProj * MatView * MatModel* vec4(a_curvature3.xyz, 0.0)).xyz;
-//  CurvatureEndPoint1 = a_curvature1.xyz + a_position;
-//  CurvatureEndPoint2 = a_curvature2.xyz + a_position;
-//  CurvatureEndPoint3 = a_curvature3.xyz + a_position;
-
-
 }
