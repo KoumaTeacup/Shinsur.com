@@ -99,8 +99,8 @@ void main() {
 		SampleUV = clamp(SampleUV, 0.0, 1.0);
 
 		// Bilienar sample the stroke image with random rotation, sampled value with be a colorless alpha indicating stroke intensity
-//		float StrokeIntensity = SampleBilinear(StrokeSampler, SampleUV).r;
-		float StrokeIntensity = texture(StrokeSampler, SampleUV).r;
+		float StrokeIntensity = SampleBilinear(StrokeSampler, SampleUV).r;
+//		float StrokeIntensity = texture(StrokeSampler, SampleUV).r;
 		
 		// Inverse the sampled color since pencil is black
 		StrokeIntensity = 1.0 - StrokeIntensity;

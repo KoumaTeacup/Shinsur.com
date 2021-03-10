@@ -90,7 +90,8 @@ class Viewport {
 
   renderToGBuffer() {
     this.gBuffer.bindForWriting();
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.viewport(0, 0, this.gBuffer.width, this.gBuffer.height);
+    Program.setUniform2fv('OutputSize', new Float32Array([this.gBuffer.width, this.gBuffer.height]));
     return this;
   }
 

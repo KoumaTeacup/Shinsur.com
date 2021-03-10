@@ -3,7 +3,7 @@
 // fragment shaders don't have a default precision so we need
 // to pick one. highp is a good default. It means "high precision"
 precision highp float;
-precision highp sampler3D;
+precision highp sampler3D; 
  
 uniform sampler2D WorldPosSampler;
 uniform sampler2D DiffuseSampler;
@@ -15,66 +15,101 @@ uniform sampler2D CurvatureSampler2;
 uniform sampler2D CurvatureSampler3;
 uniform sampler3D HatchingSampler;
 
+// Shadow
+uniform bool ShadowDisabled;
+uniform int ShadowView;
+uniform float LightIntensity;
+uniform float ShadowBias;
+uniform float ShadowExpScale;
+uniform vec3 LightPos;
+uniform vec3 CameraPos;
+uniform vec3 LightColor;
+uniform mat4 MatShadowView;
+uniform mat4 MatShadowProj;
+uniform sampler2D ShadowSampler;
+
+// Hatching
 uniform int NumHatchingSlices;
 uniform float HatchingSampleScale;
 uniform float HatchingSliceCoord;
 
 out vec4 OutColor;
 
-vec3 CalculateHatchingColor(vec2 HatchingSampleUV, vec2 ScreenSampleUV, sampler2D CurvatureSampler, float SliceCoord)
+vec3 SampleHatchingColor(sampler2D CurvatureSampler, vec2 ScreenSampleUV, sampler3D HatchingSampler, float HatchingSliceCoord)
 {
-	float PI = 3.1415926;
-
-	vec3 CurvatureDir = texture(CurvatureSampler, ScreenSampleUV).rgb;
-	float angle = atan(CurvatureDir.y, CurvatureDir.x);
-	mat2 rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
-	HatchingSampleUV = rot * (HatchingSampleUV - vec2(0.5)) + vec2(0.5);
-
-	vec3 HatchingColor = texture(HatchingSampler, vec3(HatchingSampleUV, SliceCoord)).rgb;
-	return length(CurvatureDir) > 0.0 ? HatchingColor : vec3(1.0);
+	vec3 CurvatureSampleUV = texture(CurvatureSampler, ScreenSampleUV).xyz;
+	return (1.0 - texture(HatchingSampler, vec3(CurvatureSampleUV.xy, HatchingSliceCoord)).rgb) * CurvatureSampleUV.z;
 }
 
 void main() {
-	// Calculate coordinate of the curvature sample
 	ivec2 ScreenTexutreSize = textureSize(WorldPosSampler, 0);
 	vec2 ScreenSampleUV = gl_FragCoord.xy / vec2(ScreenTexutreSize);
+
+	// shadow calculation
+	vec3 WorldPos = texture(WorldPosSampler, ScreenSampleUV).rgb;
+	vec3 Normal = texture(NormalSampler, ScreenSampleUV).rgb;
+	float Roughness = texture(DiffuseSampler, ScreenSampleUV).a;
 	
-	// Calculate coordinate of the hatching texture sample
-	ivec2 HatchingTexutreSize = textureSize(HatchingSampler, 0).xy;
-	vec2 HatchingSampleUV = mod(gl_FragCoord.xy / vec2(HatchingTexutreSize) * HatchingSampleScale, 1.0);
+	vec4 vecShadowMV = MatShadowView * vec4(WorldPos, 1.0);
+	float ShadowDepth = vecShadowMV.z;
+	vec4 ShadowClip = MatShadowProj * vecShadowMV;
+	vec2 ShadowUV = (ShadowClip / ShadowClip.w).xy / 2.0 + 0.5;
 
-	vec3 Color = vec3(1.0, 1.0, 1.0);
-	vec3 HatchingColor, HatchingColor1, HatchingColor2;
-	float SliceCoord = (HatchingSliceCoord - 0.5) / float(NumHatchingSlices);
+	// PCF sampling
+	float ShadowMapDepth = texture(ShadowSampler, ShadowUV).r;
+	float ShadowFactor = clamp(exp((ShadowDepth+ ShadowBias) * ShadowExpScale) * exp(-ShadowMapDepth * ShadowExpScale), 0.0, 1.0);
+	ShadowFactor = ShadowDisabled ? 1.0 : ShadowFactor;
 
-	vec2 v1 = HatchingSampleUV - vec2(0.5);
-	vec2 v2 = vec2(0.5) - abs(HatchingSampleUV - vec2(0.5));
-	float len1 = length(v1) * 2.0;
-	len1 = max(1.0 - len1, 0.0);
-	float len2 = length(v2) * 2.0;
-	len2 = max(1.0 - len2, 0.0);
-	float weight1 = len1 / (len1 + len2);
-	float weight2 = 1.0 - weight1;
+	// light calculation
+	vec3 L = normalize(LightPos - WorldPos);
+	vec3 V = normalize(CameraPos - WorldPos);
+	float NdotL = dot(Normal, L);
+	vec3 R = normalize(NdotL * Normal * 2.0 -L);
+	float Ambient = 0.15;
+	float Diffuse = clamp(NdotL,0.0, 1.0);
+	float Specular = pow(clamp(dot(R, V), 0.0, 1.0), Roughness);
+	float Light = (Ambient + (Diffuse + Specular) * ShadowFactor) * LightIntensity;// * LightColor;
 
-	vec2 AltHatchingUV = mod(abs(HatchingSampleUV + vec2(0.5)), 1.0);
+//	Light = pow(Light, 0.4);
+
+	// Hatching Calculation
+//	float SliceCoord = ((1.0 - Light * 7.0 + 1.0 - 0.5) / float(NumHatchingSlices);
+	float SliceCoord = (clamp((1.0 - Light), 0.0, 1.0) * 7.0 + 1.0 - 0.5) / float(NumHatchingSlices);
 	
-	HatchingColor1 = CalculateHatchingColor(HatchingSampleUV, ScreenSampleUV, CurvatureSampler1, SliceCoord);
-	HatchingColor2 = CalculateHatchingColor(AltHatchingUV, ScreenSampleUV, CurvatureSampler1, SliceCoord);
+	vec3 CurvatureSampleUV1 = texture(CurvatureSampler1, ScreenSampleUV).xyz;
+	vec3 CurvatureSampleUV2 = texture(CurvatureSampler2, ScreenSampleUV).xyz;
+	vec3 CurvatureSampleUV3 = texture(CurvatureSampler3, ScreenSampleUV).xyz;
 
-	HatchingColor = vec3(1.0) - (vec3(1.0) - HatchingColor1) * weight1 - (vec3(1.0) - HatchingColor2) * weight2;
-	Color = min(Color, HatchingColor);
+	vec3 HatchingIntensity1 = 1.0 - texture(HatchingSampler, vec3(CurvatureSampleUV1.xy, SliceCoord)).rgb;
+	vec3 HatchingIntensity2 = 1.0 - texture(HatchingSampler, vec3(CurvatureSampleUV2.xy, SliceCoord)).rgb;
+	vec3 HatchingIntensity3 = 1.0 - texture(HatchingSampler, vec3(CurvatureSampleUV3.xy, SliceCoord)).rgb;
 
-	HatchingColor1 = CalculateHatchingColor(HatchingSampleUV, ScreenSampleUV, CurvatureSampler2, SliceCoord);
-	HatchingColor2 = CalculateHatchingColor(AltHatchingUV, ScreenSampleUV, CurvatureSampler2, SliceCoord);
+	float WeightSum = CurvatureSampleUV1.z + CurvatureSampleUV2.z + CurvatureSampleUV3.z;
+	float BlendWeight1 = CurvatureSampleUV1.z / WeightSum;
+	float BlendWeight2 = CurvatureSampleUV2.z / WeightSum;
+	float BlendWeight3 = CurvatureSampleUV3.z / WeightSum;
 
-	HatchingColor = vec3(1.0) - (vec3(1.0) - HatchingColor1) * weight1 - (vec3(1.0) - HatchingColor2) * weight2;
-	Color = min(Color, HatchingColor);
+	vec3 WeightedIntensity = HatchingIntensity1 * BlendWeight1 + HatchingIntensity2 * BlendWeight2 + HatchingIntensity3 * BlendWeight3;
 
-	HatchingColor1 = CalculateHatchingColor(HatchingSampleUV, ScreenSampleUV, CurvatureSampler3, SliceCoord);
-	HatchingColor2 = CalculateHatchingColor(AltHatchingUV, ScreenSampleUV, CurvatureSampler3, SliceCoord);
+	// Don't draw if no mesh
+	WeightedIntensity = WeightSum > 0.0 ? WeightedIntensity : vec3(0.0);
 
-	HatchingColor = vec3(1.0) - (vec3(1.0) - HatchingColor1) * weight1 - (vec3(1.0) - HatchingColor2) * weight2;
-	Color = min(Color, HatchingColor);
+	// final output
+	OutColor = vec4(1.0 - WeightedIntensity, 1.0);
+//	OutColor = vec4(vec3(ShadowFactor), 1.0);
+//	OutColor = ShadowView == 0 ? OutColor : vec4(vec3(ShadowFactor), 1.0);
 
-	OutColor = vec4(Color, 1.0);
+//	OutColor = vec4(1.0 - WeightedIntensity, 1.0);
+
+//	vec3 HatchingColor1 = SampleHatchingColor(CurvatureSampler1, ScreenSampleUV, HatchingSampler, SliceCoord);
+//	vec3 HatchingColor2 = SampleHatchingColor(CurvatureSampler2, ScreenSampleUV, HatchingSampler, SliceCoord);
+//	vec3 HatchingColor3 = SampleHatchingColor(CurvatureSampler3, ScreenSampleUV, HatchingSampler, SliceCoord);
+//	vec3 HatchingIntensity = HatchingColor1;
+//	HatchingIntensity = max(HatchingIntensity, HatchingColor2);
+//	HatchingIntensity = max(HatchingIntensity, HatchingColor3);
+//	OutColor = vec4(1.0 - HatchingIntensity, 1.0);
+
+//	vec3 CurvatureSampleUV1 = texture(CurvatureSampler1, ScreenSampleUV).xyz;
+//
+//	OutColor = vec4(CurvatureSampleUV1.xy, 0.0, 1.0);
 }

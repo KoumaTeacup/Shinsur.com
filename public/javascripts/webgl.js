@@ -24,7 +24,7 @@ var hatchingDebugProgram = new Program('hatchingDebug');
 var normalViewProgram = new Program('normalView');
 var curvatureViewProgram = new Program('curvatureView');
 
-//var floor = new Mesh('floor');
+var floor = new Mesh('floor');
 //var bowsette = new Mesh('bowsette');
 //var cubes = new Mesh('cubes');
 //var cube = new Mesh('cube');
@@ -82,8 +82,9 @@ function renderLoop(timestamp) {
       // light
       light.bindForShadow();
       // mesh
-      bowsette.draw();
+      //bowsette.draw();
       floor.draw();
+      test.draw();
 
       if (util.PCFEnabled) {
         // program
@@ -205,6 +206,7 @@ function renderLoop(timestamp) {
       camera.update();
       // mesh
       //cubes.draw();
+      floor.draw();
       test.draw();
     } else if (util.curvatureView.value) {
       // program
@@ -221,6 +223,7 @@ function renderLoop(timestamp) {
       // mesh
       //teapot.draw();
       //cubes.draw();
+      floor.draw();
       test.draw();
     } else if(util.hatchingView.value) {
       // program
@@ -253,6 +256,7 @@ function renderLoop(timestamp) {
       gbufferGeometryProg.use();
       // viewport
       viewport.renderToGBuffer()
+        .readHatchingBuffer()
         .enableBlend(false)
         .enableFaceCull(true)
         .enableDepthTest(true)
@@ -262,6 +266,7 @@ function renderLoop(timestamp) {
       // mesh
       //cubes.draw();
       //bowsette.draw();
+      floor.draw();
       test.draw();
 
       // ------------ Contour Light pass ------------
@@ -291,7 +296,6 @@ function renderLoop(timestamp) {
       // viewport
       viewport.renderToDefault()
         .readGenericFBO(0)
-        //.readShadowMap()
         .enableBlend(false)
         .enableFaceCull(false)
         .enableDepthTest(false)
@@ -305,12 +309,16 @@ function renderLoop(timestamp) {
         pencilLightProgram.use();
         // viewport
         viewport.renderToDefault()
-          .readGBuffer()
           .readHatchingBuffer()
+          .readGBuffer()
+          .readShadowMap()
           //.enableBlend(true, gl.FUNC_REVERSE_SUBTRACT, gl.FUNC_ADD, gl.ONE_MINUS_SRC_COLOR, gl.ONE)
           .enableBlend(true, gl.MIN)
           .enableFaceCull(false)
           .enableDepthTest(false)
+        // light
+        lights[0].bind();
+        lights[0].bindForShadow();
         // mesh
         screenPlane.draw();
       }

@@ -27,6 +27,13 @@
   recomputeSmoothNormal;
 
   constructor() {
+    // Prevent right click context menu
+    document.getElementById('mainCanvas').addEventListener('contextmenu', e => {
+      if (e.button === 2) {
+        e.preventDefault();
+      }
+    })
+
     document.getElementById("DebugViewCheckbox").onclick = (e) => {
       if (this.showDebugView = e.target.checked) {
         document.getElementById('DebugBufferSelector').style.display = 'block';

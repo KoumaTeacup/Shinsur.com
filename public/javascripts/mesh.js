@@ -536,8 +536,8 @@ class VertexCluster {
     if (this.maxNeighbourAngle === 0.0) {
       // no valid neighbour, we have to come up with an arbitrary principal direction
       // this will only affect principal direction, not curvature magnitude (since it's computed )
-      this.maxCurvatureDir = [1.0, 1.0, 0.0];
-      this.minCurvatureDir = [1.0, -1.0, 0.0];
+      this.maxCurvatureDir = [1.0, 0.0, 0.0];
+      this.minCurvatureDir = [0.0, 1.0, 0.0];
 
       // project principle curvature direction from cluster space to object space, so we won't burden GPU for calculation
       let m = mat3.fromValues(
