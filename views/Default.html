@@ -190,6 +190,21 @@
                     </label>
                     <p class="styleText">On</p>
                 </center><br />
+                <p class="styleText">Number of lines drawn:</p>
+                <div class="slidecontainer">
+                    <input type="range" min="1" max="8" value="3" id="contourNumberLinesSlider">
+                    <p class="styleText" id="contourNumberLinesDisplay"></p>
+                </div>
+                <p class="styleText">Period:</p>
+                <div class="slidecontainer">
+                    <input type="range" min="1" max="100" value="1" id="contourRedrawPeriodSlider">
+                    <p class="styleText" id="contourRedrawPeriodDisplay"></p>
+                </div>
+                <p class="styleText">Amplify:</p>
+                <div class="slidecontainer">
+                    <input type="range" min="0" max="100" value="1" id="contourRedrawAmplifySlider">
+                    <p class="styleText" id="contourRedrawAmplifyDisplay"></p>
+                </div>
             </div>
             <div class="debugInfoDiv" id="hatchingSection">
                 <p class="debugInfoCategory">Hatching</p>

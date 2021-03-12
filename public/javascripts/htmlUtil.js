@@ -11,6 +11,9 @@
   shadowBias = { value: 0.0 };
   shadowExpScale = { value: 0.0 };
   totalTries = 0;
+  contourNumberOfLines = { value: 0 };
+  contourRedrawPeriod = { value: 0.0 };
+  contourRedrawAmplify = { value: 0.0 };
   hatchingSampleScale = { value: 0 };
   normalSmoothingView = { value: false };
   contourView = { value: false };
@@ -134,11 +137,33 @@
     this.setupStandaloneCheckbox(this.showSmoothedNormal, 'normalDebugShowSmoothedCheckBox');
 
     this.setupNumericalSlider(
+      this.contourNumberOfLines,
+      'contourNumberLinesSlider',
+      'contourNumberLinesDisplay'
+    );
+
+    this.setupNumericalSlider(
       this.hatchingSampleScale,
       'hatchingSampleScaleSlider',
       'hatchingSampleScaleDisplay',
       (val) => { return val * 0.19 + 1 },
       (val) => { return val.toFixed(2) }
+    );
+
+    this.setupNumericalSlider(
+      this.contourRedrawPeriod,
+      'contourRedrawPeriodSlider',
+      'contourRedrawPeriodDisplay',
+      (val) => { return val/100.0 },
+      (val) => { return val.toFixed(2) }
+    );
+
+    this.setupNumericalSlider(
+      this.contourRedrawAmplify,
+      'contourRedrawAmplifySlider',
+      'contourRedrawAmplifyDisplay',
+      (val) => { return val/5000.0 + 0.001 },
+      (val) => { return val.toFixed(4) }
     );
 
     this.setupNumericalSlider(

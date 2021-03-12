@@ -91,6 +91,16 @@ class Program {
     gl.uniform1i(uniformLoc, util.selectedDebugCurvatureIndex);
     var uniformLoc = gl.getUniformLocation(this.program, 'CurvatureDebugVertexId');
     gl.uniform1i(uniformLoc, util.selectedDebugCurvatureVertexIndex);
+
+    // Contour
+    if (util.useNPR) {
+      var uniformLoc = gl.getUniformLocation(this.program, 'ContourNumberLines');
+      gl.uniform1i(uniformLoc, util.contourNumberOfLines.value);
+      var uniformLoc = gl.getUniformLocation(this.program, 'ContourPeriod');
+      gl.uniform1f(uniformLoc, util.contourRedrawPeriod.value);
+      var uniformLoc = gl.getUniformLocation(this.program, 'ContourAmplify');
+      gl.uniform1f(uniformLoc, util.contourRedrawAmplify.value);
+    }
   }
 
   static setUniform1f(_uniform, _value) {
