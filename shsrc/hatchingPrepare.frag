@@ -60,10 +60,55 @@ vec4 SampleBilinear(sampler2D TexSampler, vec2 UV) {
 	vec2 SampleRightTop = SampleLeftBottom + vec2(1.0, 1.0);
 	vec2 Delta = SampleLoc - SampleLeftBottom;
 	
-	return (texture(TexSampler, SampleLeftBottom / TexSize) * (1.0 - Delta.x) +	texture(TexSampler, SampleRightBottom / TexSize) * Delta.x)
+	// We have to use textureLod with level 0 to prevent mipmapping, due to our stroke texture is strictly devided to multiple regions.
+	return (textureLod(TexSampler, SampleLeftBottom / TexSize, 0.0) * (1.0 - Delta.x) +	textureLod(TexSampler, SampleRightBottom / TexSize, 0.0) * Delta.x)
 		* (1.0 - Delta.y) + 
-		(texture(TexSampler, SampleLeftTop / TexSize) * (1.0 - Delta.x) + texture(TexSampler, SampleRightTop / TexSize) * Delta.x)
+		(textureLod(TexSampler, SampleLeftTop / TexSize, 0.0) * (1.0 - Delta.x) + textureLod(TexSampler, SampleRightTop / TexSize, 0.0) * Delta.x)
 		* Delta.y;
+}
+
+float DrawLine(int Seed, vec2 StrokeSamplerSize, inout vec2 Pos)
+{
+	// Move the line to the ending point of saved position, creating seamless boarder
+	vec2 ShiftedFragCoord = gl_FragCoord.xy;
+	float OutputRes = OutputSize.x;
+	ShiftedFragCoord.y -= mod(Pos.y, OutputRes);
+
+	float debugPosY = Pos.y;
+
+	// Random Rotation
+	vec2 RandomCoord = vec2(float(Seed+1), float(Seed+3));
+	float RandFloatY = rand(RandomCoord);
+	float angle = RandFloatY * AngleRange;
+	ShiftedFragCoord.y += ShiftedFragCoord.y < -32.0 && Pos.y + OutputRes * tan(angle) > OutputRes ? OutputRes : 0.0;
+	ShiftedFragCoord = RotateVec2(ShiftedFragCoord, angle);
+
+	ShiftedFragCoord.x += Pos.x;
+
+	// Save the ending position for the next line
+	Pos.x = mod(Pos.x + OutputRes / cos(angle), StrokeSamplerSize.x);
+	Pos.y = mod(Pos.y + OutputRes * tan(angle), OutputRes);
+
+	// Lerp between 2 stroke sizes
+	vec2 SampleUV = ShiftedFragCoord / StrokeSamplerSize;
+
+	float ThinerStroke = floor(StrokeWidth);
+	float ThickerStroke = ceil(StrokeWidth);
+
+
+	SampleUV.y += (ThinerStroke - 8.5) / 8.0;
+	SampleUV.y = clamp(SampleUV.y, (ThinerStroke - 9.0) / 8.0, (ThinerStroke - 8.0) / 8.0);
+	SampleUV.y = round(SampleUV.y * StrokeSamplerSize.y) / StrokeSamplerSize.y;
+	float ThinStrokeValue = SampleBilinear(StrokeSampler, SampleUV).r;
+
+	SampleUV = ShiftedFragCoord / StrokeSamplerSize;
+	SampleUV.y += (ThickerStroke - 8.5) / 8.0;
+	SampleUV.y = clamp(SampleUV.y, (ThickerStroke - 9.0) / 8.0, (ThickerStroke - 8.0) / 8.0);
+	float ThickStrokeValue = SampleBilinear(StrokeSampler, SampleUV).r;
+
+	float alpha = StrokeWidth - ThinerStroke;
+
+	return ThickStrokeValue * alpha + ThinStrokeValue * (1.0 - alpha);
 }
 
 void main() {
@@ -75,33 +120,13 @@ void main() {
 
 	float AccumulatedIntensity = 0.0;
 	vec4 OutColor[8];
-
+	vec2 LinePos = vec2(0.0, 0.0);
 	// Draw Lines
 	for (int i = 0; i < NumLinesToDraw; i++)
 //	for (int i = 0; i < 7; i++)
 	{
-		// Generating random numbers per line.
-		vec2 RandomCoord = vec2(float(i), float(i));
-		float RandFloatX = pseudo(RandomCoord);
-		RandFloatX *= 0.1;
-		float RandFloatY = rand(RandomCoord);
-		float RandFloatR = ign(RandomCoord);
+		float StrokeIntensity = DrawLine(i, StrokeSamplerSize, LinePos);
 
-		// Apply randomeness to the line posistion
-		vec2 ShiftedFragCoord = gl_FragCoord.xy;
-		float OutputRes = OutputSize.x;
-		ShiftedFragCoord -= vec2(OutputRes * RandFloatY, 0.0);
-		ShiftedFragCoord = RotateVec2(ShiftedFragCoord, (RandFloatR * 2.0 - 1.0) * AngleRange);
-		ShiftedFragCoord += vec2(OutputRes * RandFloatY, 0.0);
-		ShiftedFragCoord = ShiftedFragCoord + vec2(RandFloatX * (StrokeSamplerSize.x - OutputRes * 1.41) + 100.0, -mod(float(i) * 123.45, OutputRes));
-		
-		vec2 SampleUV = ShiftedFragCoord / StrokeSamplerSize;
-		SampleUV = clamp(SampleUV, 0.0, 1.0);
-
-		// Bilienar sample the stroke image with random rotation, sampled value with be a colorless alpha indicating stroke intensity
-		float StrokeIntensity = SampleBilinear(StrokeSampler, SampleUV).r;
-//		float StrokeIntensity = texture(StrokeSampler, SampleUV).r;
-		
 		// Inverse the sampled color since pencil is black
 		StrokeIntensity = 1.0 - StrokeIntensity;
 
@@ -118,6 +143,7 @@ void main() {
 		// Output current value to different layers of our draw buffer, creating uniform layers scaled by number of lines drawn
 		OutColor[i * 7 / NumLinesToDraw + 1] = vec4(vec3(max(1.0 - AccumulatedIntensity, 0.0)), 1.0);
 //		OutColor[i + 1] = vec4(vec3(max(1.0 - AccumulatedIntensity, 0.0)), 1.0);
+//		OutColor[i + 1] = vec4(vec3(DrawLine(i, StrokeSamplerSize, LinePos)), 1.0);
 	}
 
 	Hatching0 = vec4(1.0, 1.0, 1.0, 1.0);
@@ -129,44 +155,12 @@ void main() {
 	Hatching6 = OutColor[6];
 	Hatching7 = OutColor[7];
 
-//	vec2 RandomCoord = vec2(float(5), float(1));
-//	float RandFloatX = pseudo(RandomCoord);
-//	float RandFloatY = rand(RandomCoord);
-//	float RandFloatR = ign(RandomCoord);
-//
-//	vec2 ShiftedFragCoord = gl_FragCoord.xy;
-//	ShiftedFragCoord = RotateVec2(ShiftedFragCoord, RandFloatR * (AngleRange * 2.0 - AngleRange));
-//	ShiftedFragCoord = ShiftedFragCoord + vec2(RandFloatX * (StrokeSamplerSize.x - OutputSize.x * 1.41) + 100.0, -RandFloatY * OutputSize.x);
-//	vec2 SampleUV = ShiftedFragCoord / StrokeSamplerSize;
-//	SampleUV = clamp(SampleUV, 0.0, 1.0);
-//
-//	vec4 TestColor = SampleBilinear(StrokeSampler, SampleUV);
-	
-//	TestColor = texture(StrokeSampler, SampleUV);
-//	TestColor = vec4(vec3(rand(gl_FragCoord.xy)), 1.0);
-	
-//	float val = mod(gl_FragCoord.y / OutputSize.y * 20.0, 1.0);
-//	vec4 TestColor = vec4(vec3(val), 1.0);
-//	TestColor = vec4(gl_FragCoord.xy / OutputSize.xy, 0.0, 1.0);
-
-//	Hatching0 = TestColor;
-//	Hatching1 = TestColor;
-//	Hatching2 = TestColor;
-//	Hatching3 = TestColor;
-//	Hatching4 = TestColor;
-//	Hatching5 = TestColor;
-//	Hatching6 = TestColor;
-//	Hatching7 = TestColor;
-
-//	SampleUV = gl_FragCoord.xy / OutputSize * StrokeWidth;
-//	vec4 multiplier = vec4(SampleUV.x, SampleUV.y, 1.0, 1.0);
-//
-//	Hatching0 *= multiplier;
-//	Hatching1 *= multiplier;
-//	Hatching2 *= multiplier;
-//	Hatching3 *= multiplier;
-//	Hatching4 *= multiplier;
-//	Hatching5 *= multiplier;
-//	Hatching6 *= multiplier;
-//	Hatching7 *= multiplier; 
+//	Hatching0 = OutColor[6];
+//	Hatching1 = OutColor[6];
+//	Hatching2 = OutColor[6];
+//	Hatching3 = OutColor[6];
+//	Hatching4 = OutColor[6];
+//	Hatching5 = OutColor[6];
+//	Hatching6 = OutColor[6];
+//	Hatching7 = OutColor[6];
 }

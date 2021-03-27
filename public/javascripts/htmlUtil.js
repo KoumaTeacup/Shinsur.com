@@ -199,7 +199,8 @@
       this.strokeWidth,
       "HatchingStrokeWidthSlider",
       'HatchingStrokeWidthDisplay',
-      (val) => { return (Math.pow(10.0, (val - 50.0) / 50.0)).toFixed(2) }
+      (val) => { return val / 100.0 },
+      (val) => { return val.toFixed(2) }
     );
 
     this.setupNumericalSlider(

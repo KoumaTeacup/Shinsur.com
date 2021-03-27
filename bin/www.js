@@ -36,8 +36,6 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
-console.log('tttttt')
-
 /**
  * Normalize a port into a number, string, or false.
  */
@@ -65,7 +63,7 @@ function normalizePort(val) {
 function onError(error) {
   if (error.syscall !== 'listen') {
     throw error;
-  }
+  } 
 
   var bind = typeof port === 'string'
     ? 'Pipe ' + port
