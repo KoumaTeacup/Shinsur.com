@@ -4,7 +4,6 @@ import { FocusCamera } from './camera.js';
 import { PointLight } from './pointLight.js';
 import { Viewport } from './viewport.js';
 import { util } from './htmlUtil.js';
-import { Framebuffer3D} from './framebuffer.js'
 import { gl } from './context.js';
 import * as vec3 from './gl-matrix/vec3.js';
 
@@ -40,7 +39,7 @@ camera.viewAngle = vec3.fromValues(0.0, 1.0, 1.0);
 camera.distance = 20.0;
 
 var lights = [new PointLight()];
-lights[0].worldLocation = [6.0, 6.0, 6.0];
+lights[0].worldLocation = [16.0, 30.0, 6.0];
 
 var lastTimestamp = 0;
 
@@ -130,9 +129,9 @@ function renderLoop(timestamp) {
       lights[0].bind();
       lights[0].bindForShadow();
       // mesh
-      bowsette.draw();
+      //bowsette.draw();
       floor.draw();
-      //test.draw();
+      test.draw();
     }
     // ------------ End of Forward Rendering ------------
 
@@ -151,9 +150,9 @@ function renderLoop(timestamp) {
       // camera
       camera.update();
       // mesh
-      bowsette.draw();
+      //bowsette.draw();
       floor.draw();
-      //test.draw();
+      test.draw();
 
       // ------------ Light pass ------------
       // program

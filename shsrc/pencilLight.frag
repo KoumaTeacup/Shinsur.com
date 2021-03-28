@@ -75,6 +75,7 @@ void main() {
 	// Hatching Calculation
 //	float SliceCoord = ((1.0 - Light * 7.0 + 1.0 - 0.5) / float(NumHatchingSlices);
 	float SliceCoord = (clamp((1.0 - Light), 0.0, 1.0) * 7.0 + 1.0 - 0.5) / float(NumHatchingSlices);
+//	SliceCoord = (HatchingSliceCoord - 0.5) / float(NumHatchingSlices);
 	
 	vec3 CurvatureSampleUV1 = texture(CurvatureSampler1, ScreenSampleUV).xyz;
 	vec3 CurvatureSampleUV2 = texture(CurvatureSampler2, ScreenSampleUV).xyz;
@@ -90,6 +91,7 @@ void main() {
 	float BlendWeight3 = CurvatureSampleUV3.z / WeightSum;
 
 	vec3 WeightedIntensity = HatchingIntensity1 * BlendWeight1 + HatchingIntensity2 * BlendWeight2 + HatchingIntensity3 * BlendWeight3;
+//	vec3 WeightedIntensity = HatchingIntensity1 + HatchingIntensity2 + HatchingIntensity3;
 
 	// Don't draw if no mesh
 	WeightedIntensity = WeightSum > 0.0 ? WeightedIntensity : vec3(0.0);

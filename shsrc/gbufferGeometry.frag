@@ -39,10 +39,12 @@ layout (location = 7) out vec4 CurvatureUVOut3;
 
 vec2 CalculateHatchingUV(vec2 ScreenPos, vec2 CurvatureDir, vec2 CurvaturePos, vec2 HatchingTexutreSize)
 {
-	vec2 HatchingSampleUV = (ScreenPos - CurvaturePos) / HatchingTexutreSize;
+	vec2 HatchingSampleUV = ScreenPos / HatchingTexutreSize;
 	float angle = atan(CurvatureDir.y, CurvatureDir.x);
 	mat2 rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
-	return rot * HatchingSampleUV;
+	HatchingSampleUV = rot * HatchingSampleUV;
+	return HatchingSampleUV;
+	return HatchingSampleUV + CurvaturePos / HatchingTexutreSize;
 }
 
 float CalculatePointEdgeDistance(vec2 Pos, vec2 EdgePos, vec2 EdgeVec)
@@ -81,7 +83,7 @@ void main() {
 	float BlendWeight3 = d12 / d3;
 	
 	// Calculate 3 sets of UVs for curvature based hatching sampling
-	CurvatureUVOut1 = vec4(CalculateHatchingUV(gl_FragCoord.xy, Curvature1.xy, VertexPos1.xy, HatchingTexutreSize) + RandomOffset1, BlendWeight1, 0.0);
-	CurvatureUVOut2 = vec4(CalculateHatchingUV(gl_FragCoord.xy, Curvature2.xy, VertexPos2.xy, HatchingTexutreSize) + RandomOffset2, BlendWeight2, 0.0);
-	CurvatureUVOut3 = vec4(CalculateHatchingUV(gl_FragCoord.xy, Curvature3.xy, VertexPos3.xy, HatchingTexutreSize) + RandomOffset3, BlendWeight3, 0.0);
+	CurvatureUVOut1 = vec4(CalculateHatchingUV(gl_FragCoord.xy, Curvature1.xy, VertexPos1.xy, HatchingTexutreSize), BlendWeight1, 0.0);
+	CurvatureUVOut2 = vec4(CalculateHatchingUV(gl_FragCoord.xy, Curvature2.xy, VertexPos2.xy, HatchingTexutreSize), BlendWeight2, 0.0);
+	CurvatureUVOut3 = vec4(CalculateHatchingUV(gl_FragCoord.xy, Curvature3.xy, VertexPos3.xy, HatchingTexutreSize), BlendWeight3, 0.0);
 }
