@@ -44,7 +44,6 @@ vec2 CalculateHatchingUV(vec2 ScreenPos, vec2 CurvatureDir, vec2 CurvaturePos, v
 	mat2 rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
 	HatchingSampleUV = rot * HatchingSampleUV;
 	return HatchingSampleUV;
-	return HatchingSampleUV + CurvaturePos / HatchingTexutreSize;
 }
 
 float CalculatePointEdgeDistance(vec2 Pos, vec2 EdgePos, vec2 EdgeVec)
