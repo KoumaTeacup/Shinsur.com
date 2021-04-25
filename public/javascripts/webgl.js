@@ -311,6 +311,7 @@ function renderLoop(timestamp) {
           .readHatchingBuffer()
           .readGBuffer()
           .readShadowMap()
+          .readBackground()
           //.enableBlend(true, gl.FUNC_REVERSE_SUBTRACT, gl.FUNC_ADD, gl.ONE_MINUS_SRC_COLOR, gl.ONE)
           .enableBlend(true, gl.MIN)
           .enableFaceCull(false)

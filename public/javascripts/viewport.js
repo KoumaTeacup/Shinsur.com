@@ -18,10 +18,20 @@ class Viewport {
   hatchingRes;
   hatchingTexDepth;
   pencilStrokeTex;
+  paperBackgroundDiff;
+  paperBackgroundNorm;
   initialized = false;
 
   constructor(onLoad) {
     this.pencilStrokeTex = new Texture2D('./pencilStroke.png', () => {
+      if (onLoad) onLoad();
+    });
+
+    this.paperBackgroundDiff = new Texture2D('./PaperBackgroundBaseColor.png', () => {
+      if (onLoad) onLoad();
+    });
+
+    this.paperBackgroundNorm = new Texture2D('./PaperBackgroundNormal.png', () => {
       if (onLoad) onLoad();
     });
 
@@ -92,6 +102,11 @@ class Viewport {
     this.gBuffer.bindForWriting();
     gl.viewport(0, 0, this.gBuffer.width, this.gBuffer.height);
     Program.setUniform2fv('OutputSize', new Float32Array([this.gBuffer.width, this.gBuffer.height]));
+
+    this.paperBackgroundNorm.bind('BackgroundNormSampler', 11)
+
+    Program.setUniform1f('PaperEffectWeight', util.paperNormalWeight.value);
+
     return this;
   }
 
@@ -132,12 +147,12 @@ class Viewport {
     // use canvas if not specified
     gl.viewport(left ? left : 0, bottom ? bottom : 0, width ? width : gl.canvas.width, height ? height : gl.canvas.height);
     return this;
-  } 
+  }
 
   enableBlend(enable, blendRGB, blendAlpha, scaleSRGB, scaleDRGB) {
     if (enable) {
       gl.enable(gl.BLEND);
-      gl.blendEquationSeparate(blendRGB ? blendRGB : gl.FUNC_ADD, blendAlpha ? blendAlpha:gl.FUNC_ADD);
+      gl.blendEquationSeparate(blendRGB ? blendRGB : gl.FUNC_ADD, blendAlpha ? blendAlpha : gl.FUNC_ADD);
       gl.blendFuncSeparate(scaleSRGB != undefined ? scaleSRGB : gl.ONE, scaleDRGB != undefined ? scaleDRGB : gl.ONE, gl.ONE, gl.ONE);
     }
     else gl.disable(gl.BLEND);
@@ -195,6 +210,15 @@ class Viewport {
     return this;
   }
 
+  readBackground() {
+    this.paperBackgroundDiff.bind('BackgroundDiffSampler', 11);
+
+    Program.setUniform1f('PaperEffectWeight', util.paperDiffuseWeight.value);
+    Program.setUniform1i('UsePaperDiffuse', util.usePaperDiffuse.value);
+    Program.setUniform1i('UsePaperNormal', util.usePaperNormal.value);
+    return this;
+  }
+
   bindPCFHorizontal() {
     // resize the filter if it's different from shadow texture
     if (this.GaussianBlurFBO.width !== this.shadowFBO.width
@@ -235,7 +259,7 @@ class Viewport {
   }
 
   // this is expected to be called only after normal deferred shading render pass
-  
+
   bindCustomFBForDebug() {
     this.shadowFBO.bindForReading(0, 'DebugBufferSampler');
   }

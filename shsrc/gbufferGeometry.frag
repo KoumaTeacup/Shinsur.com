@@ -23,10 +23,12 @@ flat in vec2 RandomOffset3;
 uniform float Roughness;
 uniform sampler2D DiffuseSampler;
 uniform sampler3D HatchingSampler;
+uniform sampler2D BackgroundNormSampler;
 uniform bool UseRawColor;
 uniform vec4 RawColor;
 uniform float HatchingSampleScale;
 uniform vec2 OutputSize;
+uniform float PaperEffectWeight;
 
 layout (location = 0) out vec3 WorldPosOut;
 layout (location = 1) out vec4 DiffuseOut;
@@ -81,8 +83,14 @@ void main() {
 	float BlendWeight2 = d13 / d2;
 	float BlendWeight3 = d12 / d3;
 	
+	vec3 PaperNormal = texture(BackgroundNormSampler, gl_FragCoord.xy / vec2(OutputSize)).xyz;
+	PaperNormal = PaperNormal * 2.0 - 1.0;
+	float PaperEffectFactor1 = dot(vec3(normalize(Curvature1.xy), 0.0), PaperNormal) * PaperEffectWeight;
+	float PaperEffectFactor2 = dot(vec3(normalize(Curvature2.xy), 0.0), PaperNormal) * PaperEffectWeight;
+	float PaperEffectFactor3 = dot(vec3(normalize(Curvature3.xy), 0.0), PaperNormal) * PaperEffectWeight;
+
 	// Calculate 3 sets of UVs for curvature based hatching sampling
-	CurvatureUVOut1 = vec4(CalculateHatchingUV(gl_FragCoord.xy, Curvature1.xy, VertexPos1.xy, HatchingTexutreSize), BlendWeight1, 0.0);
-	CurvatureUVOut2 = vec4(CalculateHatchingUV(gl_FragCoord.xy, Curvature2.xy, VertexPos2.xy, HatchingTexutreSize), BlendWeight2, 0.0);
-	CurvatureUVOut3 = vec4(CalculateHatchingUV(gl_FragCoord.xy, Curvature3.xy, VertexPos3.xy, HatchingTexutreSize), BlendWeight3, 0.0);
+	CurvatureUVOut1 = vec4(CalculateHatchingUV(gl_FragCoord.xy, Curvature1.xy, VertexPos1.xy, HatchingTexutreSize), BlendWeight1, PaperEffectFactor1);
+	CurvatureUVOut2 = vec4(CalculateHatchingUV(gl_FragCoord.xy, Curvature2.xy, VertexPos2.xy, HatchingTexutreSize), BlendWeight2, PaperEffectFactor2);
+	CurvatureUVOut3 = vec4(CalculateHatchingUV(gl_FragCoord.xy, Curvature3.xy, VertexPos3.xy, HatchingTexutreSize), BlendWeight3, PaperEffectFactor3);
 }

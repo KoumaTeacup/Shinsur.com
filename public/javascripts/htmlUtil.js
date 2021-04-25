@@ -28,6 +28,10 @@
   showSmoothedNormal = { value: false };
   maxSmoothAngle = { value: 0.0 };
   recomputeSmoothNormal;
+  usePaperDiffuse = { value: false };
+  usePaperNormal = { value: false };
+  paperDiffuseWeight = { value: 0.0 };
+  paperNormalWeight = { value: 0.0 };
 
   constructor() {
     // Prevent right click context menu
@@ -135,6 +139,8 @@
 
     this.setupStandaloneCheckbox(this.shadowView, 'ShadowViewCheckbox');
     this.setupStandaloneCheckbox(this.showSmoothedNormal, 'normalDebugShowSmoothedCheckBox');
+    this.setupStandaloneCheckbox(this.usePaperDiffuse, 'paperDiffuseCheckbox');
+    this.setupStandaloneCheckbox(this.usePaperNormal, 'paperNormalCheckbox');
 
     this.setupNumericalSlider(
       this.contourNumberOfLines,
@@ -154,7 +160,7 @@
       this.contourRedrawPeriod,
       'contourRedrawPeriodSlider',
       'contourRedrawPeriodDisplay',
-      (val) => { return val/100.0 },
+      (val) => { return val / 100.0 },
       (val) => { return val.toFixed(2) }
     );
 
@@ -162,7 +168,7 @@
       this.contourRedrawAmplify,
       'contourRedrawAmplifySlider',
       'contourRedrawAmplifyDisplay',
-      (val) => { return val/5000.0 + 0.001 },
+      (val) => { return val / 5000.0 + 0.001 },
       (val) => { return val.toFixed(4) }
     );
 
@@ -230,6 +236,20 @@
       "maxSmoothAngleSlider",
       'maxSmoothAngleDisplay',
       (val) => { this.recomputeSmoothNormal = true; return val; }
+    );
+
+    this.setupNumericalSlider(
+      this.paperDiffuseWeight,
+      'paperDiffuseWeightSlider',
+      'paperDiffuseWeightDisplay',
+      (val) => { return val / 100.0 }
+    );
+
+    this.setupNumericalSlider(
+      this.paperNormalWeight,
+      'paperNormalWeightSlider',
+      'paperNormalWeightDisplay',
+      (val) => { return val / 100.0 }
     );
   }
 
