@@ -65,7 +65,7 @@ function renderLoop(timestamp) {
   lastTimestamp = timestamp;
 
   // Update html UI:
-  document.getElementById("fps").innerHTML = 'fps: ' + Math.trunc(1000 / deltaTime);
+  util.update(deltaTime);
 
   // ----------- Shadow Pass------------
   if (!util.shadowDisabled) {
@@ -325,8 +325,6 @@ function renderLoop(timestamp) {
     }
     // ------------ End of Pencil rendering ------------
   }
-  // update html
-  document.getElementById('triCount').innerHTML = 'Tries Drawn: ' + util.totalTries;
 
   util.recomputeSmoothNormal = false;
 

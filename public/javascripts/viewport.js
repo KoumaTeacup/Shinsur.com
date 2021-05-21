@@ -197,7 +197,6 @@ class Viewport {
 
     Program.setUniform1i('NumHatchingSlices', this.hatchingTexDepth);
     Program.setUniform1f('HatchingSliceCoord', util.currentHatchingDepth.value);
-    Program.setUniform1f('HatchingSampleScale', util.hatchingSampleScale.value);
     return this;
   }
 

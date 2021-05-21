@@ -1,10 +1,21 @@
+html {
+    height: 100%;
+    /*background-image: linear-gradient(to bottom right, white, #cdc);*/
+    background-image: linear-gradient(to bottom right, rgba(241, 237, 231, 0.75), rgba(132, 107, 89, 0.75));
+}
+
 body {
-    padding: 10px;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
+address {
+    text-align:right;
+    width: 100%;
+    position: relative;
+}
+
 a {
-  color: #00B7FF;
+    color: rgb(0, 60, 157);
 }
 
 .switch {
@@ -75,13 +86,8 @@ input:checked + .slider:before {
         border-radius: 50%;
     }
 
-.styleText {
-    margin: auto;
-    display: inline-block;
-    font-size: 15px;
-    font-family: 'Tahoma';
-    text-align: center;
-    color: snow;
+.slidecontainer {
+    width: 100%;
 }
 
 .styleDropdown {
@@ -90,53 +96,73 @@ input:checked + .slider:before {
     color: black;
 }
 
-.styleHideable {
-    font-size: 15px;
-    font-family: 'Tahoma';
-    color: snow;
-    display: none;
-}
-
 .canvasContainer {
-    margin: auto;
-    position: relative;
+    width: 100%;
 }
 
 .debugInfoContainer {
-    position: absolute;
-    top:0;
+    float:left;
 }
 
 .shadingSytleControlDiv {
-    zoom:3;
+    zoom: 3;
     text-align: center;
     margin-bottom: 5px;
 }
 
-.canvasDiv {
-    top:auto;
-    margin: auto;
-    width: 1280px;
-    position: relative;
+.debugTab {
+    padding-left: 5px;
+    padding-right: 15px;
+    border-right: groove;
+    width: auto;
+    float: left;
 }
 
-.debugInfoDiv {
-    background-color:rgba(98, 14, 21, 0.55);
-    padding: 5px 5px 5px 5px;
-    border: 1px solid red;
-    border-radius: 8px;
-    display: block;
-    margin-bottom:5px;
+    .debugTab input {
+        margin: 5px;
+        border-style: none;
+        font-size: 18px;
+    }
+
+        .debugTab input:hover {
+            background-image: radial-gradient(closest-side, white, rgba(221, 215, 210, 0));
+        }
+
+        .debugTab input.active {
+            margin: 3px;
+            border-style: inset;
+            border-width: 2px;
+            background-image: radial-gradient(closest-side, rgb(132,107,89), rgba(169,152,141, 0));
+        }
+
+        .debugTab input.disabled {
+        }
+
+.debugTabContent {
+    border-right: groove;
+    padding-left: 45px;
+    padding-right: 45px;
+    width: 256px;
+    float: left;
+    display: none;
 }
 
-.debugInfoCategory {
-    margin:0;
-    color:snow;
+.debugMenuTitle {
+    padding-bottom: 15px;
+    font-family: system-ui;
+    color: rgb(197, 174, 244);
+    font-size: 24px;
     text-align: center;
-    text-shadow: 2px 2px 5px red;
-    font-weight:bold;
+    text-shadow: 1px 2px 2px #404040;
+    font-weight: bolder;
+    border-bottom-style:groove;
 }
 
-.slidecontainer {
-    width: 100%;
+.debugMenuText {
+    margin: auto;
+    display: inline-block;
+    font-size: 16px;
+    font-family: system-ui;
+    text-align: center;
+    color: black;
 }

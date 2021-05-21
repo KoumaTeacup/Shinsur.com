@@ -1,4 +1,100 @@
-﻿class Utility {
+﻿class DebugTab {
+  name;
+  button;
+  content;
+  active = false;
+  disabled = false;
+  contentOverwriteIfDisabled;
+
+  constructor(name) {
+    this.name = name;
+    this.setup();
+    this.setupDisabledContent();
+  }
+
+  setup() {
+    var buttonId = this.name + 'Button';
+    var contentId = this.name + 'DebugMenu';
+
+    this.button = document.getElementById(buttonId);
+    this.content = document.getElementById(contentId);
+    var _this = this;
+
+    function ThisObj() {
+      return _this;
+    }
+
+    Array.from(document.getElementsByClassName('tabLink')).forEach(buttonElem => {
+      buttonElem.addEventListener('click', e => {
+        if (buttonElem.id === buttonId) {
+          if (_this.active) {
+            return;
+          }
+
+          if (_this.disabled) {
+            // Disabled
+            _this.active = true;
+            _this.disable();
+          } else {
+            // Clicked
+            _this.active = true;
+            _this.enable();
+          }
+        } else {
+          // Other Tab Clicked
+          _this.active = false;
+          _this.button.className = _this.button.className.replace(' active', '');
+          _this.content.style.display = 'none';
+          _this.contentOverwriteIfDisabled.style.display = 'none';
+        }
+      })
+    })
+  }
+
+  disable() {
+    if (!this.disabled) {
+      this.disabled = true;
+      this.button.className += ' disabled';
+      this.button.className = this.button.className.replace(' active', '');
+    }
+
+    // Don't change content if the tab is not active
+    if (this.active) {
+      this.content.style.display = 'none';
+      if (this.contentOverwriteIfDisabled) {
+        this.contentOverwriteIfDisabled.style.display = 'block';
+      }
+    }
+  }
+
+  enable() {
+    if (this.disabled) {
+      this.disabled = false;
+      this.button.className = this.button.className.replace(' disabled', '');
+    }
+
+    // Don't change content if the tab is not active
+    if (this.active) {
+      this.button.className += ' active';
+      this.content.style.display = 'block';
+      if (this.contentOverwriteIfDisabled) {
+        this.contentOverwriteIfDisabled.style.display = 'none';
+      }
+    }
+  }
+
+  setupDisabledContent() {
+    switch (this.name) {
+      case 'shadingMode':
+        this.contentOverwriteIfDisabled = document.getElementById('pbrOnly');
+        break;
+      default:
+        break;
+    }
+  }
+}
+
+class Utility {
   useNPR;
   showDebugView = false;
   selectedDebugGBufferIndex;
@@ -14,7 +110,6 @@
   contourNumberOfLines = { value: 0 };
   contourRedrawPeriod = { value: 0.0 };
   contourRedrawAmplify = { value: 0.0 };
-  hatchingSampleScale = { value: 0 };
   normalSmoothingView = { value: false };
   contourView = { value: false };
   hatchingView = { value: false };
@@ -41,6 +136,24 @@
       }
     })
 
+    var profileTab = new DebugTab('profile');
+    var shadingModeTab = new DebugTab('shadingMode');
+    var gBufferTab = new DebugTab('gBuffer');
+    var shadowTab = new DebugTab('shadow');
+    var normalTab= new DebugTab('normalSmooth');
+    var curvatureTab= new DebugTab('curvature');
+    var contourTab= new DebugTab('contour');
+    var hatchingTab= new DebugTab('hatching');
+    var paperTab= new DebugTab('paperEffect');
+
+    function styleChanged(checked) {
+      if (checked) {
+        shadingModeTab.disable();
+      } else {
+        shadingModeTab.enable();
+      }
+    }
+
     document.getElementById("DebugViewCheckbox").onclick = (e) => {
       if (this.showDebugView = e.target.checked) {
         document.getElementById('DebugBufferSelector').style.display = 'block';
@@ -49,23 +162,6 @@
       }
     }
 
-    function styleChanged(checked) {
-      if (checked) {
-        document.getElementById('shadowSection').style.display = 'none';
-        document.getElementById('shadingModeSection').style.display = 'none';
-        document.getElementById('contourSection').style.display = 'block';
-        document.getElementById('hatchingSection').style.display = 'block';
-        document.getElementById('normalSmoothingSection').style.display = 'block';
-        document.getElementById('curvatureViewSection').style.display = 'block';
-      } else {
-        document.getElementById('shadowSection').style.display = 'block';
-        document.getElementById('shadingModeSection').style.display = 'block';
-        document.getElementById('contourSection').style.display = 'none';
-        document.getElementById('hatchingSection').style.display = 'none';
-        document.getElementById('normalSmoothingSection').style.display = 'none';
-        document.getElementById('curvatureViewSection').style.display = 'none';
-      }
-    }
     this.useNPR = document.getElementById('shadingStyleCheckbox').checked;
     styleChanged(this.useNPR);
     document.getElementById("shadingStyleCheckbox").onclick = (e) => {
@@ -146,14 +242,6 @@
       this.contourNumberOfLines,
       'contourNumberLinesSlider',
       'contourNumberLinesDisplay'
-    );
-
-    this.setupNumericalSlider(
-      this.hatchingSampleScale,
-      'hatchingSampleScaleSlider',
-      'hatchingSampleScaleDisplay',
-      (val) => { return val * 0.19 + 1 },
-      (val) => { return val.toFixed(2) }
     );
 
     this.setupNumericalSlider(
@@ -253,6 +341,18 @@
     );
   }
 
+  setupDebugTabEvents(buttonId, contentId) {
+    document.getElementById(buttonId).addEventListener('click', e => {
+      Array.from(document.getElementsByClassName('tabLink')).forEach(button => {
+        button.className = button.className.replace(' active', '')
+      });
+      Array.from(document.getElementsByClassName('debugTabContent')).forEach(content => {
+        content.style.display = content.id == contentId ? 'block' : 'none';
+      });
+      e.currentTarget.className += ' active';
+    });
+  }
+
   setupNumericalSlider(localVar, sliderId, displayId, preSaveFunc = (val) => { return val; }, preDisplayFunc = (val) => { return val; }) {
     var slider = document.getElementById(sliderId);
     localVar.value = preSaveFunc(slider.value);
@@ -306,6 +406,14 @@
     }
 
     return 0;
+  }
+
+  // Per Frame Tick
+  update(deltaTime) {
+    document.getElementById("fps").innerHTML = 'fps: ' + Math.trunc(1000 / deltaTime);
+
+    // Triangles rendered, currently counting everything
+    document.getElementById('triCount').innerHTML = 'Tries Drawn: ' + this.totalTries;
   }
 }
 

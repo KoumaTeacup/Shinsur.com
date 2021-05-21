@@ -26,7 +26,6 @@ uniform sampler3D HatchingSampler;
 uniform sampler2D BackgroundNormSampler;
 uniform bool UseRawColor;
 uniform vec4 RawColor;
-uniform float HatchingSampleScale;
 uniform vec2 OutputSize;
 uniform float PaperEffectWeight;
 

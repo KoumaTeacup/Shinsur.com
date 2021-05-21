@@ -32,7 +32,6 @@ uniform sampler2D ShadowSampler;
 
 // Hatching
 uniform int NumHatchingSlices;
-uniform float HatchingSampleScale;
 uniform float HatchingSliceCoord;
 
 // Paper Effect
