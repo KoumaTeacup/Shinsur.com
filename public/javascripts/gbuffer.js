@@ -84,14 +84,14 @@ class GBuffer {
   bindDebugBuffer() {
     var bufferType;
     switch (util.selectedDebugGBufferIndex) {
-      case 0: bufferType = 'position'; break;
-      case 1: bufferType = 'diffuse'; break;
-      case 2: bufferType = 'normal'; break;
-      case 3: bufferType = 'snormal'; break;
-      case 4: bufferType = 'texCoord'; break;
-      case 5: bufferType = 'curvature1'; break;
-      case 6: bufferType = 'curvature2'; break;
-      case 7: bufferType = 'curvature3'; break;
+      case 1: bufferType = 'position'; break;
+      case 2: bufferType = 'diffuse'; break;
+      case 3: bufferType = 'normal'; break;
+      case 4: bufferType = 'snormal'; break;
+      case 5: bufferType = 'texCoord'; break;
+      case 6: bufferType = 'curvature1'; break;
+      case 7: bufferType = 'curvature2'; break;
+      case 8: bufferType = 'curvature3'; break;
       default: return;
     }
     var index = this.texturesInfo.findIndex((element) => element.type === bufferType);

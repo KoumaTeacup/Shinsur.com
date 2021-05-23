@@ -4,12 +4,10 @@
   content;
   active = false;
   disabled = false;
-  contentOverwriteIfDisabled;
 
   constructor(name) {
     this.name = name;
     this.setup();
-    this.setupDisabledContent();
   }
 
   setup() {
@@ -20,77 +18,48 @@
     this.content = document.getElementById(contentId);
     var _this = this;
 
-    function ThisObj() {
-      return _this;
-    }
-
     Array.from(document.getElementsByClassName('tabLink')).forEach(buttonElem => {
       buttonElem.addEventListener('click', e => {
         if (buttonElem.id === buttonId) {
-          if (_this.active) {
-            return;
-          }
-
-          if (_this.disabled) {
-            // Disabled
-            _this.active = true;
-            _this.disable();
-          } else {
-            // Clicked
-            _this.active = true;
-            _this.enable();
-          }
+          _this.onClicked();
         } else {
           // Other Tab Clicked
           _this.active = false;
           _this.button.className = _this.button.className.replace(' active', '');
           _this.content.style.display = 'none';
-          _this.contentOverwriteIfDisabled.style.display = 'none';
         }
       })
     })
   }
 
   disable() {
-    if (!this.disabled) {
-      this.disabled = true;
-      this.button.className += ' disabled';
-      this.button.className = this.button.className.replace(' active', '');
+    if (this.disabled) {
+      return;
     }
 
-    // Don't change content if the tab is not active
-    if (this.active) {
-      this.content.style.display = 'none';
-      if (this.contentOverwriteIfDisabled) {
-        this.contentOverwriteIfDisabled.style.display = 'block';
-      }
-    }
+    this.disabled = true;
+    this.button.className += ' disabled';
+    this.content.className += ' disabled';
   }
 
   enable() {
-    if (this.disabled) {
-      this.disabled = false;
-      this.button.className = this.button.className.replace(' disabled', '');
+    if (!this.disabled) {
+      return;
     }
 
-    // Don't change content if the tab is not active
-    if (this.active) {
-      this.button.className += ' active';
-      this.content.style.display = 'block';
-      if (this.contentOverwriteIfDisabled) {
-        this.contentOverwriteIfDisabled.style.display = 'none';
-      }
-    }
+    this.disabled = false;
+    this.button.className = this.button.className.replace(' disabled', '');
+    this.content.className = this.content.className.replace(' disabled', '');
   }
 
-  setupDisabledContent() {
-    switch (this.name) {
-      case 'shadingMode':
-        this.contentOverwriteIfDisabled = document.getElementById('pbrOnly');
-        break;
-      default:
-        break;
+  onClicked() {
+    if (this.active) {
+      return;
     }
+
+    this.active = true;
+    this.button.className += ' active';
+    this.content.style.display = 'block';
   }
 }
 
@@ -140,50 +109,57 @@ class Utility {
     var shadingModeTab = new DebugTab('shadingMode');
     var gBufferTab = new DebugTab('gBuffer');
     var shadowTab = new DebugTab('shadow');
-    var normalTab= new DebugTab('normalSmooth');
-    var curvatureTab= new DebugTab('curvature');
-    var contourTab= new DebugTab('contour');
-    var hatchingTab= new DebugTab('hatching');
-    var paperTab= new DebugTab('paperEffect');
+    var normalTab = new DebugTab('normalSmooth');
+    var curvatureTab = new DebugTab('curvature');
+    var contourTab = new DebugTab('contour');
+    var hatchingTab = new DebugTab('hatching');
+    var paperTab = new DebugTab('paperEffect');
 
-    function styleChanged(checked) {
-      if (checked) {
+    var _this = this;
+    function styleChanged() {
+      if (_this.useNPR) {
         shadingModeTab.disable();
+        document.getElementById('shadingModeCheckBox').disabled = true;
+        gBufferTab.enable();
       } else {
         shadingModeTab.enable();
+        document.getElementById('shadingModeCheckBox').disabled = false;
+        if (_this.useForwardShading) {
+          gBufferTab.disable();
+        }
       }
     }
 
     document.getElementById("DebugViewCheckbox").onclick = (e) => {
-      if (this.showDebugView = e.target.checked) {
-        document.getElementById('DebugBufferSelector').style.display = 'block';
-      } else {
-        document.getElementById('DebugBufferSelector').style.display = 'none';
-      }
+      this.showDebugView = e.target.checked;
     }
 
     this.useNPR = document.getElementById('shadingStyleCheckbox').checked;
-    styleChanged(this.useNPR);
+    styleChanged();
     document.getElementById("shadingStyleCheckbox").onclick = (e) => {
       this.useNPR = e.target.checked;
-      styleChanged(this.useNPR);
+      styleChanged();
     }
 
     this.useForwardShading = !document.getElementById('shadingModeCheckBox').checked;
     document.getElementById("shadingModeCheckBox").onclick = (e) => {
       this.useForwardShading = !e.target.checked;
       if (this.useForwardShading) {
-        document.getElementById('GbufferViewerSection').style.display = 'none';
-      } else {
-        document.getElementById('GbufferViewerSection').style.display = 'block';
+        gBufferTab.disable();
+      }
+      else {
+        gBufferTab.enable();
       }
     }
 
-    this.selectedDebugGBufferIndex = document.getElementById('debugViewOptions').selectedIndex;
-    document.getElementById('debugViewOptions').onchange = (e) => {
-      this.selectedDebugGBufferIndex = e.target.selectedIndex;
+    var gBufferTypes = document.gBufferTypeForm.gBufferType;
+    this.selectedDebugGBufferIndex = +gBufferTypes.value;
+    for (let i = 0; i < gBufferTypes.length; i++) {
+      gBufferTypes[i].addEventListener('click', e => {
+        this.selectedDebugGBufferIndex = +e.target.value;
+      });
     }
-
+    
     this.selectedDebugCurvatureIndex = document.getElementById('curvatureDebugViewOptions').selectedIndex;
     document.getElementById('curvatureDebugViewOptions').onchange = (e) => {
       this.selectedDebugCurvatureIndex = e.target.selectedIndex;
@@ -213,10 +189,10 @@ class Utility {
       }
     }
 
-    this.shadowDisabled = document.getElementById('ShadowDisabledCheckbox').checked;
+    this.shadowDisabled = !document.getElementById('ShadowDisabledCheckbox').checked;
     document.getElementById('ShadowDiv').style.display = this.shadowDisabled ? 'none' : 'block';
     document.getElementById('ShadowDisabledCheckbox').onclick = (e) => {
-      this.shadowDisabled = e.target.checked;
+      this.shadowDisabled = !e.target.checked;
       document.getElementById('ShadowDiv').style.display = this.shadowDisabled ? 'none' : 'block';
     }
 

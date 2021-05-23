@@ -9,7 +9,7 @@ body {
 }
 
 address {
-    text-align:right;
+    text-align: right;
     width: 100%;
     position: relative;
 }
@@ -23,6 +23,7 @@ a {
     display: inline-block;
     width: 30px;
     height: 17px;
+    vertical-align: sub;
 }
 
     .switch input {
@@ -60,7 +61,7 @@ input:default + .slider {
 }
 
 input:default + .round {
-    background-color: white;
+    background-color: #ccc;
 }
 
 input:checked + .slider {
@@ -86,22 +87,16 @@ input:checked + .slider:before {
         border-radius: 50%;
     }
 
+[type='radio'] {
+    cursor: pointer;
+}
+
 .slidecontainer {
     width: 100%;
 }
 
-.styleDropdown {
-    font-size: 15px;
-    font-family: 'Tahoma';
-    color: black;
-}
-
-.canvasContainer {
-    width: 100%;
-}
-
 .debugInfoContainer {
-    float:left;
+    float: left;
 }
 
 .shadingSytleControlDiv {
@@ -142,27 +137,54 @@ input:checked + .slider:before {
     border-right: groove;
     padding-left: 45px;
     padding-right: 45px;
-    width: 256px;
+    width: 300px;
     float: left;
     display: none;
-}
-
-.debugMenuTitle {
-    padding-bottom: 15px;
-    font-family: system-ui;
-    color: rgb(197, 174, 244);
-    font-size: 24px;
-    text-align: center;
-    text-shadow: 1px 2px 2px #404040;
-    font-weight: bolder;
-    border-bottom-style:groove;
-}
-
-.debugMenuText {
-    margin: auto;
-    display: inline-block;
-    font-size: 16px;
-    font-family: system-ui;
-    text-align: center;
     color: black;
+}
+
+    .debugTabContent .debugMenuTitle {
+        padding-bottom: 15px;
+        font-family: system-ui;
+        color: rgb(197, 174, 244);
+        font-size: 24px;
+        text-align: center;
+        text-shadow: 1px 2px 2px #404040;
+        font-weight: bolder;
+        border-bottom-style: groove;
+    }
+
+    .debugTabContent .debugMenuWarning {
+        display: none;
+    }
+
+    .debugTabContent p:not([class]), label{
+        margin: auto;
+        display: inline-block;
+        font-size: 16px;
+        font-family: system-ui;
+        text-align: center;
+    }
+
+    .debugTabContent.disabled {
+        color: #bbb;
+    }
+
+        .debugTabContent.disabled .debugMenuWarning {
+            padding-bottom: 15px;
+            font-family: system-ui;
+            font-size: 20px;
+            text-align: center;
+            font-weight: bolder;
+            border-bottom-style: groove;
+            display: block;
+            color: crimson;
+        }
+
+        .debugTabContent.disabled input, .debugTabContent.disabled .switch {
+            pointer-events: none;
+        }
+
+canvas{
+    padding-left: 50px;
 }

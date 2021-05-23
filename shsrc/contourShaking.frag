@@ -8,6 +8,7 @@ uniform sampler2D InputSampler;
 uniform int ContourNumberLines;
 uniform float ContourPeriod;
 uniform float ContourAmplify;
+uniform int ShadowView;
 out vec4 OutColor;
 
 void main() {
@@ -24,4 +25,5 @@ void main() {
 	}
 
 	OutColor = vec4(Color, 1.0);
+	OutColor = ShadowView == 0 ? OutColor : vec4(vec3(1.0), 1.0);
 }

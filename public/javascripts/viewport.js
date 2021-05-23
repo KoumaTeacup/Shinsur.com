@@ -252,8 +252,8 @@ class Viewport {
     return this;
   }
 
-  showSmoothedNormal(show) {
-    Program.setUniform1i('ShowSmoothed', show);
+  showSmoothedNormal() {
+    Program.setUniform1i('ShowSmoothed', util.showSmoothedNormal.value);
     return this;
   }
 

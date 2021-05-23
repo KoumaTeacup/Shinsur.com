@@ -107,4 +107,5 @@ void main() {
 	// Background blend
 	vec4 BackgroundColor = UsePaperDiffuse == 0 ? vec4(1.0) : 1.0 - (1.0 - texture(BackgroundDiffSampler, ScreenSampleUV)) * PaperEffectWeight;
 	OutColor = min(BackgroundColor, OutColor);
+	OutColor = ShadowView == 0 ? OutColor : vec4(vec3(ShadowFactor), 1.0);
 }
