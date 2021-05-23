@@ -129,6 +129,9 @@
     <Compile Include="public\javascripts\pointLight.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="public\javascripts\renderer.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="public\javascripts\shsrc.js" />
     <Compile Include="public\javascripts\texture.js" />
     <Compile Include="public\javascripts\viewport.js">

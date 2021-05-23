@@ -11,7 +11,7 @@ in vec2 UV;
 in float ShadowDepth;
 in vec4 ShadowClip;
 
-uniform bool ShadowDisabled;
+uniform bool ShadowEnabled;
 uniform int ShadowView;
 uniform float LightIntensity;
 uniform float Roughness;
@@ -36,7 +36,7 @@ void main() {
 	vec2 ShadowUV = (ShadowClip / ShadowClip.w).xy / 2.0 + 0.5;
 	float ShadowMapDepth = texture(ShadowSampler, ShadowUV).r;
 	float ShadowFactor = clamp(exp((ShadowDepth+ ShadowBias) * ShadowExpScale) * exp(-ShadowMapDepth * ShadowExpScale), 0.0, 1.0);
-	ShadowFactor = ShadowDisabled ? 1.0 : ShadowFactor;
+	ShadowFactor = ShadowEnabled ? ShadowFactor : 1.0;
 
 	// light calculation
 	vec3 L = normalize(LightPos - WorldPos);

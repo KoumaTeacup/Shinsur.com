@@ -4,7 +4,7 @@
 // to pick one. highp is a good default. It means "high precision"
 precision highp float;
  
-uniform bool ShadowDisabled;
+uniform bool ShadowEnabled;
 uniform int ShadowView;
 uniform float LightIntensity;
 uniform float ShadowBias;
@@ -40,7 +40,7 @@ void main() {
 	// PCF sampling
 	float ShadowMapDepth = texture(ShadowSampler, ShadowUV).r;
 	float ShadowFactor = clamp(exp((ShadowDepth+ ShadowBias) * ShadowExpScale) * exp(-ShadowMapDepth * ShadowExpScale), 0.0, 1.0);
-	ShadowFactor = ShadowDisabled ? 1.0 : ShadowFactor;
+	ShadowFactor = ShadowEnabled ? ShadowFactor : 1.0;
 
 	// light calculation
 	vec3 L = normalize(LightPos - WorldPos);

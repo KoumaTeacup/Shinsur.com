@@ -15,8 +15,8 @@ function renderLoop(timestamp) {
   util.update(deltaTime);
 
   // Update Shadow Map
-  if (!util.shadowDisabled) {
-    renderer.drawShadowPass(util.PCFEnabled);
+  if (util.shadowEnabled.value) {
+    renderer.drawShadowPass(util.PCFEnabled.value);
   }
 
   // clear html per frame data
@@ -50,18 +50,18 @@ function renderLoop(timestamp) {
     }
 
     // PBR Forward Shading
-    if (!util.useNPR && util.useForwardShading) {
+    if (!util.useNPR.value && util.useForwardShading) {
       renderer.drawPBRForward();
     }
 
     // PBR Deferred Shading
-    if (!util.useNPR && !util.useForwardShading) {
+    if (!util.useNPR.value && !util.useForwardShading) {
       renderer.drawPBRDeferredGeometryPass();
       renderer.drawPBRDeferredLightingPass();
     }
 
     // NPR Pencil Rendering
-    if (util.useNPR) {
+    if (util.useNPR.value) {
       renderer.drawNPRGeometryPass();
       renderer.drawNPRContourLightingPass();
       renderer.drawNPRContourShakingPass();
@@ -69,7 +69,7 @@ function renderLoop(timestamp) {
     }
 
     // GBuffer View
-    if (util.showDebugView && !(util.useForwardShading && !util.useNPR)) {
+    if (util.showDebugView.value && !(util.useForwardShading && !util.useNPR.value)) {
       renderer.drawGBufferDebugView();
     }
   }

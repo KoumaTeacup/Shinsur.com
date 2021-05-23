@@ -64,14 +64,14 @@
 }
 
 class Utility {
-  useNPR;
-  showDebugView = false;
+  useNPR = { value: false };
+  showDebugView = { value: false };
   selectedDebugGBufferIndex;
   selectedDebugCurvatureIndex;
   selectedDebugCurvatureVertexIndex;
   useForwardShading;
-  PCFEnabled = true;
-  shadowEnabled;
+  PCFEnabled = { value: true };
+  shadowEnabled = { value: true };
   shadowView = { value: false };
   shadowBias = { value: 0.0 };
   shadowExpScale = { value: 0.0 };
@@ -117,7 +117,7 @@ class Utility {
 
     var _this = this;
     function styleChanged() {
-      if (_this.useNPR) {
+      if (_this.useNPR.value) {
         shadingModeTab.disable();
         document.getElementById('shadingModeCheckBox').disabled = true;
         gBufferTab.enable();
@@ -128,17 +128,6 @@ class Utility {
           gBufferTab.disable();
         }
       }
-    }
-
-    document.getElementById("DebugViewCheckbox").onclick = (e) => {
-      this.showDebugView = e.target.checked;
-    }
-
-    this.useNPR = document.getElementById('shadingStyleCheckbox').checked;
-    styleChanged();
-    document.getElementById("shadingStyleCheckbox").onclick = (e) => {
-      this.useNPR = e.target.checked;
-      styleChanged();
     }
 
     this.useForwardShading = !document.getElementById('shadingModeCheckBox').checked;
@@ -159,7 +148,7 @@ class Utility {
         this.selectedDebugGBufferIndex = +e.target.value;
       });
     }
-    
+
     this.selectedDebugCurvatureIndex = document.getElementById('curvatureDebugViewOptions').selectedIndex;
     document.getElementById('curvatureDebugViewOptions').onchange = (e) => {
       this.selectedDebugCurvatureIndex = e.target.selectedIndex;
@@ -180,39 +169,22 @@ class Utility {
       }
     }
 
-    document.getElementById("PCFFilterCheckbox").onclick = (e) => {
-      this.PCFEnabled = e.target.checked;
-      if (!this.PCFEnabled) {
-        document.getElementById("PCFFilterDiv").style.display = 'none';
-      } else {
-        document.getElementById("PCFFilterDiv").style.display = 'block';
-      }
-    }
+    this.setupCheckbox(this.shadowView, 'ShadowViewCheckbox', true);
+    this.setupCheckbox(this.normalSmoothingView, 'normalSmoothingCheckBox', true)
+    this.setupCheckbox(this.curvatureView, 'curvatureViewCheckBox', true, 'curvatureOptional');
+    this.setupCheckbox(this.contourView, 'viewContourCheckBox', true)
+    this.setupCheckbox(this.hatchingView, 'viewHatchingCheckBox', true, 'hatchingOptional');
 
-    this.shadowDisabled = !document.getElementById('ShadowDisabledCheckbox').checked;
-    document.getElementById('ShadowDiv').style.display = this.shadowDisabled ? 'none' : 'block';
-    document.getElementById('ShadowDisabledCheckbox').onclick = (e) => {
-      this.shadowDisabled = !e.target.checked;
-      document.getElementById('ShadowDiv').style.display = this.shadowDisabled ? 'none' : 'block';
-    }
+    this.setupCheckbox(this.useNPR, 'shadingStyleCheckbox', false);
+    this.setupCheckbox(this.showDebugView, 'DebugViewCheckbox', false, 'gBufferOptional');
+    this.setupCheckbox(this.shadowEnabled, 'ShadowEnabledCheckbox', false, 'shadowOptional');
+    this.setupCheckbox(this.showSmoothedNormal, 'normalDebugShowSmoothedCheckBox', false);
+    this.setupCheckbox(this.usePaperDiffuse, 'paperDiffuseCheckbox', false);
+    this.setupCheckbox(this.usePaperNormal, 'paperNormalCheckbox', false);
+    this.setupCheckbox(this.PCFEnabled, 'PCFFilterCheckbox', false, 'PCFFilterOptional');
 
-    this.setupNPRMutexCheckbox(this.normalSmoothingView, 'normalSmoothingCheckBox')
-    this.setupNPRMutexCheckbox(this.curvatureView, 'curvatureViewCheckBox',
-      () => {
-        document.getElementById('CurvatureDebugBufferSelector').style.display = 'block';
-        document.getElementById('CurvatureViewVertexRadioButtons').style.display = 'block';
-      },
-      () => {
-        document.getElementById('CurvatureDebugBufferSelector').style.display = 'none';
-        document.getElementById('CurvatureViewVertexRadioButtons').style.display = 'none';
-      })
-    this.setupNPRMutexCheckbox(this.contourView, 'viewContourCheckBox')
-    this.setupNPRMutexCheckbox(this.hatchingView, 'viewHatchingCheckBox')
-
-    this.setupStandaloneCheckbox(this.shadowView, 'ShadowViewCheckbox');
-    this.setupStandaloneCheckbox(this.showSmoothedNormal, 'normalDebugShowSmoothedCheckBox');
-    this.setupStandaloneCheckbox(this.usePaperDiffuse, 'paperDiffuseCheckbox');
-    this.setupStandaloneCheckbox(this.usePaperNormal, 'paperNormalCheckbox');
+    styleChanged();
+    document.getElementById('shadingStyleCheckbox').addEventListener('click', styleChanged);
 
     this.setupNumericalSlider(
       this.contourNumberOfLines,
@@ -339,36 +311,38 @@ class Utility {
     }
   }
 
-  setupStandaloneCheckbox(localVar, elementId) {
+  setupCheckbox(localVar, elementId, isMutex, optionalId) {
     localVar.value = document.getElementById(elementId).checked;
-    document.getElementById(elementId).onclick = (e) => {
-      localVar.value = e.target.checked;
-    }
-  }
-
-  setupNPRMutexCheckbox(localVar, elementId, onChecked, onUnchecked) {
-    localVar.value = document.getElementById(elementId).checked;
-    document.getElementById(elementId).onclick = (e) => {
+    document.getElementById(elementId).addEventListener('click', e => {
       if (e.target.checked) {
-        this.closeAllMutualExclusiveViews();
+        if (isMutex) {
+          this.closeAllMutualExclusiveViews();
+          e.target.checked = true;
+        }
         localVar.value = true;
-        document.getElementById(elementId).checked = true;
-
-        if (onChecked) onChecked();
+        if (optionalId) {
+          document.getElementById(optionalId).className = document.getElementById(optionalId).className.replace(/ off/g, '');
+        }
       } else {
         localVar.value = false;
-        if (onUnchecked) onUnchecked();
+        if (optionalId) {
+          document.getElementById(optionalId).className += ' off';
+        }
       }
-    }
+    })
   }
 
   closeAllMutualExclusiveViews() {
+    this.shadowView.value = false;
+    document.getElementById('ShadowViewCheckbox').checked = false;
     this.normalSmoothingView.value = false;
     document.getElementById('normalSmoothingCheckBox').checked = false;
     this.curvatureView.value = false;
     document.getElementById('curvatureViewCheckBox').checked = false;
+    document.getElementById('curvatureOptional').className += ' off';
     this.hatchingView.value = false;
     document.getElementById('viewHatchingCheckBox').checked = false;
+    document.getElementById('hatchingOptional').className += ' off';
     this.contourView.value = false;
     document.getElementById('viewContourCheckBox').checked = false;
   }

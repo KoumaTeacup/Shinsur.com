@@ -77,8 +77,8 @@ class Program {
     // Bind some global render settings automatically
 
     // Shadow
-    var uniformLoc = gl.getUniformLocation(this.program, 'ShadowDisabled');
-    gl.uniform1i(uniformLoc, util.shadowDisabled);
+    var uniformLoc = gl.getUniformLocation(this.program, 'ShadowEnabled');
+    gl.uniform1i(uniformLoc, util.shadowEnabled.value);
     var uniformLoc = gl.getUniformLocation(this.program, 'ShadowBias');
     gl.uniform1f(uniformLoc, util.shadowBias.value);
     var uniformLoc = gl.getUniformLocation(this.program, 'ShadowView');
@@ -93,7 +93,7 @@ class Program {
     gl.uniform1i(uniformLoc, util.selectedDebugCurvatureVertexIndex);
 
     // Contour
-    if (util.useNPR) {
+    if (util.useNPR.value) {
       var uniformLoc = gl.getUniformLocation(this.program, 'ContourNumberLines');
       gl.uniform1i(uniformLoc, util.contourNumberOfLines.value);
       var uniformLoc = gl.getUniformLocation(this.program, 'ContourPeriod');

@@ -62,22 +62,24 @@
                     <input id="DebugViewCheckbox" type="checkbox">
                     <span class="slider round"></span>
                 </label>
-                <p>On</p><br>
-                <br>
-                <p>Buffer Type</p>
+                <p>On</p><br><br>
 
-                <form name="gBufferTypeForm">
-                    <input type="radio" id="gBufferType1" name="gBufferType" value=1 checked>
-                    <label for="gBufferType1">World Position</label><br />
-                    <input type="radio" id="gBufferType2" name="gBufferType" value=2>
-                    <label for="gBufferType2">Diffuse</label><br />
-                    <input type="radio" id="gBufferType3" name="gBufferType" value=3>
-                    <label for="gBufferType3">Normal</label><br />
-                    <input type="radio" id="gBufferType4" name="gBufferType" value=4>
-                    <label for="gBufferType4">Smoothed Normal</label><br />
-                    <input type="radio" id="gBufferType5" name="gBufferType" value=5>
-                    <label for="gBufferType5">Texture Coordinates</label><br />
-                </form>
+                <div id="gBufferOptional" class="optional off">
+                    <p>Buffer Type</p>
+
+                    <form name="gBufferTypeForm">
+                        <input type="radio" id="gBufferType1" name="gBufferType" value=1 checked>
+                        <label for="gBufferType1">World Position</label><br />
+                        <input type="radio" id="gBufferType2" name="gBufferType" value=2>
+                        <label for="gBufferType2">Diffuse</label><br />
+                        <input type="radio" id="gBufferType3" name="gBufferType" value=3>
+                        <label for="gBufferType3">Normal</label><br />
+                        <input type="radio" id="gBufferType4" name="gBufferType" value=4>
+                        <label for="gBufferType4">Smoothed Normal</label><br />
+                        <input type="radio" id="gBufferType5" name="gBufferType" value=5>
+                        <label for="gBufferType5">Texture Coordinates</label><br />
+                    </form>
+                </div>
 
             </div>
 
@@ -85,21 +87,22 @@
             <div id="shadowDebugMenu" class="debugTabContent">
                 <p class="debugMenuTitle">Shadow</p>
                 <center>
-                    <p>Off</p>
+                    <p> Enable Shadow: Off</p>
                     <label class="switch">
-                        <input id="ShadowDisabledCheckbox" type="checkbox" checked>
+                        <input id="ShadowEnabledCheckbox" type="checkbox" checked>
                         <span class="slider round"></span>
                     </label>
                     <p>On</p><br>
                 </center>
                 <br>
-                <div id="ShadowDiv">
-                    <p>Shadow View: Off</p>
+                <div id="shadowOptional" class="optional">
+                    <p>Shadow Debug View: Off</p>
                     <label class="switch">
                         <input id="ShadowViewCheckbox" type="checkbox">
                         <span class="slider round"></span>
                     </label>
-                    <p>On</p><br>
+                    <p>On</p>
+                    <br><br>
 
                     <p>Resolution: </p>
                     <form name="shadowResForm">
@@ -112,24 +115,27 @@
                         <input type="radio" id="shadowRes8k" name="shadowRes" value="8192">
                         <label for="shadowRes8k">8k</label>
                     </form>
-
+                    <br>
                     <p>Bias: </p>
                     <div class="slidecontainer">
                         <input type="range" min="0" max="300" value="152" id="ShadowBiasSlider">
                         <p id="shadowBiasDisplay"></p>
                     </div>
+                    <br>
                     <p>Exponential Scale: </p>
                     <div class="slidecontainer">
                         <input type="range" min="1" max="100" value="50" id="ShadowExpScaleSlider">
                         <p id="ShadowExpScaleDisplay"></p>
                     </div>
+                    <br>
                     <p>PCF Filter</p>
                     <label class="switch">
                         <input id="PCFFilterCheckbox" type="checkbox" checked>
                         <span class="slider round"></span>
                     </label>
                     <p>On</p><br>
-                    <div id="PCFFilterDiv">
+                    <br>
+                    <div id="PCFFilterOptional" class="optional">
                         <p>PCF Kernel Size: </p>
                         <div class="slidecontainer">
                             <input type="range" min="1" max="15" value="15" id="PCFKernelSizeSlider">
@@ -147,14 +153,13 @@
             <!-- Normal Smooth Tab -->
             <div id="normalSmoothDebugMenu" class="debugTabContent">
                 <p class="debugMenuTitle">Normal Smoothing</p>
-                <center>
-                    <p>Normal Test View: Off</p>
-                    <label class="switch">
-                        <input id="normalSmoothingCheckBox" type="checkbox">
-                        <span class="slider round"></span>
-                    </label>
-                    <p>On</p>
-                </center>
+                <p>Normal Debug View: Off</p>
+                <label class="switch">
+                    <input id="normalSmoothingCheckBox" type="checkbox">
+                    <span class="slider round"></span>
+                </label>
+                <p>On</p>
+                <br>
                 <br>
                 <p>Normal Smooth: Off</p>
                 <label class="switch">
@@ -162,6 +167,7 @@
                     <span class="slider round"></span>
                 </label>
                 <p>On</p>
+                <br>
                 <br>
                 <p>Max Smooth Angle:</p>
                 <div class="slidecontainer">
@@ -174,22 +180,23 @@
             <div id="curvatureDebugMenu" class="debugTabContent">
                 <p class="debugMenuTitle">Curvature</p>
                 <center>
-                    <p>Curvature View: Off</p>
+                    <p>Curvature Debug View: Off</p>
                     <label class="switch">
                         <input id="curvatureViewCheckBox" type="checkbox">
                         <span class="slider round"></span>
                     </label>
                     <p>On</p>
                 </center><br>
-                <p>Display property of min principal curvature:</p>
-                <span id="CurvatureDebugBufferSelector">
-                    <select name="CurvatureDebugViewType" id="curvatureDebugViewOptions">
-                        <option value="Curvature">Magnitude</option>
-                        <option value="CurvatureDir">Direction</option>
-                        <option value="CurvatureProj">Projected Direction</option>
-                    </select>
-                </span>
-                <center id="CurvatureViewVertexRadioButtons">
+                <div id="curvatureOptional" class="optional off">
+                    <p>Property Visualizer:</p>
+                    <span id="CurvatureDebugBufferSelector">
+                        <select name="CurvatureDebugViewType" id="curvatureDebugViewOptions">
+                            <option value="Curvature">Magnitude</option>
+                            <option value="CurvatureDir">Direction</option>
+                            <option value="CurvatureProj">Projected Direction</option>
+                        </select>
+                    </span>
+                    <br /><br />
                     <input type="radio" id="CurvatureViewVertexIndex0" name="CurvatureViewVertexIndexRadioGroup" value=0 checked>
                     <label for="CurvatureViewVertexIndex0">Self</label><br>
                     <input type="radio" id="CurvatureViewVertexIndex1" name="CurvatureViewVertexIndexRadioGroup" value=1>
@@ -198,14 +205,14 @@
                     <label for="CurvatureViewVertexIndex2">Vertex 2</label><br>
                     <input type="radio" id="CurvatureViewVertexIndex3" name="CurvatureViewVertexIndexRadioGroup" value=3>
                     <label for="CurvatureViewVertexIndex3">Vertex 3</label>
-                </center>
+                </div>
             </div>
 
             <!-- Contour Tab -->
             <div id="contourDebugMenu" class="debugTabContent">
                 <p class="debugMenuTitle">Contour</p>
                 <center>
-                    <p>Contour View: Off</p>
+                    <p>Contour Debug View: Off</p>
                     <label class="switch">
                         <input id="viewContourCheckBox" type="checkbox">
                         <span class="slider round"></span>
@@ -240,51 +247,53 @@
                     </label>
                     <p>On</p>
                 </center><br>
-                <p>Resolution: </p>
-                <form name="hatchingResForm">
-                    <input type="radio" id="hatchingRes128" name="hatchingRes" value="128">
-                    <label for="hatchingRes128">128</label>
-                    <input type="radio" id="hatchingRes256" name="hatchingRes" value="256">
-                    <label for="hatchingRes256">256</label>
-                    <input type="radio" id="hatchingRes512" name="hatchingRes" value="512">
-                    <label for="hatchingRes512">512</label>
-                    <input type="radio" id="hatchingRes1k" name="hatchingRes" value="1024" checked>
-                    <label for="hatchingRes1k">1k</label>
-                </form>
-                <p>Hatching Texture Depth:</p>
-                <div class="slidecontainer">
-                    <input type="range" min="1" max="8" value="8" id="HatchingDepthSlider">
-                    <p id="HatchingDepthDisplay"></p>
-                </div>
-                <p>View Depth:</p>
-                <div class="slidecontainer">
-                    <input type="range" min="0" max="100" value="50" id="CurrentHatchingDepthSlider">
-                    <p id="CurrentHatchingDepthDisplay"></p>
-                </div>
-                <p>Max Lines Drawn:</p>
-                <div class="slidecontainer">
-                    <input type="range" min="1" max="5000" value="5000" id="MaxHatchingLinesSlider">
-                    <p id="MaxHatchingLinesDisplay"></p>
-                </div>
-                <p>Stroke Width Scale:</p>
-                <div class="slidecontainer">
-                    <input type="range" min="100" max="800" value="100" id="HatchingStrokeWidthSlider">
-                    <p id="HatchingStrokeWidthDisplay"></p>
-                </div>
-                <p>Source Stroke Intensity Scale:</p>
-                <div class="slidecontainer">
-                    <input type="range" min="0" max="150" value="100" id="SrcStrokeIntensitySlider">
-                    <p id="SrcStrokeIntensityDisplay"></p>
-                </div>
-                <p>Max Stroke Angle (degree):</p>
-                <div class="slidecontainer">
-                    <input type="range" min="0" max="450" value="40" id="HatchingStrokeMaxAngleSlider">
-                    <p id="HatchingStrokeMaxAngleDisplay"></p>
-                </div>
-                <p>First Stroke Bias:</p>
-                <div class="slidecontainer">
-                    <input type="range" min="0" max="100" value="5" id="FirstStrokeBiasSlider">
-                    <p id="FirstStrokeBiasDisplay"></p>
+                <div id="hatchingOptional" class="optional off">
+                    <p>Resolution: </p>
+                    <form name="hatchingResForm">
+                        <input type="radio" id="hatchingRes128" name="hatchingRes" value="128">
+                        <label for="hatchingRes128">128</label>
+                        <input type="radio" id="hatchingRes256" name="hatchingRes" value="256">
+                        <label for="hatchingRes256">256</label>
+                        <input type="radio" id="hatchingRes512" name="hatchingRes" value="512">
+                        <label for="hatchingRes512">512</label>
+                        <input type="radio" id="hatchingRes1k" name="hatchingRes" value="1024" checked>
+                        <label for="hatchingRes1k">1k</label>
+                    </form>
+                    <p>Hatching Texture Depth:</p>
+                    <div class="slidecontainer">
+                        <input type="range" min="1" max="8" value="8" id="HatchingDepthSlider">
+                        <p id="HatchingDepthDisplay"></p>
+                    </div>
+                    <p>View Depth:</p>
+                    <div class="slidecontainer">
+                        <input type="range" min="0" max="100" value="50" id="CurrentHatchingDepthSlider">
+                        <p id="CurrentHatchingDepthDisplay"></p>
+                    </div>
+                    <p>Max Lines Drawn:</p>
+                    <div class="slidecontainer">
+                        <input type="range" min="1" max="5000" value="5000" id="MaxHatchingLinesSlider">
+                        <p id="MaxHatchingLinesDisplay"></p>
+                    </div>
+                    <p>Stroke Width Scale:</p>
+                    <div class="slidecontainer">
+                        <input type="range" min="100" max="800" value="100" id="HatchingStrokeWidthSlider">
+                        <p id="HatchingStrokeWidthDisplay"></p>
+                    </div>
+                    <p>Source Stroke Intensity Scale:</p>
+                    <div class="slidecontainer">
+                        <input type="range" min="0" max="150" value="100" id="SrcStrokeIntensitySlider">
+                        <p id="SrcStrokeIntensityDisplay"></p>
+                    </div>
+                    <p>Max Stroke Angle (degree):</p>
+                    <div class="slidecontainer">
+                        <input type="range" min="0" max="450" value="40" id="HatchingStrokeMaxAngleSlider">
+                        <p id="HatchingStrokeMaxAngleDisplay"></p>
+                    </div>
+                    <p>First Stroke Bias:</p>
+                    <div class="slidecontainer">
+                        <input type="range" min="0" max="100" value="5" id="FirstStrokeBiasSlider">
+                        <p id="FirstStrokeBiasDisplay"></p>
+                    </div>
                 </div>
             </div>
 

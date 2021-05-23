@@ -185,6 +185,21 @@ input:checked + .slider:before {
             pointer-events: none;
         }
 
+.optional {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: ridge;
+    border-width: 1px;
+    border-radius: 15px;
+}
+
+    .optional.off {
+        pointer-events: none;
+        color: #bbb;
+    }
+
 canvas{
     padding-left: 50px;
 }
