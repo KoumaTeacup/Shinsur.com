@@ -169,6 +169,7 @@ class Utility {
       }
     }
 
+    // Checkboxes
     this.setupCheckbox(this.shadowView, 'ShadowViewCheckbox', true);
     this.setupCheckbox(this.normalSmoothingView, 'normalSmoothingCheckBox', true)
     this.setupCheckbox(this.curvatureView, 'curvatureViewCheckBox', true, 'curvatureOptional');
@@ -186,6 +187,7 @@ class Utility {
     styleChanged();
     document.getElementById('shadingStyleCheckbox').addEventListener('click', styleChanged);
 
+    // Sliders
     this.setupNumericalSlider(
       this.contourNumberOfLines,
       'contourNumberLinesSlider',
