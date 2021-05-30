@@ -277,5 +277,9 @@ class Viewport {
       this.PCFKernelSum += this.PCFKernel[i];
     }
   }
+
+  UseNPRSlider() {
+    Program.setUniform1i('NPRWidth', util.NPRSlider.value);
+  }
 }
 export { Viewport };

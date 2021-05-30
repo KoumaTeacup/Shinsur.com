@@ -45,31 +45,26 @@ function renderLoop(timestamp) {
     if (util.contourView.value) {
       renderer.drawNPRGeometryPass();
       renderer.drawNPRContourLightingPass();
-      renderer.drawNPRContourShakingPass();
+      renderer.drawNPRContourShakingPass(true);
       break renderPasses;
     }
 
-    // PBR Forward Shading
-    if (!util.useNPR.value && util.useForwardShading) {
+    if (util.useForwardShading.value) {
+      // PBR Forward Shading
       renderer.drawPBRForward();
-    }
-
-    // PBR Deferred Shading
-    if (!util.useNPR.value && !util.useForwardShading) {
+    } else {
+      // PBR Deferred Shading
       renderer.drawPBRDeferredGeometryPass();
       renderer.drawPBRDeferredLightingPass();
     }
-
     // NPR Pencil Rendering
-    if (util.useNPR.value) {
-      renderer.drawNPRGeometryPass();
-      renderer.drawNPRContourLightingPass();
-      renderer.drawNPRContourShakingPass();
-      renderer.drawNPRPencilLightingPass();
-    }
+    renderer.drawNPRGeometryPass();
+    renderer.drawNPRContourLightingPass();
+    renderer.drawNPRContourShakingPass(false);
+    renderer.drawNPRPencilLightingPass();
 
     // GBuffer View
-    if (util.showDebugView.value && !(util.useForwardShading && !util.useNPR.value)) {
+    if (util.showDebugView.value) {
       renderer.drawGBufferDebugView();
     }
   }

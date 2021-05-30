@@ -9,17 +9,6 @@
 
 <body>
     <div>
-
-        <!-- Style Control -->
-        <div class="shadingSytleControlDiv">
-            PBR
-            <label class="switch">
-                <input id="shadingStyleCheckbox" type="checkbox" checked>
-                <span class="slider"></span>
-            </label>
-            NPR
-        </div>
-
         <div class="debugInfoContainer">
             <!-- Debug Tab Buttons -->
             <div class="debugTab">
@@ -329,7 +318,13 @@
         </div>
 
         <!-- Main Canvas -->
-        <canvas id="mainCanvas" width="1280" height="720" />
+        <div style="white-space:nowrap">
+            <div class="styleSlider">
+                <input style="width: 100%" type="range" min="0" max="1280" value="640" id="NPRSlider">
+            </div>
+            <br />
+            <canvas id="mainCanvas" width="1280" height="720" />
+        </div>
     </div>
 
     <address>

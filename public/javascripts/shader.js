@@ -74,7 +74,11 @@ class Program {
     Program.currentShader = this.program;
     gl.useProgram(this.program);
 
-    // Bind some global render settings automatically
+    // Bind some global render settings automatically, these are initial values and can be altered later
+
+    // NPR
+    var uniformLoc = gl.getUniformLocation(this.program, 'NPRWidth');
+    gl.uniform1i(uniformLoc, -1);
 
     // Shadow
     var uniformLoc = gl.getUniformLocation(this.program, 'ShadowEnabled');
@@ -93,14 +97,12 @@ class Program {
     gl.uniform1i(uniformLoc, util.selectedDebugCurvatureVertexIndex);
 
     // Contour
-    if (util.useNPR.value) {
-      var uniformLoc = gl.getUniformLocation(this.program, 'ContourNumberLines');
-      gl.uniform1i(uniformLoc, util.contourNumberOfLines.value);
-      var uniformLoc = gl.getUniformLocation(this.program, 'ContourPeriod');
-      gl.uniform1f(uniformLoc, util.contourRedrawPeriod.value);
-      var uniformLoc = gl.getUniformLocation(this.program, 'ContourAmplify');
-      gl.uniform1f(uniformLoc, util.contourRedrawAmplify.value);
-    }
+    var uniformLoc = gl.getUniformLocation(this.program, 'ContourNumberLines');
+    gl.uniform1i(uniformLoc, util.contourNumberOfLines.value);
+    var uniformLoc = gl.getUniformLocation(this.program, 'ContourPeriod');
+    gl.uniform1f(uniformLoc, util.contourRedrawPeriod.value);
+    var uniformLoc = gl.getUniformLocation(this.program, 'ContourAmplify');
+    gl.uniform1f(uniformLoc, util.contourRedrawAmplify.value);
   }
 
   static setUniform1f(_uniform, _value) {

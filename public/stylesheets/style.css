@@ -91,18 +91,14 @@ input:checked + .slider:before {
     cursor: pointer;
 }
 
-.slidecontainer {
-    width: 100%;
+.styleSlider {
+    display: inline-block;
+    width: 1280px;
+    padding-left: 50px;
 }
 
 .debugInfoContainer {
     float: left;
-}
-
-.shadingSytleControlDiv {
-    zoom: 3;
-    text-align: center;
-    margin-bottom: 5px;
 }
 
 .debugTab {

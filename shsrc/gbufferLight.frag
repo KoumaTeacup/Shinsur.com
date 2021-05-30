@@ -4,6 +4,7 @@
 // to pick one. highp is a good default. It means "high precision"
 precision highp float;
  
+uniform int NPRWidth;
 uniform bool ShadowEnabled;
 uniform int ShadowView;
 uniform float LightIntensity;
@@ -22,6 +23,8 @@ uniform sampler2D ShadowSampler;
 out vec4 OutColor;
  
 void main() {
+	if(NPRWidth >= 0 && int(gl_FragCoord.x) >= NPRWidth) discard;
+
 	// load gbuffer textures
 	ivec2 GBufferSize = textureSize(WorldPosSampler, 0);
 	vec2 GBufferUV = gl_FragCoord.xy / vec2(GBufferSize);

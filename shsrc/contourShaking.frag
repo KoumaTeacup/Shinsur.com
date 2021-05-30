@@ -4,6 +4,7 @@
 // to pick one. highp is a good default. It means "high precision"
 precision highp float;
  
+uniform int NPRWidth;
 uniform sampler2D InputSampler;
 uniform int ContourNumberLines;
 uniform float ContourPeriod;
@@ -12,6 +13,8 @@ uniform int ShadowView;
 out vec4 OutColor;
 
 void main() {
+	if(NPRWidth > 0 && int(gl_FragCoord.x) < NPRWidth) discard;
+
 	ivec2 TexutreSize = textureSize(InputSampler, 0);
 	vec2 SampleUV = gl_FragCoord.xy / vec2(TexutreSize);
 

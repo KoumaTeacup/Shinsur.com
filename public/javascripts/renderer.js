@@ -117,7 +117,8 @@ class Renderer {
       .enableFaceCull(true)
       .enableDepthTest(true)
       .clearFrame(0.22, 0.77, 0.73, 1.0) // use miku blue for forward shading
-      .readShadowMap();
+      .readShadowMap()
+      .UseNPRSlider();
     // camera
     this.camera.update();
     // light
@@ -152,7 +153,8 @@ class Renderer {
       .enableBlend(true)
       .enableFaceCull(false)
       .enableDepthTest(false)
-      .clearFrame();
+      .clearFrame()
+      .UseNPRSlider();
     // camera
     this.camera.update();
     // light
@@ -268,7 +270,7 @@ class Renderer {
     this.screenPlane.draw();
   }
 
-  drawNPRContourShakingPass() {
+  drawNPRContourShakingPass(isDebug) {
     // program
     this.contourShakingProgram.use();
     // viewport
@@ -276,8 +278,11 @@ class Renderer {
       .readGenericFBO(0)
       .enableBlend(false)
       .enableFaceCull(false)
-      .enableDepthTest(false)
-      .clearFrame(1, 1, 1, 1);
+      .enableDepthTest(false);
+      //.clearFrame(1, 1, 1, 1);
+
+    if (!isDebug) this.viewport.UseNPRSlider();
+
     // mesh
     this.screenPlane.draw();
   }
@@ -295,6 +300,7 @@ class Renderer {
       .enableBlend(true, gl.MIN)
       .enableFaceCull(false)
       .enableDepthTest(false)
+      .UseNPRSlider();
     // light
     this.lights[0].bind();
     this.lights[0].bindForShadow();

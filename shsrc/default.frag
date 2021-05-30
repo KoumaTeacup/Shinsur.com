@@ -11,6 +11,7 @@ in vec2 UV;
 in float ShadowDepth;
 in vec4 ShadowClip;
 
+uniform int NPRWidth;
 uniform bool ShadowEnabled;
 uniform int ShadowView;
 uniform float LightIntensity;
@@ -29,6 +30,8 @@ uniform vec4 RawColor;
 out vec4 OutColor;
  
 void main() {
+	if(NPRWidth >= 0 && int(gl_FragCoord.x) >= NPRWidth) discard;
+
 	// load sampler texture
 	vec3 DiffuseColor = (UseRawColor ? RawColor : texture(DiffuseSampler, UV)).rgb;
 

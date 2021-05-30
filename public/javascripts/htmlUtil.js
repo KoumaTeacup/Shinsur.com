@@ -64,12 +64,12 @@
 }
 
 class Utility {
-  useNPR = { value: false };
+  NPRSlider = { value: 0 };
   showDebugView = { value: false };
   selectedDebugGBufferIndex;
   selectedDebugCurvatureIndex;
   selectedDebugCurvatureVertexIndex;
-  useForwardShading;
+  useForwardShading = { value: false };
   PCFEnabled = { value: true };
   shadowEnabled = { value: true };
   shadowView = { value: false };
@@ -115,32 +115,6 @@ class Utility {
     var hatchingTab = new DebugTab('hatching');
     var paperTab = new DebugTab('paperEffect');
 
-    var _this = this;
-    function styleChanged() {
-      if (_this.useNPR.value) {
-        shadingModeTab.disable();
-        document.getElementById('shadingModeCheckBox').disabled = true;
-        gBufferTab.enable();
-      } else {
-        shadingModeTab.enable();
-        document.getElementById('shadingModeCheckBox').disabled = false;
-        if (_this.useForwardShading) {
-          gBufferTab.disable();
-        }
-      }
-    }
-
-    this.useForwardShading = !document.getElementById('shadingModeCheckBox').checked;
-    document.getElementById("shadingModeCheckBox").onclick = (e) => {
-      this.useForwardShading = !e.target.checked;
-      if (this.useForwardShading) {
-        gBufferTab.disable();
-      }
-      else {
-        gBufferTab.enable();
-      }
-    }
-
     var gBufferTypes = document.gBufferTypeForm.gBufferType;
     this.selectedDebugGBufferIndex = +gBufferTypes.value;
     for (let i = 0; i < gBufferTypes.length; i++) {
@@ -176,7 +150,7 @@ class Utility {
     this.setupCheckbox(this.contourView, 'viewContourCheckBox', true)
     this.setupCheckbox(this.hatchingView, 'viewHatchingCheckBox', true, 'hatchingOptional');
 
-    this.setupCheckbox(this.useNPR, 'shadingStyleCheckbox', false);
+    this.setupCheckbox(this.useForwardShading, 'shadingModeCheckBox', false);
     this.setupCheckbox(this.showDebugView, 'DebugViewCheckbox', false, 'gBufferOptional');
     this.setupCheckbox(this.shadowEnabled, 'ShadowEnabledCheckbox', false, 'shadowOptional');
     this.setupCheckbox(this.showSmoothedNormal, 'normalDebugShowSmoothedCheckBox', false);
@@ -184,10 +158,12 @@ class Utility {
     this.setupCheckbox(this.usePaperNormal, 'paperNormalCheckbox', false);
     this.setupCheckbox(this.PCFEnabled, 'PCFFilterCheckbox', false, 'PCFFilterOptional');
 
-    styleChanged();
-    document.getElementById('shadingStyleCheckbox').addEventListener('click', styleChanged);
-
     // Sliders
+    this.setupNumericalSlider(
+      this.NPRSlider,
+      'NPRSlider',
+    );
+
     this.setupNumericalSlider(
       this.contourNumberOfLines,
       'contourNumberLinesSlider',
@@ -306,10 +282,10 @@ class Utility {
   setupNumericalSlider(localVar, sliderId, displayId, preSaveFunc = (val) => { return val; }, preDisplayFunc = (val) => { return val; }) {
     var slider = document.getElementById(sliderId);
     localVar.value = preSaveFunc(slider.value);
-    document.getElementById(displayId).innerHTML = preDisplayFunc(localVar.value);
+    if(displayId) document.getElementById(displayId).innerHTML = preDisplayFunc(localVar.value);
     slider.oninput = (e) => {
       localVar.value = preSaveFunc(e.target.value);
-      document.getElementById(displayId).innerHTML = preDisplayFunc(localVar.value);
+      if (displayId) document.getElementById(displayId).innerHTML = preDisplayFunc(localVar.value);
     }
   }
 

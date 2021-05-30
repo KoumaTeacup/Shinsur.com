@@ -18,6 +18,7 @@ uniform sampler2D BackgroundDiffSampler;
 uniform sampler3D HatchingSampler;
 
 // Shadow
+uniform int NPRWidth;
 uniform bool ShadowEnabled;
 uniform int ShadowView;
 uniform float LightIntensity;
@@ -48,6 +49,8 @@ vec3 SampleHatchingColor(sampler2D CurvatureSampler, vec2 ScreenSampleUV, sample
 }
 
 void main() {
+	if(NPRWidth >= 0 && int(gl_FragCoord.x) < NPRWidth) discard;
+
 	ivec2 ScreenTexutreSize = textureSize(WorldPosSampler, 0);
 	vec2 ScreenSampleUV = gl_FragCoord.xy / vec2(ScreenTexutreSize);
 
@@ -108,4 +111,5 @@ void main() {
 	vec4 BackgroundColor = UsePaperDiffuse == 0 ? vec4(1.0) : 1.0 - (1.0 - texture(BackgroundDiffSampler, ScreenSampleUV)) * PaperEffectWeight;
 	OutColor = min(BackgroundColor, OutColor);
 	OutColor = ShadowView == 0 ? OutColor : vec4(vec3(ShadowFactor), 1.0);
+	
 }
