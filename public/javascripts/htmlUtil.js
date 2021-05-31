@@ -99,12 +99,14 @@ class Utility {
 
   constructor() {
     // Prevent right click context menu
-    document.getElementById('mainCanvas').addEventListener('contextmenu', e => {
+    var mainCanvas = document.getElementById('mainCanvas');
+    mainCanvas.addEventListener('contextmenu', e => {
       if (e.button === 2) {
         e.preventDefault();
       }
     })
 
+    // Debug tab buttons
     var profileTab = new DebugTab('profile');
     var shadingModeTab = new DebugTab('shadingMode');
     var gBufferTab = new DebugTab('gBuffer');
@@ -115,6 +117,8 @@ class Utility {
     var hatchingTab = new DebugTab('hatching');
     var paperTab = new DebugTab('paperEffect');
 
+
+    // GBuffer drop down menu
     var gBufferTypes = document.gBufferTypeForm.gBufferType;
     this.selectedDebugGBufferIndex = +gBufferTypes.value;
     for (let i = 0; i < gBufferTypes.length; i++) {
@@ -123,6 +127,7 @@ class Utility {
       });
     }
 
+    // Curvature debug drop down menu
     this.selectedDebugCurvatureIndex = document.getElementById('curvatureDebugViewOptions').selectedIndex;
     document.getElementById('curvatureDebugViewOptions').onchange = (e) => {
       this.selectedDebugCurvatureIndex = e.target.selectedIndex;
@@ -143,6 +148,28 @@ class Utility {
       }
     }
 
+    // Before-after slider of canvas
+    var NPRHandleMouseDown = false;
+    var NPRDivider = document.getElementById('NPRDividerBar');
+    NPRDivider.addEventListener('mousedown', e => {
+      NPRHandleMouseDown = true;
+    });
+
+    document.addEventListener('mouseup', e => {
+      NPRHandleMouseDown = false;
+    });
+
+    this.NPRSlider.value = (NPRDivider.offsetLeft - mainCanvas.offsetLeft);
+    document.addEventListener('mousemove', e => {
+      if (NPRHandleMouseDown) {
+        var leftPercent = (e.pageX - mainCanvas.offsetLeft+3) / mainCanvas.offsetWidth;
+        leftPercent = Math.max(0, leftPercent);
+        leftPercent = Math.min(1, leftPercent);
+        NPRDivider.style.left = leftPercent * 100.0 + '%';
+        this.NPRSlider.value = leftPercent * mainCanvas.offsetWidth;
+      }
+    })
+
     // Checkboxes
     this.setupCheckbox(this.shadowView, 'ShadowViewCheckbox', true);
     this.setupCheckbox(this.normalSmoothingView, 'normalSmoothingCheckBox', true)
@@ -157,12 +184,6 @@ class Utility {
     this.setupCheckbox(this.usePaperDiffuse, 'paperDiffuseCheckbox', false);
     this.setupCheckbox(this.usePaperNormal, 'paperNormalCheckbox', false);
     this.setupCheckbox(this.PCFEnabled, 'PCFFilterCheckbox', false, 'PCFFilterOptional');
-
-    // Sliders
-    this.setupNumericalSlider(
-      this.NPRSlider,
-      'NPRSlider',
-    );
 
     this.setupNumericalSlider(
       this.contourNumberOfLines,
@@ -267,6 +288,7 @@ class Utility {
     );
   }
 
+  // Helper functions
   setupDebugTabEvents(buttonId, contentId) {
     document.getElementById(buttonId).addEventListener('click', e => {
       Array.from(document.getElementsByClassName('tabLink')).forEach(button => {
@@ -296,6 +318,7 @@ class Utility {
         if (isMutex) {
           this.closeAllMutualExclusiveViews();
           e.target.checked = true;
+          this.hideNPRSlider(true);
         }
         localVar.value = true;
         if (optionalId) {
@@ -305,6 +328,9 @@ class Utility {
         localVar.value = false;
         if (optionalId) {
           document.getElementById(optionalId).className += ' off';
+        }
+        if (isMutex) {
+          this.hideNPRSlider(false);
         }
       }
     })
@@ -334,6 +360,11 @@ class Utility {
     }
 
     return 0;
+  }
+
+  hideNPRSlider(hide) {
+    document.getElementById('NPRDividerBar').style.display = hide || this.shadowView.value ? 'none' : 'block';
+    var test = document.getElementById('NPRDividerBar').style.display;
   }
 
   // Per Frame Tick

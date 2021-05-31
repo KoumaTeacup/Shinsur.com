@@ -42,7 +42,7 @@ class FocusCamera {
       this.lastMousePos[1] = event.clientY;
     });
 
-    canvas.addEventListener('mouseup', (event) => {
+    document.addEventListener('mouseup', (event) => {
       switch (event.button) {
         case 0: // LMB
           this.isLMBDown = false;
@@ -63,12 +63,12 @@ class FocusCamera {
       this.distance = Math.min(100, Math.max(0, this.distance));
     });
 
-    canvas.addEventListener('mouseout', (event) => {
-      this.isLMBDown = false;
-      this.isRMBDown = false;
-    });
+    //canvas.addEventListener('mouseout', (event) => {
+    //  this.isLMBDown = false;
+    //  this.isRMBDown = false;
+    //});
 
-    canvas.addEventListener('mousemove', (event) => {
+    document.addEventListener('mousemove', (event) => {
       if (this.isLMBDown) {
         var currPos = vec2.fromValues(event.clientX, event.clientY);
         var offsetX = currPos[0] - this.lastMousePos[0];

@@ -48,7 +48,7 @@ function renderLoop(timestamp) {
       renderer.drawNPRContourShakingPass(true);
       break renderPasses;
     }
-
+    
     if (util.useForwardShading.value) {
       // PBR Forward Shading
       renderer.drawPBRForward();

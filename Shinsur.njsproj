@@ -75,6 +75,9 @@
     <Content Include="shsrc\shadow.frag" />
     <Content Include="shsrc\shadow.vert" />
     <Content Include="views\Default.html" />
+    <Content Include="views\Logo.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="views\summer.html" />
     <Content Include="views\winter.html" />
     <Content Include="views\error.jade" />
