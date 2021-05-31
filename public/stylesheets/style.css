@@ -34,7 +34,6 @@ body {
 }
 
 a {
-    color: #ffbb71;
 }
 
 .switch {
@@ -240,4 +239,13 @@ input:checked + .slider:before {
         position: absolute;
         background-color: rgba(0, 0, 0, 0.3);
         cursor:ew-resize;
+    }
+
+.paperArchive {
+    font-size: 24px;
+    padding-left: 100px;
+}
+
+    .paperArchive h1 {
+        font-size: 64px;
     }
