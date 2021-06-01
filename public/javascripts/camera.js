@@ -7,7 +7,7 @@ import * as glMatrix from './gl-matrix/common.js';
 
 class FocusCamera {
   // camera properties
-  focus = vec3.fromValues(0.0, 5.0, 0.0);
+  focus = vec3.fromValues(0.0, 6.0, 0.0);
   distance = 0.0;
   upAngle = 0.0;
   frontAngle = 0.0;

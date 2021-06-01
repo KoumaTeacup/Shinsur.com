@@ -55,6 +55,4 @@ void main() {
 	// final output
 	OutColor = vec4(DiffuseColor * Light, 1.0);
 	OutColor = ShadowView == 0 ? OutColor : vec4(vec3(ShadowFactor), 1.0);
-//	OutColor = vec4(DiffuseColor, 1.0);
-//	OutColor = vec4(vec3(-ShadowMapDepth/10.0), 1.0);
 }

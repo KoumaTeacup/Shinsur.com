@@ -49,7 +49,7 @@ function renderLoop(timestamp) {
       break renderPasses;
     }
     
-    if (util.useForwardShading.value) {
+    if (!util.useDeferredShading.value) {
       // PBR Forward Shading
       renderer.drawPBRForward();
     } else {

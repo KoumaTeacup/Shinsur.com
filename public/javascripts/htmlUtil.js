@@ -69,7 +69,7 @@ class Utility {
   selectedDebugGBufferIndex;
   selectedDebugCurvatureIndex;
   selectedDebugCurvatureVertexIndex;
-  useForwardShading = { value: false };
+  useDeferredShading = { value: false };
   PCFEnabled = { value: true };
   shadowEnabled = { value: true };
   shadowView = { value: false };
@@ -177,7 +177,7 @@ class Utility {
     this.setupCheckbox(this.contourView, 'viewContourCheckBox', true)
     this.setupCheckbox(this.hatchingView, 'viewHatchingCheckBox', true, 'hatchingOptional');
 
-    this.setupCheckbox(this.useForwardShading, 'shadingModeCheckBox', false);
+    this.setupCheckbox(this.useDeferredShading, 'shadingModeCheckBox', false);
     this.setupCheckbox(this.showDebugView, 'DebugViewCheckbox', false, 'gBufferOptional');
     this.setupCheckbox(this.shadowEnabled, 'ShadowEnabledCheckbox', false, 'shadowOptional');
     this.setupCheckbox(this.showSmoothedNormal, 'normalDebugShowSmoothedCheckBox', false);

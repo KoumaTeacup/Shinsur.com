@@ -39,9 +39,8 @@ void main() {
 	float NdotV = dot(SNormal, V);
 
 	int NumSamples = 10;
-	float SampleRadius = 0.9;
+	float SampleRadius = pow(2.0 / distance(CameraPos, WorldPos), 0.2);
 	float Tolerance = 0.8;
-	float Threshold = 0.5;
 	// Sampling surrounding pixels
 	float PI = 3.1415926528;
 	float UnitAngle = 2.0 * PI / float(NumSamples);
@@ -73,6 +72,7 @@ void main() {
 	float DepthFactor = abs((Depth * float(NumSamples) - SampleDepthSum)/Depth) > DepthThreshold ? 0.0 : 1.0;
 	float NdotVFactor = float(NumDarker) / float(NumSamples) > Tolerance ? 0.0 : 1.0;
 	float ContourFactor = DepthFactor * NormalFactor;
+//	ContourFactor = 1.0 - (1.0 - ContourFactor) / distance(CameraPos, WorldPos) * 8.0;
 
 	OutColor = (Normal == vec3(0.0, 0.0, 0.0)) ? vec4(1.0, 1.0, 1.0, 0.0) : vec4(vec3(ContourFactor), 1.0);
 //	OutColor = vec4(1.0, 0.0, 0.0, 1.0);

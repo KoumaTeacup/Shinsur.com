@@ -57,6 +57,7 @@ void main() {
 	// shadow calculation
 	vec3 WorldPos = texture(WorldPosSampler, ScreenSampleUV).rgb;
 	vec3 Normal = texture(NormalSampler, ScreenSampleUV).rgb;
+	vec3 DiffuseColor = texture(DiffuseSampler, ScreenSampleUV).rgb;
 	float Roughness = texture(DiffuseSampler, ScreenSampleUV).a;
 	
 	vec4 vecShadowMV = MatShadowView * vec4(WorldPos, 1.0);
@@ -78,6 +79,10 @@ void main() {
 	float Diffuse = clamp(NdotL,0.0, 1.0);
 	float Specular = pow(clamp(dot(R, V), 0.0, 1.0), Roughness);
 	float Light = (Ambient + (Diffuse + Specular) * ShadowFactor) * LightIntensity;// * LightColor;
+	float gamma = 2.25;
+//	float RedFactor = max(pow(DiffuseColor.r * (2.0 - DiffuseColor.g - DiffuseColor.b), 4.0), 0.0);
+	DiffuseColor = pow(DiffuseColor, vec3(gamma));
+	Light *= pow(DiffuseColor.x + DiffuseColor.y + DiffuseColor.z, 1.0/gamma);
 
 	// Hatching Calculation
 	float SliceCoord = (clamp((1.0 - Light), 0.0, 1.0) * 7.0 + 1.0 - 0.5) / float(NumHatchingSlices);
@@ -90,9 +95,11 @@ void main() {
 	vec3 HatchingIntensity2 = 1.0 - texture(HatchingSampler, vec3(CurvatureSample2.xy, SliceCoord)).rgb;
 	vec3 HatchingIntensity3 = 1.0 - texture(HatchingSampler, vec3(CurvatureSample3.xy, SliceCoord)).rgb;
 
-	HatchingIntensity1 -= UsePaperNormal == 0 ? 0.0 : CurvatureSample1.w;
-	HatchingIntensity2 -= UsePaperNormal == 0 ? 0.0 : CurvatureSample2.w;
-	HatchingIntensity3 -= UsePaperNormal == 0 ? 0.0 : CurvatureSample3.w;
+	float paperEffectPower = 0.2;
+
+	HatchingIntensity1 -= pow(HatchingIntensity1.x, paperEffectPower) * (UsePaperNormal == 0 ? 0.0 : CurvatureSample1.w);
+	HatchingIntensity2 -= pow(HatchingIntensity2.x, paperEffectPower) * (UsePaperNormal == 0 ? 0.0 : CurvatureSample2.w);
+	HatchingIntensity3 -= pow(HatchingIntensity3.x, paperEffectPower) * (UsePaperNormal == 0 ? 0.0 : CurvatureSample3.w);
 
 	float WeightSum = CurvatureSample1.z + CurvatureSample2.z + CurvatureSample3.z;
 	float BlendWeight1 = CurvatureSample1.z / WeightSum;
@@ -107,9 +114,14 @@ void main() {
 	// final output
 	OutColor = vec4(1.0 - WeightedIntensity, 1.0);
 
+	// Red Factor
+//	OutColor.rgb = OutColor.rgb * pow(1.0 - RedFactor) + vec3(1.0, 0.0, 0.0) * clamp(Light, 0.0, 1.0) * RedFactor;
+
 	// Background blend
 	vec4 BackgroundColor = UsePaperDiffuse == 0 ? vec4(1.0) : 1.0 - (1.0 - texture(BackgroundDiffSampler, ScreenSampleUV)) * PaperEffectWeight;
 	OutColor = min(BackgroundColor, OutColor);
 	OutColor = ShadowView == 0 ? OutColor : vec4(vec3(ShadowFactor), 1.0);
-	
+
+//	OutColor = vec4(vec3(RedFactor), 1.0);
+//	OutColor = vec4(HatchingIntensity1, 1.0);
 }

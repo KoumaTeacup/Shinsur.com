@@ -52,7 +52,7 @@ class Renderer {
     this.camera.viewAngle = vec3.fromValues(0.0, 1.0, 1.0);
     this.camera.distance = 20.0;
 
-    this.lights[0].worldLocation = [16.0, 30.0, 6.0];
+    this.lights[0].worldLocation = [16.0, 30.0, 26.0];
 
     // Initialize our pipe, Contructor needed, don't delete
     this.viewport = new Viewport(() => {
@@ -301,6 +301,8 @@ class Renderer {
       .enableFaceCull(false)
       .enableDepthTest(false)
       .UseNPRSlider();
+    // camera
+    this.camera.update();
     // light
     this.lights[0].bind();
     this.lights[0].bindForShadow();

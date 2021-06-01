@@ -123,21 +123,21 @@
                         <label for="shadowRes1k">1k</label>
                         <input type="radio" id="shadowRes2k" name="shadowRes" value="2048">
                         <label for="shadowRes2k">2k</label>
-                        <input type="radio" id="shadowRes4k" name="shadowRes" value="4096" checked>
+                        <input type="radio" id="shadowRes4k" name="shadowRes" value="4096">
                         <label for="shadowRes4k">4k</label>
-                        <input type="radio" id="shadowRes8k" name="shadowRes" value="8192">
+                        <input type="radio" id="shadowRes8k" name="shadowRes" value="8192" checked>
                         <label for="shadowRes8k">8k</label>
                     </form>
                     <br>
                     <p>Bias: </p>
                     <div class="slidecontainer">
-                        <input type="range" min="0" max="300" value="152" id="ShadowBiasSlider">
+                        <input type="range" min="0" max="300" value="150" id="ShadowBiasSlider">
                         <p id="shadowBiasDisplay"></p>
                     </div>
                     <br>
                     <p>Exponential Scale: </p>
                     <div class="slidecontainer">
-                        <input type="range" min="1" max="100" value="50" id="ShadowExpScaleSlider">
+                        <input type="range" min="1" max="100" value="75" id="ShadowExpScaleSlider">
                         <p id="ShadowExpScaleDisplay"></p>
                     </div>
                     <br>
@@ -151,12 +151,12 @@
                     <div id="PCFFilterOptional" class="optional">
                         <p>PCF Kernel Size: </p>
                         <div class="slidecontainer">
-                            <input type="range" min="1" max="15" value="15" id="PCFKernelSizeSlider">
+                            <input type="range" min="1" max="15" value="4" id="PCFKernelSizeSlider">
                             <p id="PCFKernelSizeDisplay"></p>
                         </div>
                         <p>PCF Gauss Width: </p>
                         <div class="slidecontainer">
-                            <input type="range" min="1" max="100" value="100" id="PCFGaussianWidthSlider">
+                            <input type="range" min="1" max="100" value="20" id="PCFGaussianWidthSlider">
                             <p id="PCFGaussianWidthDisplay"></p>
                         </div>
                     </div>
