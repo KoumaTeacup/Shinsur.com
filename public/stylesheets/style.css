@@ -220,7 +220,7 @@ input:checked + .slider:before {
 
 #NPRDividerBar {
     float: left;
-    left: 20%;
+    left: 75%;
     display: block;
     position: relative;
     width: 5px;
