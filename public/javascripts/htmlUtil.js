@@ -16,6 +16,7 @@
 
     this.button = document.getElementById(buttonId);
     this.content = document.getElementById(contentId);
+    if (this.button.checked) this.onClicked();
     var _this = this;
 
     Array.from(document.getElementsByClassName('tabLink')).forEach(buttonElem => {
