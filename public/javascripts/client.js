@@ -14,7 +14,7 @@ TrelloPowerUp.initialize({
                 dark: WHITE_ICON,
                 light: BLACK_ICON
             },
-            text: 'Callback',
+            text: 'IP Garden Feature Center',
             callback: onBtnClick,
             condition: 'edit'
         }];
