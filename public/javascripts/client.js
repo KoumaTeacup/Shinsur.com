@@ -22,5 +22,5 @@ TrelloPowerUp.initialize({
 });
 
 var onBtnClick = function (t, opts) {
-    console.log('Insomniac Trello Power-Up Under construction');
+    alert('Insomniac Trello Power-Up Under construction');
 };
