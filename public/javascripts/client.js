@@ -38,7 +38,9 @@ TrelloPowerUp.initialize({
     //    ];
     //  });
     return [{
-      text: "Vote"
+      icon: BLACK_ROCKET_ICON,
+      text: "Vote",
+      color: 'green'
     }]
   },
 
