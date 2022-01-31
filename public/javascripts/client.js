@@ -53,14 +53,14 @@ TrelloPowerUp.initialize({
   'show-settings': function (t, opts) {
     return t.boardBar({
       // required URL to load in the iframe
-      url: "/summer.html",
+      url: "https:://shinsur.com/summer.html",
       // optional arguments to be passed to the iframe as query parameters
       // access later with t.arg('text')
       args: { text: 'Hello' },
       // optional color for header chrome
       accentColor: '#F2D600',
       // initial height for iframe
-      height: 1000, // initial height for iframe
+      height: 200, // initial height for iframe
       // optional function to be called if user closes modal
       callback: () => console.log('Goodbye.'),
       // optional boolean for whether the user should
