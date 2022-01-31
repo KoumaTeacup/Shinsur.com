@@ -1,0 +1,3 @@
+C:\Shinsur\obj\Debug\Shinsur.njsproj.AssemblyReference.cache
+C:\Shinsur\obj\Debug\Shinsur.njsproj.CoreCompileInputs.cache
+C:\Shinsur\bin\Microsoft.NodejsTools.WebRole.dll

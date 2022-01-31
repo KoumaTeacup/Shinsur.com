@@ -78,6 +78,9 @@
     <Content Include="views\Logo.html">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="views\BMY.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="views\summer.html" />
     <Content Include="views\winter.html" />
     <Content Include="views\error.jade" />
