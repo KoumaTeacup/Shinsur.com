@@ -5,6 +5,7 @@ var Promise = TrelloPowerUp.Promise;
 var BLACK_ROCKET_ICON = 'https://cdn.glitch.com/1b42d7fe-bda8-4af8-a6c8-eff0cea9e08a%2Frocket-ship.png?1494946700421';
 var INSOMNIAC_ICON = 'https://shinsur.com/insomniac_logo.png';
 var LIKE_ICON = 'https://shinsur.com/IG_Garden_like.png';
+var HELP_HTML = 'https://shinsur.com/trello_help.html';
 
 TrelloPowerUp.initialize({
   // Board Buttons
@@ -56,7 +57,7 @@ TrelloPowerUp.initialize({
 var onBtnClick = function (t, opts) {
   return t.boardBar({
     // required URL to load in the iframe
-    url: "https://shinsur.com/summer.html",
+    url: "HELP_HTML",
     // optional arguments to be passed to the iframe as query parameters
     // access later with t.arg('text')
     args: { text: 'Hello' },
