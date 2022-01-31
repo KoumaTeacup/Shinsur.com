@@ -53,6 +53,9 @@ TrelloPowerUp.initialize({
   'show-settings': function (t, opts) {
     return onBtnClick;
   }
+}, {
+  appKey: '672ab4bc0f8c05ba1c73242a6e30f513',
+  appName: 'Insomniac IP Garden'
 });
 
 var onBtnClick = function (t, opts) {
