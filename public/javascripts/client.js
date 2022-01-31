@@ -57,7 +57,7 @@ TrelloPowerUp.initialize({
 var onBtnClick = function (t, opts) {
   return t.boardBar({
     // required URL to load in the iframe
-    url: "HELP_HTML",
+    url: HELP_HTML,
     // optional arguments to be passed to the iframe as query parameters
     // access later with t.arg('text')
     args: { text: 'Hello' },
