@@ -20,23 +20,28 @@ TrelloPowerUp.initialize({
     }];
   },
   "card-badges": function (t, opts) {
-    let cardAttachments = opts.attachments; // Trello passes you the attachments on the card
-    return t
-      .card("name")
-      .get("name")
-      .then(function (cardName) {
-        console.log("We just loaded the card name for fun: " + cardName);
-        return [
-          {
-            // It's best to use static badges unless you need your
-            // badges to refresh.
-            // You can mix and match between static and dynamic
-            text: "Vote",
-            icon: "IG_Garden_like.png", // for card front badges only
-            color: "green",
-          },
-        ];
-      });
+    //let cardAttachments = opts.attachments; // Trello passes you the attachments on the card
+    //return t
+    //  .card("name")
+    //  .get("name")
+    //  .then(function (cardName) {
+    //    console.log("We just loaded the card name for fun: " + cardName);
+    //    return [
+    //      {
+    //        // It's best to use static badges unless you need your
+    //        // badges to refresh.
+    //        // You can mix and match between static and dynamic
+    //        text: "Vote",
+    //        icon: "IG_Garden_like.png", // for card front badges only
+    //        color: "green",
+    //      },
+    //    ];
+    //  });
+    return [{
+      icon: "IG_Garden_like.png",
+      text: "Vote",
+      color: "green"
+    }]
   },
 
 });
