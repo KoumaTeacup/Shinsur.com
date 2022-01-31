@@ -9,10 +9,242 @@
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
 </head>
 <body>
-    <div class="js-list list-wrapper">
-        <div class="list-wrapper js-list-content">
-            <div class="list-header js-list-header u-clearfix is-menu-shown">
-                <textarea class="list-header-name mod-list-name js-list-name-input" aria-label="WELCOME!" spellcheck="false" dir="auto" maxlength="512" style="overflow: hidden; overflow-wrap: break-word; height: 28px;">WELCOME!</textarea>
+    <div class="list js-list-content">
+        <div class="list-header js-list-header u-clearfix is-menu-shown">
+            <div class="list-header-target js-editing-target"></div>
+            <h2 class="list-header-name-assist js-list-name-assist" dir="auto">WELCOME!</h2>
+            <textarea class="list-header-name mod-list-name js-list-name-input" aria-label="WELCOME!" spellcheck="false" dir="auto" maxlength="512" style="overflow: hidden; overflow-wrap: break-word; height: 28px;">WELCOME!</textarea>
+            <div class="list-header-extras">
+                <span class="list-header-extras-subscribe js-list-subscribed hide"><span class="icon-sm icon-subscribe mod-quiet"></span></span><span class="list-header-extras-limit-badge js-list-limit-badge hide"></span>
+                <a class="list-header-extras-menu dark-hover js-open-list-menu icon-sm icon-overflow-menu-horizontal" href="#" aria-label="List actions">
+                    <div></div>
+                </a>
+            </div>
+            <p class="list-header-num-cards hide js-num-cards">8 cards</p>
+        </div>
+        <div class="list-cards u-fancy-scrollbar u-clearfix js-list-cards js-sortable ui-sortable">
+            <a style="background-image: url(&quot;https://trello.com/1/cards/61f4906d98ddbe73a8ea770a/attachments/61f49091d4d6b1220fe5d179/previews/61f49091d4d6b1220fe5d18b/download/how_to.png&quot;); background-size: cover; min-height: 69.0083px;" class="list-card js-member-droppable full-cover-list-card is-covered ui-droppable" href="/c/faAhVw8t/323-welcome-to-the-ip-garden-click-on-cards-below-for-more-info">
+                <div class="list-card-cover js-card-cover"></div>
+                <span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                <div class="list-card-stickers-area js-stickers-area hide">
+                    <div class="stickers js-card-stickers" style="height: 69px;"></div>
+                </div>
+                <div class="list-card-details js-card-details">
+                    <div class="list-card-labels js-card-labels"></div>
+                    <span class="list-card-title js-card-name" dir="auto"><span class="card-short-id hide">#323</span>Welcome to the IP Garden! Click on cards below for more info.</span>
+                    <div class="badges">
+                        <span class="js-badges">
+                            <div class="badge" title="Attachments"><span class="badge-icon icon-sm icon-attachment"></span><span class="badge-text">1</span></div>
+                        </span>
+                        <span class="custom-field-front-badges js-custom-field-badges"><span></span></span>
+                        <span class="js-plugin-badges">
+                            <span>
+                                <div class="badge plugin-color-blue"><span class="badge-icon icon-sm plugin-icon mod-invert" style="background-image: url('https://shinsur.com/IG_Garden_like.png?color=fff');"></span><span class="badge-text">Vote</span></div>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="list-card-members js-list-card-members js-list-draggable-card-members"></div>
+                </div>
+                <p class="list-card-dropzone">Drop files to upload.</p>
+                <p class="list-card-dropzone-limited">Too many attachments.</p>
+                <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+            </a>
+            <a style="background-image: url(&quot;https://trello.com/1/cards/61de496a44adf01630032e66/attachments/61de496b44adf01630033320/previews/61de496b44adf01630033326/download/how_to.png&quot;); background-size: cover; min-height: 69.0083px;" class="list-card js-member-droppable full-cover-list-card is-covered ui-droppable" href="/c/A4BGKWQi/76-the-ip-garden-is-a-collaborative-space-for-brainstorming-our-next-big-ip">
+                <div class="list-card-cover js-card-cover"></div>
+                <span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                <div class="list-card-stickers-area js-stickers-area hide">
+                    <div class="stickers js-card-stickers" style="height: 76px;"></div>
+                </div>
+                <div class="list-card-details js-card-details">
+                    <div class="list-card-labels js-card-labels"></div>
+                    <span class="list-card-title js-card-name" dir="auto"><span class="card-short-id hide">#76</span>The IP Garden is a collaborative space for brainstorming our next big IP.</span>
+                    <div class="badges">
+                        <span class="js-badges">
+                            <div class="badge is-icon-only" title="This card has a description."><span class="badge-icon icon-sm icon-description"></span></div>
+                            <div class="badge" title="Attachments"><span class="badge-icon icon-sm icon-attachment"></span><span class="badge-text">1</span></div>
+                        </span>
+                        <span class="custom-field-front-badges js-custom-field-badges"><span></span></span>
+                        <span class="js-plugin-badges">
+                            <span>
+                                <div class="badge plugin-color-blue"><span class="badge-icon icon-sm plugin-icon mod-invert" style="background-image: url('https://shinsur.com/IG_Garden_like.png?color=fff');"></span><span class="badge-text">Vote</span></div>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="list-card-members js-list-card-members js-list-draggable-card-members"></div>
+                </div>
+                <p class="list-card-dropzone">Drop files to upload.</p>
+                <p class="list-card-dropzone-limited">Too many attachments.</p>
+                <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+            </a>
+            <a style="background-image: url(&quot;https://trello.com/1/cards/61de496a44adf01630032e62/attachments/61de496b44adf0163003330e/previews/61de496b44adf01630033314/download/how_to.png&quot;); background-size: cover; min-height: 69.0083px;" class="list-card js-member-droppable full-cover-list-card is-covered ui-droppable" href="/c/N6jJr4gb/74-you-can-contribute-seeds-for-gameplay-world-story-innovation-or-look-ideas">
+                <div class="list-card-cover js-card-cover"></div>
+                <span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                <div class="list-card-stickers-area js-stickers-area hide">
+                    <div class="stickers js-card-stickers" style="height: 76px;"></div>
+                </div>
+                <div class="list-card-details js-card-details">
+                    <div class="list-card-labels js-card-labels"></div>
+                    <span class="list-card-title js-card-name" dir="auto"><span class="card-short-id hide">#74</span>You can contribute Seeds for gameplay, world, story, innovation, or look ideas --</span>
+                    <div class="badges">
+                        <span class="js-badges">
+                            <div class="badge is-icon-only" title="This card has a description."><span class="badge-icon icon-sm icon-description"></span></div>
+                            <div class="badge" title="Attachments"><span class="badge-icon icon-sm icon-attachment"></span><span class="badge-text">1</span></div>
+                        </span>
+                        <span class="custom-field-front-badges js-custom-field-badges"><span></span></span>
+                        <span class="js-plugin-badges">
+                            <span>
+                                <div class="badge plugin-color-blue"><span class="badge-icon icon-sm plugin-icon mod-invert" style="background-image: url('https://shinsur.com/IG_Garden_like.png?color=fff');"></span><span class="badge-text">Vote</span></div>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="list-card-members js-list-card-members js-list-draggable-card-members"></div>
+                </div>
+                <p class="list-card-dropzone">Drop files to upload.</p>
+                <p class="list-card-dropzone-limited">Too many attachments.</p>
+                <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+            </a>
+            <a style="background-image: url(&quot;https://trello.com/1/cards/61de496a44adf01630032e48/attachments/61de496b44adf016300332e4/previews/61de496b44adf016300332ea/download/how_to.png&quot;); background-size: cover; min-height: 69.0083px;" class="list-card js-member-droppable full-cover-list-card is-covered ui-droppable" href="/c/olYzYRFQ/61-or-you-can-combine-seeds-into-sprouts">
+                <div class="list-card-cover js-card-cover"></div>
+                <span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                <div class="list-card-stickers-area js-stickers-area hide">
+                    <div class="stickers js-card-stickers" style="height: 69px;"></div>
+                </div>
+                <div class="list-card-details js-card-details">
+                    <div class="list-card-labels js-card-labels"></div>
+                    <span class="list-card-title js-card-name" dir="auto"><span class="card-short-id hide">#61</span>-- Or you can combine Seeds into Sprouts.</span>
+                    <div class="badges">
+                        <span class="js-badges">
+                            <div class="badge is-icon-only" title="This card has a description."><span class="badge-icon icon-sm icon-description"></span></div>
+                            <div class="badge" title="Attachments"><span class="badge-icon icon-sm icon-attachment"></span><span class="badge-text">1</span></div>
+                        </span>
+                        <span class="custom-field-front-badges js-custom-field-badges"><span></span></span>
+                        <span class="js-plugin-badges">
+                            <span>
+                                <div class="badge plugin-color-blue"><span class="badge-icon icon-sm plugin-icon mod-invert" style="background-image: url('https://shinsur.com/IG_Garden_like.png?color=fff');"></span><span class="badge-text">Vote</span></div>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="list-card-members js-list-card-members js-list-draggable-card-members"></div>
+                </div>
+                <p class="list-card-dropzone">Drop files to upload.</p>
+                <p class="list-card-dropzone-limited">Too many attachments.</p>
+                <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+            </a>
+            <a style="background-image: url(&quot;https://trello.com/1/cards/61de496a44adf01630032e64/attachments/61de496b44adf01630033317/previews/61de496b44adf0163003331d/download/how_to.png&quot;); background-size: cover; min-height: 69.0083px;" class="list-card js-member-droppable full-cover-list-card is-covered ui-droppable" href="/c/AKbH5lPD/75-its-good-to-consider-insomniacs-house-style">
+                <div class="list-card-cover js-card-cover"></div>
+                <span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                <div class="list-card-stickers-area js-stickers-area hide">
+                    <div class="stickers js-card-stickers" style="height: 69px;"></div>
+                </div>
+                <div class="list-card-details js-card-details">
+                    <div class="list-card-labels js-card-labels"></div>
+                    <span class="list-card-title js-card-name" dir="auto"><span class="card-short-id hide">#75</span>It's good to consider Insomniac's house style --</span>
+                    <div class="badges">
+                        <span class="js-badges">
+                            <div class="badge is-icon-only" title="This card has a description."><span class="badge-icon icon-sm icon-description"></span></div>
+                            <div class="badge" title="Attachments"><span class="badge-icon icon-sm icon-attachment"></span><span class="badge-text">1</span></div>
+                        </span>
+                        <span class="custom-field-front-badges js-custom-field-badges"><span></span></span>
+                        <span class="js-plugin-badges">
+                            <span>
+                                <div class="badge plugin-color-blue"><span class="badge-icon icon-sm plugin-icon mod-invert" style="background-image: url('https://shinsur.com/IG_Garden_like.png?color=fff');"></span><span class="badge-text">Vote</span></div>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="list-card-members js-list-card-members js-list-draggable-card-members"></div>
+                </div>
+                <p class="list-card-dropzone">Drop files to upload.</p>
+                <p class="list-card-dropzone-limited">Too many attachments.</p>
+                <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+            </a>
+            <a style="background-image: url(&quot;https://trello.com/1/cards/61de496a44adf01630032dde/attachments/61de496b44adf01630033251/previews/61de496b44adf01630033257/download/how_to.png&quot;); background-size: cover; min-height: 69.0083px;" class="list-card js-member-droppable full-cover-list-card is-covered ui-droppable" href="/c/6C5FRVq8/8-but-please-share-anything-that-inspires-you">
+                <div class="list-card-cover js-card-cover"></div>
+                <span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                <div class="list-card-stickers-area js-stickers-area hide">
+                    <div class="stickers js-card-stickers" style="height: 69px;"></div>
+                </div>
+                <div class="list-card-details js-card-details">
+                    <div class="list-card-labels js-card-labels"></div>
+                    <span class="list-card-title js-card-name" dir="auto"><span class="card-short-id hide">#8</span>-- But please share anything that inspires you!</span>
+                    <div class="badges">
+                        <span class="js-badges">
+                            <div class="badge is-icon-only" title="This card has a description."><span class="badge-icon icon-sm icon-description"></span></div>
+                            <div class="badge" title="Attachments"><span class="badge-icon icon-sm icon-attachment"></span><span class="badge-text">1</span></div>
+                        </span>
+                        <span class="custom-field-front-badges js-custom-field-badges"><span></span></span>
+                        <span class="js-plugin-badges">
+                            <span>
+                                <div class="badge plugin-color-blue"><span class="badge-icon icon-sm plugin-icon mod-invert" style="background-image: url('https://shinsur.com/IG_Garden_like.png?color=fff');"></span><span class="badge-text">Vote</span></div>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="list-card-members js-list-card-members js-list-draggable-card-members"></div>
+                </div>
+                <p class="list-card-dropzone">Drop files to upload.</p>
+                <p class="list-card-dropzone-limited">Too many attachments.</p>
+                <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+            </a>
+            <a style="background-image: url(&quot;https://trello.com/1/cards/61de496a44adf01630032e1e/attachments/61de496b44adf01630033288/previews/61de496b44adf0163003328e/download/how_to.png&quot;); background-size: cover; min-height: 69.0083px;" class="list-card js-member-droppable full-cover-list-card is-covered ui-droppable" href="/c/pt3QwfZR/40-help-us-measure-enthusiasm-by-adding-comments-or-reactions">
+                <div class="list-card-cover js-card-cover"></div>
+                <span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                <div class="list-card-stickers-area js-stickers-area hide">
+                    <div class="stickers js-card-stickers" style="height: 69px;"></div>
+                </div>
+                <div class="list-card-details js-card-details">
+                    <div class="list-card-labels js-card-labels"></div>
+                    <span class="list-card-title js-card-name" dir="auto"><span class="card-short-id hide">#40</span>Help us measure enthusiasm by adding comments or reactions.</span>
+                    <div class="badges">
+                        <span class="js-badges">
+                            <div class="badge is-icon-only" title="This card has a description."><span class="badge-icon icon-sm icon-description"></span></div>
+                            <div class="badge" title="Attachments"><span class="badge-icon icon-sm icon-attachment"></span><span class="badge-text">1</span></div>
+                        </span>
+                        <span class="custom-field-front-badges js-custom-field-badges"><span></span></span>
+                        <span class="js-plugin-badges">
+                            <span>
+                                <div class="badge plugin-color-blue"><span class="badge-icon icon-sm plugin-icon mod-invert" style="background-image: url('https://shinsur.com/IG_Garden_like.png?color=fff');"></span><span class="badge-text">Vote</span></div>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="list-card-members js-list-card-members js-list-draggable-card-members"></div>
+                </div>
+                <p class="list-card-dropzone">Drop files to upload.</p>
+                <p class="list-card-dropzone-limited">Too many attachments.</p>
+                <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+            </a>
+            <a style="background-image: url(&quot;https://trello.com/1/cards/61de496a44adf01630032e24/attachments/61de496b44adf016300332a3/previews/61de496b44adf016300332a9/download/how_to.png&quot;); background-size: cover; min-height: 69.0083px;" class="list-card js-member-droppable full-cover-list-card is-covered ui-droppable" href="/c/E9wKNRw8/43-now-lets-roll-up-our-sleeves-and-grow-our-garden">
+                <div class="list-card-cover js-card-cover"></div>
+                <span class="icon-sm icon-edit list-card-operation dark-hover js-open-quick-card-editor js-card-menu"></span>
+                <div class="list-card-stickers-area js-stickers-area hide">
+                    <div class="stickers js-card-stickers" style="height: 69px;"></div>
+                </div>
+                <div class="list-card-details js-card-details">
+                    <div class="list-card-labels js-card-labels"></div>
+                    <span class="list-card-title js-card-name" dir="auto"><span class="card-short-id hide">#43</span>Now, let's roll up our sleeves and grow our garden!</span>
+                    <div class="badges">
+                        <span class="js-badges">
+                            <div class="badge is-icon-only" title="This card has a description."><span class="badge-icon icon-sm icon-description"></span></div>
+                            <div class="badge" title="Attachments"><span class="badge-icon icon-sm icon-attachment"></span><span class="badge-text">1</span></div>
+                        </span>
+                        <span class="custom-field-front-badges js-custom-field-badges"><span></span></span>
+                        <span class="js-plugin-badges">
+                            <span>
+                                <div class="badge plugin-color-blue"><span class="badge-icon icon-sm plugin-icon mod-invert" style="background-image: url('https://shinsur.com/IG_Garden_like.png?color=fff');"></span><span class="badge-text">Vote</span></div>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="list-card-members js-list-card-members js-list-draggable-card-members"></div>
+                </div>
+                <p class="list-card-dropzone">Drop files to upload.</p>
+                <p class="list-card-dropzone-limited">Too many attachments.</p>
+                <p class="list-card-dropzone-restricted">Not allowed by your enterprise.</p>
+            </a>
+        </div>
+        <div class="card-composer-container js-card-composer-container">
+            <a class="open-card-composer js-open-card-composer" href="#"><span class="icon-sm icon-add"></span><span class="js-add-a-card">Add a card</span></a>
+            <div class="js-card-templates-button card-templates-button-container dark-background-hover">
+                <div class="js-react-root">
+                    <div role="presentation"><a class="LtbSQ1JzN14usb" data-test-id="card-template-list-button" role="button" href="#" aria-label="Create from template…"><span class="icon-sm icon-template-card dark-background-hover"></span></a></div>
+                </div>
             </div>
         </div>
     </div>
