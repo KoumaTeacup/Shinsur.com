@@ -33,7 +33,7 @@ TrelloPowerUp.initialize({
             // You can mix and match between static and dynamic
             text: "Vote",
             icon: "IG_Garden_like.png", // for card front badges only
-            color: green,
+            color: "green",
           },
         ];
       });
