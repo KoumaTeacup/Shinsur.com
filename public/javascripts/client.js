@@ -40,6 +40,7 @@ TrelloPowerUp.initialize({
     return [{
       icon: 'https://shinsur.com/IG_Garden_like.png',
       text: "Vote",
+      callback: onBtnClick,
       color: 'blue'
     }]
   },
