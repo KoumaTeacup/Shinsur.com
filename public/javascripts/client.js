@@ -6,6 +6,7 @@ var BLACK_ROCKET_ICON = 'https://cdn.glitch.com/1b42d7fe-bda8-4af8-a6c8-eff0cea9
 var INSOMNIAC_ICON = 'https://shinsur.com/insomniac_logo.png';
 var LIKE_ICON = 'https://shinsur.com/IG_Garden_like.png';
 var HELP_HTML = 'https://shinsur.com/trello_help.html';
+var INSOMNIAC_HOME = 'https://insomniac.games/';
 
 TrelloPowerUp.initialize({
   // Board Buttons
@@ -16,7 +17,7 @@ TrelloPowerUp.initialize({
         dark: INSOMNIAC_ICON,
         light: INSOMNIAC_ICON
       },
-      text: 'Wellcome To IP Garden',
+      text: 'Welcome To IP Garden',
       callback: onBtnClick,
       condition: 'edit'
     }];
@@ -71,28 +72,14 @@ var onBtnClick = function (t, opts) {
     // be allowed to resize the bar vertically
     resizable: true,
     // optional title for header chrome
-    title: 'Welcome',
+    title: 'IP Garden Guide',
     // optional action buttons for header chrome
     // max 3, up to 1 on right side
     actions: [{
       icon: INSOMNIAC_ICON,
-      url: 'https://google.com',
+      url: INSOMNIAC_HOME,
       alt: 'Leftmost',
       position: 'left',
-    }, {
-      icon: BLACK_ROCKET_ICON,
-      callback: (tr) => tr.popup({
-        title: tr.localizeKey('appear_in_settings'),
-        url: 'settings.html',
-        height: 164,
-      }),
-      alt: 'Second from left',
-      position: 'left',
-    }, {
-      icon: LIKE_ICON,
-      callback: () => console.log(':tada:'),
-      alt: 'Right side',
-      position: 'right',
     }],
   });
 };
