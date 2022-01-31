@@ -38,7 +38,7 @@ TrelloPowerUp.initialize({
     //    ];
     //  });
     return [{
-      icon: BLACK_ROCKET_ICON,
+      icon: 'https://shinsur.com/IG_Garden_like.png',
       text: "Vote",
       color: 'green'
     }]
