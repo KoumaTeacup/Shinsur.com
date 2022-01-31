@@ -38,9 +38,7 @@ TrelloPowerUp.initialize({
     //    ];
     //  });
     return [{
-      icon: "IG_Garden_like.png",
-      text: "Vote",
-      color: "green"
+      text: "Vote"
     }]
   },
 
