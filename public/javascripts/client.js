@@ -18,30 +18,13 @@ TrelloPowerUp.initialize({
         light: INSOMNIAC_ICON
       },
       text: 'Welcome To IP Garden',
-      callback: onBtnClick,
+      callback: showWelcome,
       condition: 'edit'
     }];
   },
 
   // Badges
   "card-badges": function (t, opts) {
-    //let cardAttachments = opts.attachments; // Trello passes you the attachments on the card
-    //return t
-    //  .card("name")
-    //  .get("name")
-    //  .then(function (cardName) {
-    //    console.log("We just loaded the card name for fun: " + cardName);
-    //    return [
-    //      {
-    //        // It's best to use static badges unless you need your
-    //        // badges to refresh.
-    //        // You can mix and match between static and dynamic
-    //        text: "Vote",
-    //        icon: "IG_Garden_like.png", // for card front badges only
-    //        color: "green",
-    //      },
-    //    ];
-    //  });
     return [{
       icon: LIKE_ICON,
       text: "Vote",
@@ -51,14 +34,30 @@ TrelloPowerUp.initialize({
   },
 
   'show-settings': function (t, opts) {
-    return onBtnClick;
-  }
+    return showWelcome;
+  },
+
+  "card-detail-badges": function (t, opts) {
+    return [
+      {
+        // card detail badges (those that appear on the back of cards)
+        // also support callback functions so that you can open for example
+        // open a popup on click
+        title: "Insomniac Votes",
+        text: "Number Votes",
+        callback: function (t, opts) {
+          var context = t.getContext();
+          fetch('https://shinsur.com/trello/VoteCard?id=' + context.card, { method: 'POST' });
+        },
+      }
+    ];
+  },
 }, {
   appKey: '672ab4bc0f8c05ba1c73242a6e30f513',
   appName: 'Insomniac IP Garden'
 });
 
-var onBtnClick = function (t, opts) {
+var showWelcome = function (t, opts) {
   return t.boardBar({
     // required URL to load in the iframe
     url: HELP_HTML,
