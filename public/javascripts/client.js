@@ -25,11 +25,14 @@ TrelloPowerUp.initialize({
 
   // Badges
   "card-badges": function (t, opts) {
-    return [{
-      icon: LIKE_ICON,
-      text: "Vote",
-      color: 'blue'
-    }]
+    return t.get('card', 'shared', 'Insom_Votes', 0)
+      .then(function (votes) {
+        return [{
+          icon: LIKE_ICON,
+          text: "Insomniac Votes: " + votes,
+          color: 'blue'
+        }]
+      })
   },
 
   'show-settings': function (t, opts) {
@@ -46,12 +49,13 @@ TrelloPowerUp.initialize({
             // open a popup on click
             title: "Insomniac Votes",
             text: votes,
+            color: 'blue',
             callback: function (t, opts) {
               t.get('card', 'shared', 'Insom_Votes', 0)
                 .then(function (votes) {
                   t.set('card', 'shared', 'Insom_Votes', votes + 1);
                 })
-              fetch('https://shinsur.com/trello/VoteCard?id=' + t.getContext().card, { method: 'POST' });
+              //fetch('https://shinsur.com/trello/VoteCard?id=' + t.getContext().card, { method: 'POST' });
             },
           }
         ];
