@@ -28,7 +28,6 @@ TrelloPowerUp.initialize({
     return [{
       icon: LIKE_ICON,
       text: "Vote",
-      callback: onBtnClick,
       color: 'blue'
     }]
   },
