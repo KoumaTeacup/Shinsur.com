@@ -44,11 +44,11 @@ TrelloPowerUp.initialize({
         // also support callback functions so that you can open for example
         // open a popup on click
         title: "Insomniac Votes",
-        text: t.get('card', 'shared', 'Insom_Votes', 999),
+        text: t.get('card', 'shared', 'Insom_Votes', 'undefined'),
         callback: function (t, opts) {
-          t.get('card', 'shared', 'Insom_Votes', 999)
+          t.get('card', 'shared', 'Insom_Votes', 'undefined')
             .then(function (data) {
-              if (data == 999) {
+              if (data === 'undefined') {
                 t.set('card', 'shared', 'Insom_Votes', 1);
               } else {
                 t.set('card', 'shared', 'Insom_Votes', data + 1);
