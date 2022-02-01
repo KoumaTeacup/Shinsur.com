@@ -43,8 +43,16 @@ TrelloPowerUp.initialize({
         // also support callback functions so that you can open for example
         // open a popup on click
         title: "Insomniac Votes",
-        text: "Number Votes",
+        text: t.get(card, shared, 'Insom_Votes', 999),
         callback: function (t, opts) {
+          t.get(card, shared, 'Insom_Votes', 999)
+            .then(function (data) {
+              if (data == 999) {
+                t.set(card, shared, 'Insom_Votes', 1);
+              } else {
+                t.set(card, shared, 'Insom_Votes', data + 1);
+              }
+            })
           var context = t.getContext();
           fetch('https://shinsur.com/trello/VoteCard?id=' + context.card, { method: 'POST' });
         },
