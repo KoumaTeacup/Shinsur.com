@@ -37,23 +37,19 @@ TrelloPowerUp.initialize({
   },
 
   "card-detail-badges": function (t, opts) {
-    t.get('card', 'shared', 'Insom_Votes', 'undefined')
-      .then(function (data) {
+    return t.get('card', 'shared', 'Insom_Votes', 0)
+      .then(function (votes) {
         return [
           {
             // card detail badges (those that appear on the back of cards)
             // also support callback functions so that you can open for example
             // open a popup on click
             title: "Insomniac Votes",
-            text: data,
+            text: votes,
             callback: function (t, opts) {
-              t.get('card', 'shared', 'Insom_Votes', 'undefined')
-                .then(function (data) {
-                  if (data === 'undefined') {
-                    t.set('card', 'shared', 'Insom_Votes', 1);
-                  } else {
-                    t.set('card', 'shared', 'Insom_Votes', data + 1);
-                  }
+              t.get('card', 'shared', 'Insom_Votes', 0)
+                .then(function (votes) {
+                  t.set('card', 'shared', 'Insom_Votes', votes + 1);
                 })
               fetch('https://shinsur.com/trello/VoteCard?id=' + t.getContext().card, { method: 'POST' });
             },
