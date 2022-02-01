@@ -37,27 +37,29 @@ TrelloPowerUp.initialize({
   },
 
   "card-detail-badges": function (t, opts) {
-    
-    return [
-      {
-        // card detail badges (those that appear on the back of cards)
-        // also support callback functions so that you can open for example
-        // open a popup on click
-        title: "Insomniac Votes",
-        text: t.get('card', 'shared', 'Insom_Votes', 'undefined'),
-        callback: function (t, opts) {
-          t.get('card', 'shared', 'Insom_Votes', 'undefined')
-            .then(function (data) {
-              if (data === 'undefined') {
-                t.set('card', 'shared', 'Insom_Votes', 1);
-              } else {
-                t.set('card', 'shared', 'Insom_Votes', data + 1);
-              }
-            })
-          fetch('https://shinsur.com/trello/VoteCard?id=' + t.getContext().card, { method: 'POST' });
-        },
-      }
-    ];
+    t.get('card', 'shared', 'Insom_Votes', 'undefined')
+      .then(function (data) {
+        return [
+          {
+            // card detail badges (those that appear on the back of cards)
+            // also support callback functions so that you can open for example
+            // open a popup on click
+            title: "Insomniac Votes",
+            text: data,
+            callback: function (t, opts) {
+              t.get('card', 'shared', 'Insom_Votes', 'undefined')
+                .then(function (data) {
+                  if (data === 'undefined') {
+                    t.set('card', 'shared', 'Insom_Votes', 1);
+                  } else {
+                    t.set('card', 'shared', 'Insom_Votes', data + 1);
+                  }
+                })
+              fetch('https://shinsur.com/trello/VoteCard?id=' + t.getContext().card, { method: 'POST' });
+            },
+          }
+        ];
+      })
   },
 }, {
   appKey: '672ab4bc0f8c05ba1c73242a6e30f513',
