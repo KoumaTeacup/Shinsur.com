@@ -134,7 +134,11 @@ TrelloPowerUp.initialize({
                 + 'id=' + card_id
                 + '&pos=' + sprout_pos
                 + '&drafting_id' + drafting_list_id
-                , { method: 'POST' });
+                , { method: 'POST' })
+                .then(res => json())
+                .then(data => {
+                  t.set('member', 'private', 'drfating_list_id', data.id);
+                });
             })
           }
         }

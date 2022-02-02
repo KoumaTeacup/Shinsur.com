@@ -76,10 +76,12 @@ router.post('/DraftCard', function (req, res) {
       + '&key=' + key
       + '&token=' + token
       , { method: 'POST' });
+
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({ id: list_id }));
+
   }).catch(err => console.error(err));
 
-
-  res.end();
 })
 
 module.exports = router;
