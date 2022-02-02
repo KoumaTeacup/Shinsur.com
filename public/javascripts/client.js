@@ -105,7 +105,7 @@ TrelloPowerUp.initialize({
         return Promise.all(promises).then(card_votes => {
           var card_vote_objs = [];
 
-          for (var i = 0; i < card_votes.size(); ++i) {
+          for (var i = 0; i < card_votes.length; ++i) {
             card_vote_objs.push({ id: cards[i].id, votes: card_votes[i] });
           }
 
