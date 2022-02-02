@@ -43,12 +43,15 @@ TrelloPowerUp.initialize({
     const getVotedCards = t.get('member', 'private', 'voted', []);
     const card_id = opts.context.card;
     Promise.all([getVotedCards]).then(card_list => {
+      // Get Callback
       var vote_text = "Vote";
       var vote_color = 'light-gray'
       if (card_list.includes(card_id)) {
         vote_text = "Voted!";
         vote_color = 'green';
       }
+
+      // Return the detailed badge
       return [
         {
           // card detail badges (those that appear on the back of cards)
@@ -71,13 +74,6 @@ TrelloPowerUp.initialize({
         }
       ]
     })
-    return t.get('card', 'shared', 'Insom_Votes', 0)
-      .then(function (votes) {
-        return [
-          {
-          }
-        ];
-      })
   },
 
   'list-sorters': function (t) {
