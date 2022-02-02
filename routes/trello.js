@@ -36,13 +36,14 @@ router.post('/DraftCard', async function (req, res) {
 
   if (req.query.drafting_id) {
     // test if list still exists
-    valid = await fetch('https://api.trello.com/1/lists/' + req.query.drafting_id
+    valid = await fetch('https://api.trello.com/1/lists/' + req.query.drafting_id + '?'
       + 'key=' + key
       + '&token=' + token
       , {
-        method: 'POST',
+        method: 'GET'
       })
       .then(response => {
+        console.log(response.ok);
         return response.ok;
       })
   }
