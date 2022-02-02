@@ -55,44 +55,88 @@ TrelloPowerUp.initialize({
 
   "card-detail-badges": function (t, opts) {
     const card_id = opts.context.card;
-    return t.get('member', 'private', 'voted', []).then(card_list => {
-      // Get Callback
-      var vote_text = "Vote";
+
+    const getMemeberVotedCards = t.get('member', 'private', 'voted', []);
+    const getMemeberDratedCards = t.get('member', 'private', 'drafting', []);
+
+    return Promise.all([getMemeberVotedCards, getMemeberDratedCards]).then(data => {
+      // Voting
+      var voted_card_list = data[0];
+      var vote_text = "Click to Vote";
       var vote_color = 'light-gray'
-      if (card_list.includes(card_id)) {
-        vote_text = "Voted!";
+      if (voted_card_list.includes(card_id)) {
+        vote_text = "You Voted this!";
         vote_color = 'green';
       }
 
-      // Return the detailed badge
+      // Drafting
+      var drafting_card_list = data[1];
+      var draft_text = 'Add this card to draft';
+      var draft_color = 'light-gray';
+      if (drafting_card_list.includes(card_id)) {
+        draft_text = 'In Draft';
+        draft_color = 'green';
+      }
+
       return [
+        //Vote Button
         {
           // card detail badges (those that appear on the back of cards)
           // also support callback functions so that you can open for example
           // open a popup on click
-          title: "Insomniac Votes",
+          title: "Votes",
           text: vote_text,
           color: vote_color,
           callback: function (t, opts) {
             // Update card votes data based on user's action: Vote/Unvote
-            const index = card_list.indexOf(card_id);
+            const index = voted_card_list.indexOf(card_id);
             if (index > -1) {
               t.get('card', 'shared', 'Insom_Votes', 0).then(votes => {
-                t.set('card', 'shared', 'Insom_Votes', votes-1);
+                t.set('card', 'shared', 'Insom_Votes', votes - 1);
               });
-              card_list.splice(index);
+              voted_card_list.splice(index);
             } else {
-              card_list.push(card_id);
+              voted_card_list.push(card_id);
               t.get('card', 'shared', 'Insom_Votes', 0).then(votes => {
-                t.set('card', 'shared', 'Insom_Votes', votes+1);
+                t.set('card', 'shared', 'Insom_Votes', votes + 1);
               });
             }
 
             // Add this card to the user's voted list
-            t.set('member', 'private', 'voted', card_list);
+            t.set('member', 'private', 'voted', voted_card_list);
 
-            //fetch('https://shinsur.com/trello/VoteCard?id=' + t.getContext().card, { method: 'POST' });
           },
+        },
+
+        // Add to draft button
+        {
+          title: "Drfating",
+          text: draft_text,
+          color: draft_color,
+          callback: function (t, opts) {
+            const index = drafting_card_list.indexOf(card_id);
+            if (index > -1) {
+              voted_card_list.splice(index);
+            } else {
+              voted_card_list.push(card_id);
+            }
+
+            t.set('member', 'private', 'drafting', drafting_card_list);
+
+            const getSpourtPos = t.get('board', 'shared', 'sproutPos', 8);
+            const getDraftingListId = t.get('member', 'private', 'drfating_list_id', null);
+
+            return Promise.all([getSpourtPos, getDraftingListId]).then(data => {
+              var sprout_pos = data[0];
+              var drafting_list_id = data[1];
+
+              fetch('https://shinsur.com/trello/DraftCard?'
+                + 'id=' + t.getContext().card
+                + '&pos=' + pos
+                + '&drafting_id' + drafting_list_id ? drafting_list_id : null
+                , { method: 'POST' });
+            })
+          }
         }
       ]
     })
