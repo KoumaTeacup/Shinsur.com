@@ -133,7 +133,7 @@ TrelloPowerUp.initialize({
               fetch('https://shinsur.com/trello/DraftCard?'
                 + 'id=' + card_id
                 + '&pos=' + sprout_pos
-                + '&drafting_id' + drafting_list_id
+                + '&drafting_id=' + drafting_list_id
                 , { method: 'POST' })
                 .then(draftRes => draftRes.json())
                 .then(data => {
