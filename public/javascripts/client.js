@@ -6,6 +6,7 @@ var BLACK_ROCKET_ICON = 'https://cdn.glitch.com/1b42d7fe-bda8-4af8-a6c8-eff0cea9
 var INSOMNIAC_ICON = 'https://shinsur.com/insomniac_logo.png';
 var INSOMNIAC_ICON_WHITE = 'https://shinsur.com/insomniac_logo_white.png';
 var HELP_HTML = 'https://shinsur.com/trello_help.html';
+var SETTINGS_HTML = 'https://shinsur.com/trello_settings.html';
 var INSOMNIAC_HOME = 'https://insomniac.games/';
 
 TrelloPowerUp.initialize({
@@ -41,8 +42,15 @@ TrelloPowerUp.initialize({
       })
   },
 
-  'show-settings': function (t, opts) {
-    return showWelcome;
+  'show-settings': function (t, options) {
+    // when a user clicks the gear icon by your Power-Up in the Power-Ups menu
+    // what should Trello show. We highly recommend the popup in this case as
+    // it is the least disruptive, and fits in well with the rest of Trello's UX
+    return t.popup({
+      title: 'Insomniac Power-up Settings',
+      url: SETTINGS_HTML,
+      height: 184 // we can always resize later
+    });
   },
 
   "card-detail-badges": function (t, opts) {
