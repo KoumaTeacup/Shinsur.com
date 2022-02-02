@@ -44,7 +44,7 @@ TrelloPowerUp.initialize({
     const card_id = opts.context.card;
     Promise.all([getVotedCards]).then(card_list => {
       var vote_text = "Vote";
-      var vote_color = 'light_grey'
+      var vote_color = 'light-gray'
       if (card_list.includes(card_id)) {
         vote_text = "Voted!";
         vote_color = 'green';
