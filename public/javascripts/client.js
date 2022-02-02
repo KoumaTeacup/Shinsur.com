@@ -35,7 +35,7 @@ TrelloPowerUp.initialize({
 
         return [{
           icon: INSOMNIAC_ICON_WHITE,
-          text: card_votes > 0 ? card_votes : 0,
+          text: card_votes > 0 ? card_votes : '0',
           color: member_voted.includes(card_id) ? 'green' : 'light-gray',
         }]
       })
