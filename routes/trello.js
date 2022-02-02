@@ -30,12 +30,12 @@ router.post('/AddList', function (req, res) {
   res.end();
 })
 
-router.post('/DraftCard', function (req, res) {
-  const getDraftingListId =
+router.post('/DraftCard', async function (req, res) {
+  const list_id =
     req.query.drafting_id ?
       req.query.drafting_id :
       // Create new list if we don't have one
-      fetch('https://api.trello.com/1/boards/' + WIP_Board + '/lists?'
+      await fetch('https://api.trello.com/1/boards/' + WIP_Board + '/lists?'
         + 'name=Give your sprout a COOL name...'
         + '&key=' + key
         + '&token=' + token
@@ -68,7 +68,6 @@ router.post('/DraftCard', function (req, res) {
         })
 
   // copy the current card
-  getDraftingListId.then(list_id => {
     fetch('https://api.trello.com/1/cards?'
       + 'idList=' + list_id
       + '&idCardSource=' + req.query.id
@@ -79,8 +78,6 @@ router.post('/DraftCard', function (req, res) {
 
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify({ id: list_id }));
-
-  }).catch(err => console.error(err));
 
 })
 
