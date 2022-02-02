@@ -181,6 +181,19 @@ TrelloPowerUp.initialize({
       }
     }];
   },
+
+  'list-actions': function (t) {
+    return [{
+      text: "Publish",
+      callback: function (t) {
+        t.set('member', 'private', 'drfating_list_id', null);
+        fetch('https://shinsur.com/trello/PublishDraft?'
+          + 'pos=' + sprout_pos
+          + '&drafting_id=' + drafting_list_id
+          , { method: 'POST' })
+      }
+    }];
+  }
 }, {
   appKey: '672ab4bc0f8c05ba1c73242a6e30f513',
   appName: 'Insomniac IP Garden'

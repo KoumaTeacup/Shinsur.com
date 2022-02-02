@@ -43,7 +43,6 @@ router.post('/DraftCard', async function (req, res) {
         method: 'GET'
       })
       .then(response => {
-        console.log(response.ok);
         return response.ok;
       })
   }
@@ -96,6 +95,39 @@ router.post('/DraftCard', async function (req, res) {
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify({ id: list_id }));
   }
+})
+
+router.post('/PublishDraft', async function (req, res) {
+  var valid = false;
+  var list_id = req.query.drafting_id;
+  var pos = req.query.pos;
+
+  if (req.query.drafting_id) {
+    // test if list still exists
+    valid = await fetch('https://api.trello.com/1/lists/' + list_id + '?'
+      + 'key=' + key
+      + '&token=' + token
+      , {
+        method: 'GET'
+      })
+      .then(response => {
+        return response.ok;
+      })
+  }
+
+  if (valid) {
+    if (list_id) {
+      // copy the current card
+      fetch('https://api.trello.com/1/lists/' + list_id + '?'
+        + 'pos=' + pos
+        + '&key=' + key
+        + '&token=' + token
+        , { method: 'PUT' });
+    }
+  }
+
+  res.end();
+  return;
 })
 
 module.exports = router;
