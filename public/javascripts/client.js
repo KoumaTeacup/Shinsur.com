@@ -40,9 +40,8 @@ TrelloPowerUp.initialize({
   },
 
   "card-detail-badges": function (t, opts) {
-    const getVotedCards = t.get('member', 'private', 'voted', []);
     const card_id = opts.context.card;
-    return Promise.all([getVotedCards]).then(card_list => {
+    return t.get('member', 'private', 'voted', []).then(card_list => {
       // Get Callback
       var vote_text = "Vote";
       var vote_color = 'light-gray'
@@ -69,7 +68,7 @@ TrelloPowerUp.initialize({
             }
 
             t.remove('member', 'private', 'voted');
-            t.set('member', 'private', 'voted', card_list);
+            //t.set('member', 'private', 'voted', card_list);
             //fetch('https://shinsur.com/trello/VoteCard?id=' + t.getContext().card, { method: 'POST' });
           },
         }
