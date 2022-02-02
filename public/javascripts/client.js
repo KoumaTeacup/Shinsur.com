@@ -125,15 +125,16 @@ TrelloPowerUp.initialize({
 
             const getSpourtPos = t.get('board', 'shared', 'sproutPos', 8);
             const getDraftingListId = t.get('member', 'private', 'drfating_list_id', null);
+            var card_id = opts.context.card;
 
             return Promise.all([getSpourtPos, getDraftingListId]).then(data => {
               var sprout_pos = data[0];
-              var drafting_list_id = data[1];
+              var drafting_list_id = data[1] ? data[1] : null;
 
               fetch('https://shinsur.com/trello/DraftCard?'
-                + 'id=' + t.getContext().card
+                + 'id=' + card_id
                 + '&pos=' + sprout_pos
-                + '&drafting_id' + drafting_list_id ? drafting_list_id : null
+                + '&drafting_id' + drafting_list_id
                 , { method: 'POST' });
             })
           }
