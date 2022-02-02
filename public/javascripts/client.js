@@ -132,7 +132,7 @@ TrelloPowerUp.initialize({
 
               fetch('https://shinsur.com/trello/DraftCard?'
                 + 'id=' + t.getContext().card
-                + '&pos=' + pos
+                + '&pos=' + sprout_pos
                 + '&drafting_id' + drafting_list_id ? drafting_list_id : null
                 , { method: 'POST' });
             })
