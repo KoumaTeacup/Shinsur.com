@@ -40,9 +40,8 @@ TrelloPowerUp.initialize({
   },
 
   "card-detail-badges": function (t, opts) {
-    const getVotedCards = t.get('member', 'private', 'voted', []);
     const card_id = opts.context.card;
-    Promise.all([getVotedCards]).then(card_list => {
+    t.get('member', 'private', 'voted', []).then(card_list => {
       // Get Callback
       var vote_text = "Vote";
       var vote_color = 'light-gray'
