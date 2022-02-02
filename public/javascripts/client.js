@@ -4,7 +4,7 @@ var Promise = TrelloPowerUp.Promise;
 
 var BLACK_ROCKET_ICON = 'https://cdn.glitch.com/1b42d7fe-bda8-4af8-a6c8-eff0cea9e08a%2Frocket-ship.png?1494946700421';
 var INSOMNIAC_ICON = 'https://shinsur.com/insomniac_logo.png';
-var LIKE_ICON = 'https://shinsur.com/IG_Garden_like.png';
+var INSOMNIAC_ICON_WHITE = 'https://shinsur.com/insomniac_logo_white.png';
 var HELP_HTML = 'https://shinsur.com/trello_help.html';
 var INSOMNIAC_HOME = 'https://insomniac.games/';
 
@@ -36,8 +36,8 @@ TrelloPowerUp.initialize({
         var badge_color =  'light-gray'
 
         return [{
-          icon: LIKE_ICON,
-          text: "Insomniac Votes: " + card_votes,
+          icon: INSOMNIAC_ICON_WHITE,
+          text: card_votes,
           color: member_voted.includes(card_id) ? 'green' : 'light-gray',
         }]
       })
