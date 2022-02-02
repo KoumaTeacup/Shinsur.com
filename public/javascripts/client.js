@@ -68,6 +68,7 @@ TrelloPowerUp.initialize({
               card_list.push(card_id);
             }
 
+            t.remove('member', 'private', 'voted');
             t.set('member', 'private', 'voted', card_list);
             //fetch('https://shinsur.com/trello/VoteCard?id=' + t.getContext().card, { method: 'POST' });
           },
