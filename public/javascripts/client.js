@@ -125,7 +125,6 @@ TrelloPowerUp.initialize({
 
             const getSpourtPos = t.get('board', 'shared', 'sproutPos', 8);
             const getDraftingListId = t.get('member', 'private', 'drfating_list_id', null);
-            var card_id = opts.context.card;
 
             return Promise.all([getSpourtPos, getDraftingListId]).then(data => {
               var sprout_pos = data[0];
