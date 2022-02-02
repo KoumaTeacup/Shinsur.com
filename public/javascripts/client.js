@@ -58,17 +58,17 @@ TrelloPowerUp.initialize({
           // also support callback functions so that you can open for example
           // open a popup on click
           title: "Insomniac Votes",
-          text: vote_text,
-          color: vote_color,
+          text: 'Vote',
+          color: 'green',
           callback: function (t, opts) {
-            const index = card_list.indexOf(card_id);
-            if (index > -1) {
-              card_list.splice(index);
-            } else {
-              card_list.push(card_id);
-            }
+            //const index = card_list.indexOf(card_id);
+            //if (index > -1) {
+            //  card_list.splice(index);
+            //} else {
+            //  card_list.push(card_id);
+            //}
 
-            t.set('member', 'private', 'voted', card_list);
+            //t.set('member', 'private', 'voted', card_list);
             //fetch('https://shinsur.com/trello/VoteCard?id=' + t.getContext().card, { method: 'POST' });
           },
         }
@@ -76,28 +76,28 @@ TrelloPowerUp.initialize({
     })
   },
 
-  'list-sorters': function (t) {
-    return [{
-      text: "Insomniac Votes",
-      callback: function (t, opts) {
-        // Trello will call this if the user clicks on this sort
-        // opts.cards contains all card objects in the list
-        var sortedCards = opts.cards.sort(
-          function (a, b) {
-            if (a.name > b.name) {
-              return 1;
-            } else if (b.name > a.name) {
-              return -1;
-            }
-            return 0;
-          });
+  //'list-sorters': function (t) {
+  //  return [{
+  //    text: "Insomniac Votes",
+  //    callback: function (t, opts) {
+  //      // Trello will call this if the user clicks on this sort
+  //      // opts.cards contains all card objects in the list
+  //      var sortedCards = opts.cards.sort(
+  //        function (a, b) {
+  //          if (a.name > b.name) {
+  //            return 1;
+  //          } else if (b.name > a.name) {
+  //            return -1;
+  //          }
+  //          return 0;
+  //        });
 
-        return {
-          sortedIds: sortedCards.map(function (c) { return c.id; })
-        };
-      }
-    }];
-  },
+  //      return {
+  //        sortedIds: sortedCards.map(function (c) { return c.id; })
+  //      };
+  //    }
+  //  }];
+  //},
 }, {
   appKey: '672ab4bc0f8c05ba1c73242a6e30f513',
   appName: 'Insomniac IP Garden'
