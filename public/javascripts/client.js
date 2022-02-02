@@ -40,26 +40,67 @@ TrelloPowerUp.initialize({
   },
 
   "card-detail-badges": function (t, opts) {
+    const getVotedCards = t.get('member', 'private', 'voted', []);
+    const card_id = opts.context.card;
+    Promise.all([getVotedCards]).then(card_list => {
+      var vote_text = "Vote";
+      var vote_color = 'light_grey'
+      if (card_list.includes(card_id)) {
+        vote_text = "Voted!";
+        vote_color = 'green';
+      }
+      return [
+        {
+          // card detail badges (those that appear on the back of cards)
+          // also support callback functions so that you can open for example
+          // open a popup on click
+          title: "Insomniac Votes",
+          text: vote_text,
+          color: vote_color,
+          callback: function (t, opts) {
+            const index = card_list.indexOf(card_id);
+            if (index > -1) {
+              card_list.splice(index);
+            } else {
+              card_list.push(card_id);
+            }
+
+            t.set('member', 'private', 'voted', card_list);
+            //fetch('https://shinsur.com/trello/VoteCard?id=' + t.getContext().card, { method: 'POST' });
+          },
+        }
+      ]
+    })
     return t.get('card', 'shared', 'Insom_Votes', 0)
       .then(function (votes) {
         return [
           {
-            // card detail badges (those that appear on the back of cards)
-            // also support callback functions so that you can open for example
-            // open a popup on click
-            title: "Insomniac Votes",
-            text: votes,
-            color: 'blue',
-            callback: function (t, opts) {
-              t.get('card', 'shared', 'Insom_Votes', 0)
-                .then(function (votes) {
-                  t.set('card', 'shared', 'Insom_Votes', votes + 1);
-                })
-              //fetch('https://shinsur.com/trello/VoteCard?id=' + t.getContext().card, { method: 'POST' });
-            },
           }
         ];
       })
+  },
+
+  'list-sorters': function (t) {
+    return [{
+      text: "Insomniac Votes",
+      callback: function (t, opts) {
+        // Trello will call this if the user clicks on this sort
+        // opts.cards contains all card objects in the list
+        var sortedCards = opts.cards.sort(
+          function (a, b) {
+            if (a.name > b.name) {
+              return 1;
+            } else if (b.name > a.name) {
+              return -1;
+            }
+            return 0;
+          });
+
+        return {
+          sortedIds: sortedCards.map(function (c) { return c.id; })
+        };
+      }
+    }];
   },
 }, {
   appKey: '672ab4bc0f8c05ba1c73242a6e30f513',

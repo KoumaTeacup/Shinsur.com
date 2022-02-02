@@ -2,8 +2,8 @@ var express = require('express');
 var router = express.Router();
 var fetch = require("node-fetch");
 
-var key = '672ab4bc0f8c05ba1c73242a6e30f513'
-var token = '128db3b5f02f02604ff2e9830c695e0ea7206efe6b0c717f2e7ca2b910a70572';
+var key = process.env.TRELLO_KEY;
+var token = process.env.TRELLO_TOKEN;
 var WIP_Board = '61de496a44adf01630032da0';
 
 router.post('/AddList', function (req, res) {
