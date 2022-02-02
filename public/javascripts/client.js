@@ -33,11 +33,9 @@ TrelloPowerUp.initialize({
         var card_votes = data[0];
         var member_voted = data[1];
 
-        var badge_color =  'light-gray'
-
         return [{
           icon: INSOMNIAC_ICON_WHITE,
-          text: card_votes,
+          text: card_votes > 0 ? card_votes : 0,
           color: member_voted.includes(card_id) ? 'green' : 'light-gray',
         }]
       })
@@ -72,13 +70,13 @@ TrelloPowerUp.initialize({
             const index = card_list.indexOf(card_id);
             if (index > -1) {
               t.get('card', 'shared', 'Insom_Votes', 0).then(votes => {
-                t.set('card', 'shared', 'Insom_Votes', votes--);
+                t.set('card', 'shared', 'Insom_Votes', votes-1);
               });
               card_list.splice(index);
             } else {
               card_list.push(card_id);
               t.get('card', 'shared', 'Insom_Votes', 0).then(votes => {
-                t.set('card', 'shared', 'Insom_Votes', votes++);
+                t.set('card', 'shared', 'Insom_Votes', votes+1);
               });
             }
 
