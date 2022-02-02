@@ -60,14 +60,19 @@ TrelloPowerUp.initialize({
           text: vote_text,
           color: vote_color,
           callback: function (t, opts) {
+            // Update card votes data based on user's action: Vote/Unvote
             const index = card_list.indexOf(card_id);
             if (index > -1) {
+              t.get('card', 'shared', 'Insom_Votes', 0).then(votes => votes--);
               card_list.splice(index);
             } else {
               card_list.push(card_id);
+              t.get('card', 'shared', 'Insom_Votes', 0).then(votes => votes++);
             }
 
+            // Add this card to the user's voted list
             t.set('member', 'private', 'voted', card_list);
+
             //fetch('https://shinsur.com/trello/VoteCard?id=' + t.getContext().card, { method: 'POST' });
           },
         }
