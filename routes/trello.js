@@ -45,9 +45,9 @@ router.post('/DraftCard', function (req, res) {
           headers: { 'Accept': 'application/json' }
         })
         .then(response => response.json())
-        .then(data => {
+        .then(async data => {
           // Create title card
-          fetch('https://api.trello.com/1/cards?'
+          await fetch('https://api.trello.com/1/cards?'
             + 'idList=' + data.id
             + '&idCardSource=' + WIP_Sprout_Title_Id
             + '&keepFromSource=all'
@@ -63,8 +63,8 @@ router.post('/DraftCard', function (req, res) {
                 + '&token=' + token
                 , { method: 'PUT' })
 
-              return data.id;
             })
+          return data.id;
         })
 
   // copy the current card
