@@ -43,7 +43,7 @@ router.post('/DraftCard', async function (req, res) {
         method: 'POST',
       })
       .then(response => {
-        return response.status == '200';
+        return response.ok;
       })
   }
 
