@@ -1,5 +1,7 @@
 /* global TrelloPowerUp */
 
+const { query } = require("express");
+
 var Promise = TrelloPowerUp.Promise;
 
 var BLACK_ROCKET_ICON = 'https://cdn.glitch.com/1b42d7fe-bda8-4af8-a6c8-eff0cea9e08a%2Frocket-ship.png?1494946700421';
@@ -25,12 +27,20 @@ TrelloPowerUp.initialize({
 
   // Badges
   "card-badges": function (t, opts) {
-    return t.get('card', 'shared', 'Insom_Votes', 0)
-      .then(function (votes) {
+    const getCardVotes = t.get('card', 'shared', 'Insom_Votes', 0);
+    const getMemberVoted = t.get('member', 'private', 'voted', []);
+    const card_id = opts.context.card;
+    return Promise.all([getCardVotes, getMemberVoted])
+      .then(data => {
+        var card_votes = data[0];
+        var member_voted = data[1];
+
+        var badge_color =  'light-gray'
+
         return [{
           icon: LIKE_ICON,
-          text: "Insomniac Votes: " + votes,
-          color: 'blue'
+          text: "Insomniac Votes: " + card_votes,
+          color: member_voted.includes(card_id) ? 'green' : 'light-gray',
         }]
       })
   },
@@ -64,12 +74,14 @@ TrelloPowerUp.initialize({
             const index = card_list.indexOf(card_id);
             if (index > -1) {
               t.get('card', 'shared', 'Insom_Votes', 0).then(votes => {
-                votes--
+                t.set('card', 'shared', 'Insom_Votes', votes--);
               });
               card_list.splice(index);
             } else {
               card_list.push(card_id);
-              t.get('card', 'shared', 'Insom_Votes', 0).then(votes => votes++);
+              t.get('card', 'shared', 'Insom_Votes', 0).then(votes => {
+                t.set('card', 'shared', 'Insom_Votes', votes++);
+              });
             }
 
             // Add this card to the user's voted list
