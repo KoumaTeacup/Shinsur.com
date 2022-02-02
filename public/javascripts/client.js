@@ -58,17 +58,17 @@ TrelloPowerUp.initialize({
           // also support callback functions so that you can open for example
           // open a popup on click
           title: "Insomniac Votes",
-          text: 'Vote',
-          color: 'green',
+          text: vote_text,
+          color: vote_color,
           callback: function (t, opts) {
-            //const index = card_list.indexOf(card_id);
-            //if (index > -1) {
-            //  card_list.splice(index);
-            //} else {
-            //  card_list.push(card_id);
-            //}
+            const index = card_list.indexOf(card_id);
+            if (index > -1) {
+              card_list.splice(index);
+            } else {
+              card_list.push(card_id);
+            }
 
-            //t.set('member', 'private', 'voted', card_list);
+            t.set('member', 'private', 'voted', card_list);
             //fetch('https://shinsur.com/trello/VoteCard?id=' + t.getContext().card, { method: 'POST' });
           },
         }
