@@ -102,7 +102,7 @@ TrelloPowerUp.initialize({
           promises.push(t.get(card.id, 'shared', 'Insom_Votes', 0));
         });
 
-        Promise.all[promises].then(card_votes => {
+        return Promise.all[promises].then(card_votes => {
           var card_vote_objs = [];
 
           for (var i = 0; i < card_votes.size(); ++i) {
