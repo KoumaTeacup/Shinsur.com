@@ -96,19 +96,32 @@ TrelloPowerUp.initialize({
       callback: function (t, opts) {
         // Trello will call this if the user clicks on this sort
         // opts.cards contains all card objects in the list
-        var sortedCards = opts.cards.sort(
-          function (a, b) {
-            if (a.name > b.name) {
+        var promises = [];
+        var cards = opts.cards;
+        cards.forEach(card => {
+          promises.push(t.get(card.id, 'shared', 'Insom_Votes', 0));
+        });
+
+        Promise.all[promises].then(card_votes => {
+          var card_vote_objs = [];
+
+          for (var i = 0; i < card_votes.size(); ++i) {
+            card_vote_objs.push({ id: cards[i].id, votes: card_votes[i] });
+          }
+
+          card_vote_objs.sort((a, b) => {
+            if (a.vote > b.votes) {
               return 1;
-            } else if (b.name > a.name) {
+            } else if (b.votes > a.votes) {
               return -1;
             }
             return 0;
           });
 
-        return {
-          sortedIds: sortedCards.map(function (c) { return c.id; })
-        };
+          return {
+            sortedIds: card_vote_objs.map(card => { return c.id; })
+          };
+        })
       }
     }];
   },
