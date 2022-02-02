@@ -31,43 +31,59 @@ router.post('/AddList', function (req, res) {
 })
 
 router.post('/DraftCard', async function (req, res) {
-  const list_id =
-    req.query.drafting_id ?
-      req.query.drafting_id :
-      // Create new list if we don't have one
-      await fetch('https://api.trello.com/1/boards/' + WIP_Board + '/lists?'
-        + 'name=Give your sprout a COOL name...'
-        + '&key=' + key
-        + '&token=' + token
-        + '&pos=' + req.query.pos 
-        , {
-          method: 'POST',
-          headers: { 'Accept': 'application/json' }
-        })
-        .then(response => response.json())
-        .then(async data => {
-          // Create title card
-          await fetch('https://api.trello.com/1/cards?'
-            + 'idList=' + data.id
-            + '&idCardSource=' + WIP_Sprout_Title_Id
-            + '&keepFromSource=all'
-            + '&key=' + key
-            + '&token=' + token
-            , { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-              // clear title card name
-              fetch('https://api.trello.com/1/cards/' + data.id +'?'
-                + 'name=Click Here to Draft Your Pitch...'
-                + '&key=' + key
-                + '&token=' + token
-                , { method: 'PUT' })
+  var valid = false;
+  var list_id = req.query.drafting_id;
 
-            })
-          return data.id;
-        })
+  if (req.query.drafting_id) {
+    // test if list still exists
+    valid = await fetch('https://api.trello.com/1/lists/' + req.query.drafting_id
+      + 'key=' + key
+      + '&token=' + token
+      , {
+        method: 'POST',
+      })
+      .then(response => {
+        return response.status == '200';
+      })
+  }
 
-  // copy the current card
+  if (!valid) {
+    // Create new list if we don't have one
+    list_id = await fetch('https://api.trello.com/1/boards/' + WIP_Board + '/lists?'
+      + 'name=Give your sprout a COOL name...'
+      + '&key=' + key
+      + '&token=' + token
+      + '&pos=' + req.query.pos
+      , {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' }
+      })
+      .then(response => response.json())
+      .then(async data => {
+        // Create title card
+        await fetch('https://api.trello.com/1/cards?'
+          + 'idList=' + data.id
+          + '&idCardSource=' + WIP_Sprout_Title_Id
+          + '&keepFromSource=all'
+          + '&key=' + key
+          + '&token=' + token
+          , { method: 'POST' })
+          .then(response => response.json())
+          .then(data => {
+            // clear title card name
+            fetch('https://api.trello.com/1/cards/' + data.id + '?'
+              + 'name=Click Here to Draft Your Pitch...'
+              + '&key=' + key
+              + '&token=' + token
+              , { method: 'PUT' })
+
+          })
+        return data.id;
+      })
+  }
+
+  if (list_id) {
+    // copy the current card
     fetch('https://api.trello.com/1/cards?'
       + 'idList=' + list_id
       + '&idCardSource=' + req.query.id
@@ -78,7 +94,7 @@ router.post('/DraftCard', async function (req, res) {
 
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify({ id: list_id }));
-
+  }
 })
 
 module.exports = router;
