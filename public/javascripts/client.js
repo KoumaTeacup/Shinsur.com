@@ -135,7 +135,7 @@ TrelloPowerUp.initialize({
                 + '&pos=' + sprout_pos
                 + '&drafting_id' + drafting_list_id
                 , { method: 'POST' })
-                .then(res => json())
+                .then(draftRes => draftRes.json())
                 .then(data => {
                   t.set('member', 'private', 'drfating_list_id', data.id);
                 });
