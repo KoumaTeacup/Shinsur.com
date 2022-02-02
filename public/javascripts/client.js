@@ -110,16 +110,16 @@ TrelloPowerUp.initialize({
           }
 
           card_vote_objs.sort((a, b) => {
-            if (a.vote > b.votes) {
+            if (a.vote < b.votes) {
               return 1;
-            } else if (b.votes > a.votes) {
+            } else if (b.votes < a.votes) {
               return -1;
             }
             return 0;
           });
 
           return {
-            sortedIds: card_vote_objs.map(card => { return c.id; })
+            sortedIds: card_vote_objs.map(card => { return card.id; })
           };
         })
       }
