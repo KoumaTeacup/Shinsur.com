@@ -83,17 +83,23 @@ router.post('/DraftCard', async function (req, res) {
   }
 
   if (list_id) {
+    var card_id;
+
     // copy the current card
-    fetch('https://api.trello.com/1/cards?'
+    await fetch('https://api.trello.com/1/cards?'
       + 'idList=' + list_id
       + '&idCardSource=' + req.query.id
       + '&keepFromSource=all'
       + '&key=' + key
       + '&token=' + token
-      , { method: 'POST' });
+      , { method: 'POST' })
+      .then(response => response.json())
+      .then(data => {
+        card_id = data.id;
+      });
 
     res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({ id: list_id }));
+    res.end(JSON.stringify({ list_id: list_id, card_id: card_id }));
   }
 })
 
@@ -125,6 +131,23 @@ router.post('/PublishDraft', async function (req, res) {
         , { method: 'PUT' });
     }
   }
+
+  res.end();
+  return;
+})
+
+router.post('/PropagateToParent', async function (req, res) {
+  var src = req.query.src;
+  var parent = req.query.from;
+  var clone = req.query.to;
+
+  res.end();
+  return;
+})
+
+router.post('/PropagateToClones', async function (req, res) {
+  var parent = req.query.from;
+  var clone = req.query.to;
 
   res.end();
   return;
