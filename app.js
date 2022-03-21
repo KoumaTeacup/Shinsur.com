@@ -26,7 +26,10 @@ app.use(express.static(path.join(__dirname, 'public/pdf')));
 
 // Redirect to force https
 app.use((req, res, next) => {
-  console.log(`remote address: ${req.socket.remoteAddress}`);
+  if (process.env.SHOWIP === 'true') {
+    console.log(`remote address: ${req.socket.remoteAddress}`);
+  }
+
   if (process.env.ENV === 'prod' && !req.secure) {
     res.redirect('https://' + req.headers.host + req.url);
     res.end();
