@@ -6,6 +6,7 @@ import { util } from './htmlUtil.js';
 import { Texture2D } from './texture.js';
 
 class Viewport {
+  humanityFBO;
   shadowFBO;
   gBuffer = new GBuffer();
   GaussianBlurFBO;
@@ -46,6 +47,9 @@ class Viewport {
     var shadowRes = Number(shadowResElem.value);
     this.shadowFBO = new Framebuffer(shadowRes, shadowRes);
     this.GaussianBlurFBO = new Framebuffer(this.shadowFBO.width, this.shadowFBO.height);
+    
+    // Initialize humanity fbo
+    this.humanityFBO = new Framebuffer(1920, 1080);
 
     // Initialize hatching fbo from html settings
     var hatchingResElem = document.hatchingResForm.hatchingRes;
@@ -95,6 +99,12 @@ class Viewport {
   renderToShadowMap() {
     this.shadowFBO.bindForWriting();
     gl.viewport(0, 0, this.shadowFBO.width, this.shadowFBO.height);
+    return this;
+  }
+
+  renderToHumanityFBO() {
+    this.humanityFBO.bindForWriting();
+    gl.viewport(0, 0, this.humanityFBO.width, this.humanityFBO.height);
     return this;
   }
 
@@ -184,6 +194,11 @@ class Viewport {
 
   readShadowMap() {
     this.shadowFBO.bindForReading(8, 'ShadowSampler');
+    return this;
+  }
+
+  readHumanityFBO() {
+    this.humanityFBO.bindForReading(0, 'HumanitySampler');
     return this;
   }
 

@@ -33,6 +33,9 @@
     <Content Include="public\images\default.jpg" />
     <Content Include="public\images\IzayoiLightOff.png" />
     <Content Include="public\images\IzayoiLightOn.png" />
+    <Content Include="public\javascripts\humanity.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="public\mesh\bowsette.bin" />
     <Content Include="public\mesh\bowsette.gltf" />
     <Content Include="public\mesh\cube.bin" />
@@ -64,6 +67,10 @@
     <Content Include="shsrc\hatchingDebug.vert" />
     <Content Include="shsrc\hatchingPrepare.frag" />
     <Content Include="shsrc\hatchingPrepare.vert" />
+    <Content Include="shsrc\humanity.frag" />
+    <Content Include="shsrc\humanity.vert" />
+    <Content Include="shsrc\humanityOutput.frag" />
+    <Content Include="shsrc\humanityOutput.vert" />
     <Content Include="shsrc\normalView.frag" />
     <Content Include="shsrc\normalView.vert" />
     <Content Include="shsrc\PCFFilter.frag" />
@@ -75,6 +82,7 @@
     <Content Include="shsrc\shadow.frag" />
     <Content Include="shsrc\shadow.vert" />
     <Content Include="views\Default.html" />
+    <Content Include="views\Humanity.html" />
     <Content Include="views\Logo.html">
       <SubType>Code</SubType>
     </Content>

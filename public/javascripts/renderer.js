@@ -32,6 +32,9 @@ class Renderer {
   normalViewProgram = new Program('normalView');
   curvatureViewProgram = new Program('curvatureView');
 
+  humanityProgram = new Program('humanity');
+  humanityOutputProgram = new Program('humanityOutput');
+
   // Meshes ---------------------------------
   floor = new Mesh('floor');
   //bowsette = new Mesh('bowsette');
@@ -45,6 +48,7 @@ class Renderer {
   screenPlane = new RenderPlane();
   debugPlane = new RenderPlane(640, 360);
   squarePlane = new RenderPlane(720, 720);
+  humanityCanvas = new RenderPlane(1920, 1080);
 
   constructor() {
     this.DrawMeshes = [this.test, this.floor];
